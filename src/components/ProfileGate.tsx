@@ -94,10 +94,10 @@ export default function ProfileGate({ children, compact = false }: Props) {
 
   if (!isConnected) {
     return (
-      <div className="temple-card mx-auto flex max-w-xl flex-col items-center rounded-lg px-6 py-12 text-center">
-        <Sparkles className="mb-3 h-8 w-8 text-[var(--temple-gold)]" />
-        <h2 className="text-xl font-semibold">Connect wallet to enter the temple</h2>
-        <p className="mt-2 max-w-sm text-sm text-[var(--temple-muted)]">Your profile, check-ins, reviews, and PTS all live behind your Arc Testnet wallet.</p>
+      <div className="temple-card spark-field mx-auto flex max-w-xl flex-col items-center rounded-lg px-6 py-12 text-center">
+        <div className="flame-buddy mb-5 h-20 w-16" />
+        <h2 className="arcade-title text-2xl font-black">Connect wallet to wake the flame</h2>
+        <p className="mt-2 max-w-sm text-sm leading-6 text-[var(--temple-muted)]">Your profile, check-ins, reviews, and PTS all live behind your Arc Testnet wallet.</p>
       </div>
     )
   }
@@ -116,14 +116,15 @@ export default function ProfileGate({ children, compact = false }: Props) {
 
   return (
     <div className={`mx-auto grid max-w-5xl gap-5 px-4 py-8 ${compact ? '' : 'lg:grid-cols-[1.05fr_0.95fr]'}`}>
-      <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} className="temple-card garden-card rounded-lg p-5 sm:p-7">
+      <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} className="temple-card garden-card spark-field rounded-lg p-5 sm:p-7">
         <div className="mb-5 flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-lg border border-[var(--temple-border)] bg-[var(--temple-mint-soft)]">
+          <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-[var(--temple-border)] bg-[var(--temple-mint-soft)]">
             <UserRound className="h-5 w-5 text-[var(--temple-emerald)]" />
           </div>
           <div>
-            <h1 className="text-2xl font-semibold">Set up your Rialo profile</h1>
-            <p className="text-sm text-[var(--temple-muted)]">Make your on-chain identity feel like yours.</p>
+            <p className="text-xs font-black uppercase tracking-wider text-[var(--temple-cyan)]">Player card</p>
+            <h1 className="text-2xl font-black">Set up your Rialo profile</h1>
+            <p className="text-sm text-[var(--temple-muted)]">Name the wallet. Light the tiny ritual.</p>
           </div>
         </div>
 
@@ -151,7 +152,7 @@ export default function ProfileGate({ children, compact = false }: Props) {
             </div>
           )}
 
-          <button type="button" onClick={submitProfile} disabled={isSaving} className="temple-button inline-flex w-full items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-bold disabled:cursor-not-allowed disabled:opacity-60">
+          <button type="button" onClick={submitProfile} disabled={isSaving} className="temple-button inline-flex w-full items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-black disabled:cursor-not-allowed disabled:opacity-60">
             {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
             {isConfirming ? 'Confirming on Arc' : isPending ? 'Waiting for wallet' : 'Seal profile on-chain'}
           </button>
@@ -160,12 +161,12 @@ export default function ProfileGate({ children, compact = false }: Props) {
 
       {!compact && (
         <div className="temple-card garden-card rounded-lg p-5">
-          <p className="text-xs font-semibold uppercase tracking-wider text-[var(--temple-gold)]">Profile preview</p>
-          <div className="mt-6 rounded-lg border border-[var(--temple-border)] bg-white/[0.035] p-4">
+          <p className="text-xs font-black uppercase tracking-wider text-[var(--temple-gold)]">Profile preview</p>
+          <div className="pixel-panel mt-6 rounded-lg border border-[var(--temple-border)] p-4">
             <div className="flex items-center gap-3">
               {previewAvatar ? <img src={previewAvatar} alt="" className="h-14 w-14 rounded-lg object-cover" /> : <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-[var(--temple-emerald)]/15 text-xl">R</div>}
               <div>
-                <h3 className="font-semibold">{name || 'Your Rialo name'}</h3>
+                <h3 className="font-black">{name || 'Your Rialo name'}</h3>
                 <p className="text-sm text-[var(--temple-muted)]">@{previewHandle || 'xhandle'}</p>
               </div>
             </div>

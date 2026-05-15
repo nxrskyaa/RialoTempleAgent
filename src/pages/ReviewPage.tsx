@@ -113,19 +113,19 @@ function ReviewInner({ reviewCount, refetchProfile }: { reviewCount: number; ref
 
   return (
     <div className="mx-auto grid max-w-7xl gap-5 px-4 py-8 sm:px-6 lg:grid-cols-[0.92fr_1.08fr]">
-      <section className="temple-card rounded-lg p-5 sm:p-6">
+      <section className="temple-card spark-field rounded-lg p-5 sm:p-6">
         <div className="mb-5 flex items-start justify-between gap-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-[var(--temple-gold)]">Review altar</p>
-            <h1 className="mt-2 text-3xl font-black tracking-normal">Write on-chain taste notes</h1>
+            <p className="text-xs font-black uppercase tracking-wider text-[var(--temple-cyan)]">Review booth</p>
+            <h1 className="arcade-title mt-2 text-3xl font-black tracking-normal">Stamp a taste note</h1>
             <p className="mt-2 text-sm text-[var(--temple-muted)]">Food and film reviews cost 1 native USDC each. Your profile has {reviewCount} reviews.</p>
           </div>
-          <div className="hidden h-14 w-14 items-center justify-center rounded-lg border border-[var(--temple-border)] bg-black/20 sm:flex">
+          <div className="machine-screen hidden h-14 w-14 items-center justify-center rounded-lg border border-[var(--temple-border)] sm:flex">
             {kind === 'food' ? <Utensils className="h-6 w-6 text-[var(--temple-emerald)]" /> : <Clapperboard className="h-6 w-6 text-[var(--temple-gold)]" />}
           </div>
         </div>
 
-        <div className="mb-5 grid grid-cols-2 gap-2 rounded-lg border border-[var(--temple-border)] bg-black/20 p-1">
+        <div className="pixel-panel mb-5 grid grid-cols-2 gap-2 rounded-lg border border-[var(--temple-border)] p-1">
           {[
             { id: 'food' as const, label: 'Food', Icon: Utensils },
             { id: 'film' as const, label: 'Film', Icon: Clapperboard },
@@ -175,10 +175,10 @@ function ReviewInner({ reviewCount, refetchProfile }: { reviewCount: number; ref
       <section className="temple-card rounded-lg p-5 sm:p-6">
         <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-[var(--temple-soft)]">Browse temple wall</p>
-            <h2 className="text-2xl font-semibold">Latest reviews</h2>
+            <p className="text-xs font-black uppercase tracking-wider text-[var(--temple-soft)]">Browse the wall</p>
+            <h2 className="text-2xl font-black">Latest reviews</h2>
           </div>
-          <div className="grid grid-cols-3 rounded-lg border border-[var(--temple-border)] bg-black/20 p-1 text-xs font-semibold">
+          <div className="pixel-panel grid grid-cols-3 rounded-lg border border-[var(--temple-border)] p-1 text-xs font-semibold">
             {(['all', 'food', 'film'] as const).map((item) => (
               <button key={item} onClick={() => setTab(item)} className={`rounded-md px-3 py-2 capitalize ${tab === item ? 'temple-button' : 'text-[var(--temple-muted)]'}`}>{item}</button>
             ))}
@@ -188,7 +188,7 @@ function ReviewInner({ reviewCount, refetchProfile }: { reviewCount: number; ref
         {isLoading ? (
           <div className="flex items-center justify-center py-16 text-sm text-[var(--temple-muted)]"><Loader2 className="mr-2 h-4 w-4 animate-spin text-[var(--temple-emerald)]" /> Loading reviews</div>
         ) : reviews.length === 0 ? (
-          <div className="rounded-lg border border-[var(--temple-border)] bg-black/20 py-16 text-center">
+          <div className="pixel-panel rounded-lg border border-[var(--temple-border)] py-16 text-center">
             <Star className="mx-auto mb-3 h-8 w-8 text-[var(--temple-soft)]" />
             <p className="text-sm text-[var(--temple-muted)]">No reviews in this category yet.</p>
           </div>
@@ -215,7 +215,7 @@ function ReviewCard({ review, index }: { review: ReviewData; index: number }) {
   const isFood = review.category === 0
   const Icon = isFood ? Utensils : Clapperboard
   return (
-    <motion.article initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.025 }} className="rounded-lg border border-[var(--temple-border)] bg-black/20 p-4">
+    <motion.article initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.025 }} className="pixel-panel rounded-lg border border-[var(--temple-border)] p-4 transition hover:-translate-y-0.5 hover:border-[rgba(161,255,211,0.3)]">
       <div className="flex gap-4">
         {isFood && review.imageUrl ? <img src={review.imageUrl} alt="" className="h-24 w-24 rounded-lg object-cover" onError={(event) => { event.currentTarget.style.display = 'none' }} /> : (
           <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-lg bg-white/[0.035]">
@@ -224,7 +224,7 @@ function ReviewCard({ review, index }: { review: ReviewData; index: number }) {
         )}
         <div className="min-w-0 flex-1">
           <div className="mb-2 flex items-center justify-between gap-3">
-            <span className="inline-flex items-center gap-1.5 rounded-md bg-white/[0.04] px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-[var(--temple-gold)]">
+            <span className="inline-flex items-center gap-1.5 rounded-md bg-white/[0.06] px-2 py-1 text-[10px] font-black uppercase tracking-wider text-[var(--temple-gold)]">
               <Icon className="h-3 w-3" /> {isFood ? 'Food' : 'Film'}
             </span>
             <span className="flex gap-0.5">{[1, 2, 3, 4, 5].map((value) => <Star key={value} className="h-3.5 w-3.5" fill={value <= review.rating ? '#f4c95d' : 'none'} style={{ color: value <= review.rating ? '#f4c95d' : 'var(--temple-border)' }} />)}</span>
