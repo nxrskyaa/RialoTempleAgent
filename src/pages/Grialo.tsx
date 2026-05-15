@@ -77,25 +77,35 @@ function GrialoInner({ profileName, stats, refetchProfile }: { profileName: stri
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-      <div className="grid gap-5 lg:grid-cols-[1fr_0.78fr]">
-        <section className="temple-card overflow-hidden rounded-lg p-5 sm:p-7">
-          <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
-            <div>
+      <div className="grid gap-5 lg:grid-cols-[1fr_0.72fr]">
+        <section className="temple-rune-panel temple-card overflow-hidden rounded-lg p-5 sm:p-7">
+          <div className="relative z-10 flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+            <div className="max-w-2xl">
               <p className="text-xs font-semibold uppercase tracking-wider text-[var(--temple-gold)]">Grialo daily ritual</p>
               <h1 className="mt-2 text-4xl font-black tracking-normal sm:text-5xl">Keep the flame alive</h1>
               <p className="mt-3 max-w-xl text-sm leading-6 text-[var(--temple-muted)]">Welcome, {profileName}. Sign one on-chain transaction every 24 hours and pay 1 native USDC to build your streak.</p>
             </div>
-            <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-lg border border-[var(--temple-border)] bg-black/20" style={{ animation: 'temple-float 3s ease-in-out infinite' }}>
-              <Flame className="h-10 w-10" style={{ color: tier.color }} />
+            <div className="flex shrink-0 items-center gap-3 rounded-lg border border-[var(--temple-border)] bg-black/20 px-4 py-3">
+              <Flame className="h-5 w-5" style={{ color: tier.color }} />
+              <div>
+                <p className="text-sm font-semibold">{tier.name}</p>
+                <p className="text-xs text-[var(--temple-muted)]">+{nextPts} next</p>
+              </div>
             </div>
           </div>
 
-          <div className="mt-8 grid gap-4 sm:grid-cols-[0.9fr_1.1fr]">
-            <div className="rounded-lg border border-[var(--temple-border)] bg-black/20 p-5 text-center">
-              <p className="text-xs font-semibold uppercase tracking-wider text-[var(--temple-soft)]">Current streak</p>
-              <div className="mt-4 text-8xl font-black leading-none" style={{ color: tier.color }}>{stats.currentStreak}</div>
-              <p className="mt-2 text-sm font-semibold">{tier.name}</p>
-              <p className="text-xs text-[var(--temple-muted)]">{tier.range} / next check-in +{nextPts} PTS</p>
+          <div className="relative z-10 mt-8 grid gap-4 md:grid-cols-[0.95fr_1.05fr]">
+            <div className="relative flex min-h-[340px] items-center justify-center rounded-lg border border-[var(--temple-border)] bg-black/20 p-5 text-center">
+              <div className="temple-orbit absolute h-64 w-64 rounded-full p-[1px]">
+                <div className="h-full w-full rounded-full bg-[#090b0a]" />
+              </div>
+              <div className="absolute h-44 w-44 rounded-full border border-[var(--temple-border)] bg-black/35" />
+              <div className="relative z-10">
+                <p className="text-xs font-semibold uppercase tracking-wider text-[var(--temple-soft)]">Current streak</p>
+                <div className="mt-4 text-8xl font-black leading-none" style={{ color: tier.color }}>{stats.currentStreak}</div>
+                <p className="mt-2 text-sm font-semibold">{tier.name}</p>
+                <p className="text-xs text-[var(--temple-muted)]">{tier.range}</p>
+              </div>
             </div>
 
             <div className="flex flex-col justify-between rounded-lg border border-[var(--temple-border)] bg-white/[0.035] p-5">

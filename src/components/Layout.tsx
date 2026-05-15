@@ -5,7 +5,7 @@ export default function Layout() {
   return (
     <div className="temple-shell min-h-screen text-[var(--temple-text)]">
       <Navbar />
-      <main className="pt-16">
+      <main className="relative z-10 pt-[72px]">
         <Outlet />
       </main>
     </div>

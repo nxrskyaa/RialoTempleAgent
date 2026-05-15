@@ -21,7 +21,12 @@ export default function ProfileGate({ children, compact = false }: Props) {
     address: RIALO_TEMPLE_ADDRESS,
     abi: RIALO_TEMPLE_ABI,
     functionName: 'getMyProfile',
-    query: { enabled: isConnected, refetchInterval: 6000 },
+    query: {
+      enabled: isConnected,
+      staleTime: 60_000,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: true,
+    },
   })
 
   const { profile, stats } = useMemo(() => parseProfileResult(data), [data])
