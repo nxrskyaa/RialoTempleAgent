@@ -1,10 +1,21 @@
-import { Routes, Route } from 'react-router'
-import Home from './pages/Home'
+import { Routes, Route } from 'react-router-dom'
+import Layout from './components/Layout'
+import Landing from './pages/Landing'
+import ReviewPage from './pages/ReviewPage'
+import Profile from './pages/Profile'
+import Grialo from './pages/Grialo'
+import Leaderboard from './pages/Leaderboard'
 
 export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
+      <Route element={<Layout />}>
+        <Route path="/" element={<Landing />} />
+        <Route path="/review" element={<ReviewPage />} />
+        <Route path="/grialo" element={<Grialo />} />
+        <Route path="/leaderboard" element={<Leaderboard />} />
+        <Route path="/profile" element={<Profile />} />
+      </Route>
     </Routes>
   )
 }

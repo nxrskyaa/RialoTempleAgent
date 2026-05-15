@@ -4,72 +4,97 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 240 5.9% 10%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 240 5.9% 10%;
-    --radius: 0.625rem;
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --temple-bg: #070908;
+    --temple-panel: rgba(13, 18, 15, 0.84);
+    --temple-panel-strong: #101611;
+    --temple-border: rgba(229, 231, 199, 0.11);
+    --temple-text: #f8f6e9;
+    --temple-muted: #aeb7a2;
+    --temple-soft: #6f796b;
+    --temple-emerald: #32d583;
+    --temple-gold: #f4c95d;
+    --temple-violet: #a78bfa;
+    --temple-red: #fb7185;
+    --radius: 0.5rem;
   }
 
-  .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 240 5.9% 10%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 240 4.9% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+  html, body, #root {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background:
+      radial-gradient(circle at 18% 8%, rgba(50, 213, 131, 0.12), transparent 26rem),
+      radial-gradient(circle at 86% 14%, rgba(244, 201, 93, 0.11), transparent 22rem),
+      linear-gradient(145deg, #070908 0%, #0c100d 48%, #080908 100%);
+    color: var(--temple-text);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background: rgba(50, 213, 131, 0.25);
+    color: var(--temple-text);
+  }
+
+  ::-webkit-scrollbar {
+    width: 5px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(244, 201, 93, 0.2);
+    border-radius: 10px;
   }
 }
 
-@layer base {
-  * {
-    @apply border-border;
+@layer components {
+  .temple-shell {
+    min-height: 100vh;
+    overflow-x: hidden;
+    background:
+      linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+    background-size: 72px 72px;
   }
-  body {
-    @apply bg-background text-foreground;
+
+  .temple-card {
+    border: 1px solid var(--temple-border);
+    background: var(--temple-panel);
+    box-shadow: 0 20px 70px rgba(0, 0, 0, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(18px);
   }
+
+  .temple-button {
+    border: 1px solid rgba(244, 201, 93, 0.25);
+    background: linear-gradient(135deg, #32d583 0%, #f4c95d 100%);
+    color: #071009;
+    box-shadow: 0 12px 34px rgba(50, 213, 131, 0.18);
+  }
+
+  .temple-button-secondary {
+    border: 1px solid var(--temple-border);
+    background: rgba(255, 255, 255, 0.035);
+    color: var(--temple-text);
+  }
+
+  .temple-input {
+    border: 1px solid var(--temple-border);
+    background: rgba(4, 7, 5, 0.74);
+    color: var(--temple-text);
+    outline: none;
+  }
+
+  .temple-input:focus {
+    border-color: rgba(50, 213, 131, 0.5);
+    box-shadow: 0 0 0 3px rgba(50, 213, 131, 0.1);
+  }
+}
+
+@keyframes temple-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes temple-pulse {
+  0%, 100% { opacity: 0.65; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.04); }
 }
