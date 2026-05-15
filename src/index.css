@@ -219,6 +219,19 @@
     box-shadow: 0 22px 54px rgba(84, 244, 155, 0.24), inset -12px -16px 0 rgba(0, 0, 0, 0.12);
   }
 
+  .flame-buddy::before {
+    content: '';
+    position: absolute;
+    left: 26%;
+    top: 50%;
+    width: 12%;
+    height: 8%;
+    border-radius: 999px;
+    background: rgba(255, 248, 232, 0.74);
+    box-shadow: 25px 0 0 rgba(255, 248, 232, 0.74);
+    animation: temple-blink 4.2s infinite;
+  }
+
   .flame-buddy::after {
     content: '';
     position: absolute;
@@ -255,6 +268,141 @@
     background-position: 12px 18px, 44px 50px, 74px 22px;
     background-size: 92px 78px, 112px 90px, 128px 104px;
   }
+
+  .interactive-machine {
+    isolation: isolate;
+  }
+
+  .interactive-machine::before {
+    content: '';
+    position: absolute;
+    inset: -40%;
+    background:
+      radial-gradient(circle at 30% 30%, rgba(100, 244, 255, 0.14), transparent 16rem),
+      radial-gradient(circle at 72% 55%, rgba(255, 216, 90, 0.12), transparent 18rem);
+    animation: slow-drift 8s ease-in-out infinite alternate;
+    pointer-events: none;
+  }
+
+  .spin-orbit {
+    animation: orbit-spin 9s linear infinite;
+  }
+
+  .critter-screen {
+    overflow: visible;
+  }
+
+  .speech-pop {
+    border: 1px solid rgba(255, 216, 90, 0.4);
+    background: #fff1a8;
+    color: #071014;
+    box-shadow: 0 10px 0 rgba(0, 0, 0, 0.18);
+    transform: rotate(4deg);
+  }
+
+  .speech-pop::before {
+    content: '';
+    position: absolute;
+    bottom: -7px;
+    left: 16px;
+    width: 14px;
+    height: 14px;
+    background: #fff1a8;
+    border-bottom: 1px solid rgba(255, 216, 90, 0.4);
+    border-right: 1px solid rgba(255, 216, 90, 0.4);
+    transform: rotate(45deg);
+  }
+
+  .action-tile {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .action-tile::after {
+    content: '';
+    position: absolute;
+    inset: auto -20% -60% -20%;
+    height: 70%;
+    background: radial-gradient(circle, rgba(84, 244, 155, 0.18), transparent 60%);
+    opacity: 0;
+    transition: opacity 180ms ease, transform 180ms ease;
+  }
+
+  .action-tile:hover::after,
+  .action-tile:focus-visible::after {
+    opacity: 1;
+    transform: translateY(-12%);
+  }
+
+  .floating-sprinkle {
+    position: absolute;
+    z-index: 0;
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    pointer-events: none;
+    opacity: 0.78;
+    box-shadow: 0 0 24px currentColor;
+  }
+
+  .sprinkle-one {
+    right: 28%;
+    top: 12%;
+    color: var(--temple-gold);
+    background: var(--temple-gold);
+    animation: sprinkle-hop 4s ease-in-out infinite;
+  }
+
+  .sprinkle-two {
+    right: 9%;
+    top: 58%;
+    color: var(--temple-coral);
+    background: var(--temple-coral);
+    animation: sprinkle-hop 5.2s ease-in-out infinite 0.4s;
+  }
+
+  .sprinkle-three {
+    left: 45%;
+    bottom: 16%;
+    color: var(--temple-cyan);
+    background: var(--temple-cyan);
+    animation: sprinkle-hop 4.7s ease-in-out infinite 0.9s;
+  }
+
+  .cursor-buddy {
+    filter: drop-shadow(0 16px 26px rgba(0, 0, 0, 0.28));
+    transition: opacity 180ms ease;
+  }
+
+  .cursor-buddy .flame-buddy {
+    animation: cursor-bob 1.4s ease-in-out infinite;
+  }
+
+  .cursor-buddy-shadow {
+    position: absolute;
+    left: 8px;
+    top: 52px;
+    width: 32px;
+    height: 9px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.38);
+    filter: blur(3px);
+  }
+
+  .cursor-buddy-tag {
+    position: absolute;
+    left: 34px;
+    top: -12px;
+    border: 1px solid rgba(255, 216, 90, 0.34);
+    border-radius: 7px;
+    background: rgba(5, 10, 12, 0.86);
+    color: var(--temple-gold);
+    padding: 3px 7px;
+    font-size: 10px;
+    font-weight: 900;
+    line-height: 1;
+    transform: rotate(6deg);
+  }
 }
 
 @keyframes temple-float {
@@ -265,4 +413,38 @@
 @keyframes temple-pulse {
   0%, 100% { opacity: 0.65; transform: scale(1); }
   50% { opacity: 1; transform: scale(1.04); }
+}
+
+@keyframes temple-blink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.12); }
+}
+
+@keyframes orbit-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes slow-drift {
+  0% { transform: translate3d(-2%, -1%, 0) rotate(0deg); }
+  100% { transform: translate3d(2%, 1%, 0) rotate(5deg); }
+}
+
+@keyframes sprinkle-hop {
+  0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.62; }
+  45% { transform: translateY(-18px) rotate(18deg); opacity: 1; }
+}
+
+@keyframes cursor-bob {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-5px) scale(1.04); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spin-orbit,
+  .interactive-machine::before,
+  .floating-sprinkle,
+  .cursor-buddy .flame-buddy,
+  .flame-buddy::before {
+    animation: none;
+  }
 }
