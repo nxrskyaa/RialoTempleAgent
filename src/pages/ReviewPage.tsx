@@ -1,10 +1,10 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import { motion } from 'framer-motion'
 import { Clapperboard, ExternalLink, ImageIcon, Loader2, Send, Star, Utensils } from 'lucide-react'
-import { useReadContract, useWriteContract } from 'wagmi'
+import { useReadContract, useWaitForTransactionReceipt, useWriteContract } from 'wagmi'
 import ProfileGate from '@/components/ProfileGate'
-import { RIALO_TEMPLE_ABI, RIALO_TEMPLE_ADDRESS } from '@/config/contracts'
+import { ARC_CHAIN, RIALO_TEMPLE_ABI, RIALO_TEMPLE_ADDRESS } from '@/config/contracts'
 import { ACTION_FEE, fmtAddress, parseReviews, REVIEW_PAGE_SIZE, type ReviewData } from '@/lib/rialo'
 
 type Tab = 'all' | 'food' | 'film'
@@ -48,24 +48,39 @@ function ReviewInner({ reviewCount, refetchProfile }: { reviewCount: number; ref
 
   const reviews = useMemo(() => parseReviews(data), [data])
 
-  const { writeContract, isPending } = useWriteContract({
+  const { data: reviewTxHash, writeContract, isPending, reset } = useWriteContract({
     mutation: {
-      onSuccess: () => {
-        setMessage('Review submitted on-chain.')
-        setTitle('')
-        setOriginOrImdb('')
-        setImageUrl('')
-        setRating(0)
-        setReviewText('')
-        setTimeout(() => {
-          refetch()
-          refetchProfile()
-          setMessage('')
-        }, 1600)
-      },
       onError: (error) => setMessage(error.message.split('\n')[0] || 'Review transaction failed.'),
     },
   })
+
+  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
+    hash: reviewTxHash,
+    query: {
+      enabled: Boolean(reviewTxHash),
+      refetchOnWindowFocus: false,
+    },
+  })
+
+  useEffect(() => {
+    if (!reviewTxHash) return
+    setMessage(isConfirming ? 'Review sent. Waiting for Arc confirmation...' : 'Review sent.')
+  }, [isConfirming, reviewTxHash])
+
+  useEffect(() => {
+    if (!isConfirmed) return
+    setMessage('Review submitted on-chain.')
+    setTitle('')
+    setOriginOrImdb('')
+    setImageUrl('')
+    setRating(0)
+    setReviewText('')
+    void refetch()
+    refetchProfile()
+    reset()
+    const clear = window.setTimeout(() => setMessage(''), 1800)
+    return () => window.clearTimeout(clear)
+  }, [isConfirmed, refetch, refetchProfile, reset])
 
   function submitReview() {
     if (!title.trim() || rating < 1) {
@@ -73,10 +88,12 @@ function ReviewInner({ reviewCount, refetchProfile }: { reviewCount: number; ref
       return
     }
 
+    setMessage('Open your wallet and confirm the review transaction.')
     if (kind === 'food') {
       writeContract({
         address: RIALO_TEMPLE_ADDRESS,
         abi: RIALO_TEMPLE_ABI,
+        chainId: ARC_CHAIN.id,
         functionName: 'submitFoodReview',
         args: [title.trim(), originOrImdb.trim(), imageUrl.trim(), rating, reviewText.trim()],
         value: ACTION_FEE,
@@ -87,6 +104,7 @@ function ReviewInner({ reviewCount, refetchProfile }: { reviewCount: number; ref
     writeContract({
       address: RIALO_TEMPLE_ADDRESS,
       abi: RIALO_TEMPLE_ABI,
+      chainId: ARC_CHAIN.id,
       functionName: 'submitFilmReview',
       args: [title.trim(), originOrImdb.trim(), rating, reviewText.trim()],
       value: ACTION_FEE,
@@ -147,9 +165,9 @@ function ReviewInner({ reviewCount, refetchProfile }: { reviewCount: number; ref
           </Field>
 
           {message && <p className="text-sm text-[var(--temple-gold)]">{message}</p>}
-          <button onClick={submitReview} disabled={isPending} className="temple-button inline-flex w-full items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-bold disabled:opacity-55">
-            {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-            Submit review / 1 USDC
+          <button onClick={submitReview} disabled={isPending || isConfirming} className="temple-button inline-flex w-full items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-bold disabled:cursor-not-allowed disabled:opacity-55">
+            {isPending || isConfirming ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+            {isConfirming ? 'Confirming on Arc' : isPending ? 'Waiting for wallet' : 'Submit review / 1 USDC'}
           </button>
         </div>
       </section>

@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Check, Clock, Flame, Loader2, Sparkles, Trophy } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { useAccount, useReadContract, useWriteContract } from 'wagmi'
+import { useAccount, useReadContract, useWaitForTransactionReceipt, useWriteContract } from 'wagmi'
 import ProfileGate from '@/components/ProfileGate'
-import { RIALO_TEMPLE_ABI, RIALO_TEMPLE_ADDRESS } from '@/config/contracts'
+import { ARC_CHAIN, RIALO_TEMPLE_ABI, RIALO_TEMPLE_ADDRESS } from '@/config/contracts'
 import { ACTION_FEE, fmtTime, getTier, ptsForStreak, TIERS } from '@/lib/rialo'
 
 export default function Grialo() {
@@ -49,27 +49,43 @@ function GrialoInner({ profileName, stats, refetchProfile }: { profileName: stri
     }
   }, [timeData])
 
-  const { writeContract, isPending } = useWriteContract({
+  const { data: checkInTxHash, writeContract, isPending, reset } = useWriteContract({
     mutation: {
-      onSuccess: () => {
-        setSuccess(true)
-        setTimeout(() => {
-          refetchProfile()
-          refetchCan()
-          refetchTime()
-          setSuccess(false)
-        }, 1800)
-      },
+      onError: () => setSuccess(false),
     },
   })
 
+  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
+    hash: checkInTxHash,
+    query: {
+      enabled: Boolean(checkInTxHash),
+      refetchOnWindowFocus: false,
+    },
+  })
+
+  useEffect(() => {
+    if (!isConfirmed) return
+    void refetchProfile()
+    void refetchCan()
+    void refetchTime()
+    reset()
+    const show = window.setTimeout(() => setSuccess(true), 0)
+    const hide = window.setTimeout(() => setSuccess(false), 1800)
+    return () => {
+      window.clearTimeout(show)
+      window.clearTimeout(hide)
+    }
+  }, [isConfirmed, refetchCan, refetchProfile, refetchTime, reset])
+
   const canCheckIn = Boolean(canData) && cooldown === 0
+  const isSaving = isPending || isConfirming
 
   function checkIn() {
-    if (!canCheckIn || isPending) return
+    if (!canCheckIn || isSaving) return
     writeContract({
       address: RIALO_TEMPLE_ADDRESS,
       abi: RIALO_TEMPLE_ABI,
+      chainId: ARC_CHAIN.id,
       functionName: 'checkIn',
       value: ACTION_FEE,
     })
@@ -121,9 +137,9 @@ function GrialoInner({ profileName, stats, refetchProfile }: { profileName: stri
                     <p className="text-xs font-semibold uppercase tracking-wider text-[var(--temple-soft)]">Transaction</p>
                     <h2 className="mt-2 text-2xl font-semibold">1 native USDC</h2>
                     <p className="mt-2 text-sm leading-6 text-[var(--temple-muted)]">Arc uses USDC as the native gas token. This action sends exactly 1 USDC with the check-in transaction.</p>
-                    <button onClick={checkIn} disabled={!canCheckIn || isPending} className="temple-button mt-6 inline-flex w-full items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-bold disabled:cursor-not-allowed disabled:opacity-45">
-                      {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : canCheckIn ? <Sparkles className="h-4 w-4" /> : <Clock className="h-4 w-4" />}
-                      {isPending ? 'Signing ritual' : canCheckIn ? `Check in (+${nextPts} PTS)` : cooldown > 0 ? fmtTime(cooldown) : 'Come back tomorrow'}
+                    <button onClick={checkIn} disabled={!canCheckIn || isSaving} className="temple-button mt-6 inline-flex w-full items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-bold disabled:cursor-not-allowed disabled:opacity-45">
+                      {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : canCheckIn ? <Sparkles className="h-4 w-4" /> : <Clock className="h-4 w-4" />}
+                      {isConfirming ? 'Confirming on Arc' : isPending ? 'Waiting for wallet' : canCheckIn ? `Check in (+${nextPts} PTS)` : cooldown > 0 ? fmtTime(cooldown) : 'Come back tomorrow'}
                     </button>
                   </motion.div>
                 )}

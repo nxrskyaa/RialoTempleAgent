@@ -10,7 +10,7 @@ export default function Landing() {
     address: RIALO_TEMPLE_ADDRESS,
     abi: RIALO_TEMPLE_ABI,
     functionName: 'getTotals',
-    query: { refetchInterval: 8000 },
+    query: { staleTime: 60_000, refetchOnWindowFocus: false },
   })
   const totals = parseTotals(data)
 
@@ -27,14 +27,14 @@ export default function Landing() {
                   <p className="text-xs text-[var(--temple-muted)]">Arc Testnet / native USDC</p>
                 </div>
               </div>
-              <div className="hidden rounded-lg border border-[var(--temple-border)] bg-black/20 px-3 py-2 text-xs font-semibold text-[var(--temple-gold)] sm:block">1 USDC per ritual</div>
+              <div className="hidden rounded-lg border border-[var(--temple-border)] bg-white/[0.055] px-3 py-2 text-xs font-semibold text-[var(--temple-gold)] sm:block">1 USDC per ritual</div>
             </div>
 
             <h1 className="max-w-xl text-5xl font-black leading-[0.92] tracking-normal sm:text-7xl">
-              On-chain streaks with a review culture.
+              Streaks, reviews, and tiny rituals.
             </h1>
             <p className="mt-6 max-w-lg text-base leading-7 text-[var(--temple-muted)]">
-              Grialo check-ins, food notes, film reviews, PTS, and leaderboard identity in one contract-backed temple.
+              Keep your Grialo flame, collect PTS, and leave food or film notes that live with your wallet.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link to="/grialo" className="temple-button inline-flex items-center gap-2 rounded-lg px-5 py-3 text-sm font-bold">
@@ -52,7 +52,7 @@ export default function Landing() {
               ['Reviews', totals.totalReviews],
               ['Chain', 'Arc'],
             ].map(([label, value]) => (
-              <div key={label} className="rounded-lg border border-[var(--temple-border)] bg-black/20 p-3">
+              <div key={label} className="rounded-lg border border-[var(--temple-border)] bg-white/[0.045] p-3">
                 <p className="text-xl font-black text-[var(--temple-emerald)]">{value}</p>
                 <p className="mt-1 text-[10px] font-semibold uppercase tracking-wider text-[var(--temple-soft)]">{label}</p>
               </div>
@@ -65,7 +65,7 @@ export default function Landing() {
             <div className="relative z-10 flex flex-col justify-between">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wider text-[var(--temple-soft)]">Daily ritual console</p>
-                <h2 className="mt-2 text-3xl font-black">Keep the flame. Earn the rank.</h2>
+                <h2 className="mt-2 text-3xl font-black">Keep the flame, then share the taste.</h2>
               </div>
               <div className="mt-8 grid grid-cols-2 gap-3">
                 <ActionTile icon={Flame} title="Grialo" text="24h streak check-in" to="/grialo" />
@@ -77,9 +77,9 @@ export default function Landing() {
 
             <div className="relative mt-8 flex min-h-[310px] items-center justify-center md:mt-0">
               <div className="temple-orbit absolute h-72 w-72 rounded-full p-[1px]">
-                <div className="h-full w-full rounded-full bg-[#090b0a]" />
+                <div className="h-full w-full rounded-full bg-[#071014]" />
               </div>
-              <div className="absolute h-52 w-52 rounded-full border border-[var(--temple-border)] bg-black/30" />
+              <div className="absolute h-52 w-52 rounded-full border border-[var(--temple-border)] bg-white/[0.035]" />
               <div className="relative z-10 text-center">
                 <Flame className="mx-auto h-12 w-12 text-[var(--temple-gold)]" style={{ animation: 'temple-float 3s ease-in-out infinite' }} />
                 <p className="mt-5 text-7xl font-black leading-none text-[var(--temple-text)]">24h</p>
