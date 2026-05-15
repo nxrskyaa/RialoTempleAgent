@@ -1,7 +1,7 @@
 import type { Address } from 'viem'
 
 export const RIALO_TEMPLE_ADDRESS = (
-  import.meta.env.VITE_RIALO_TEMPLE_ADDRESS || '0x55B67EB04B36dbA14dcC02C6D1e20D4cB4FE85D4'
+  import.meta.env.VITE_RIALO_TEMPLE_ADDRESS || '0x677D6d43C8F235a22Fec0efE8A571447E30D0f72'
 ) as Address
 
 export const RIALO_TEMPLE_ABI = [
