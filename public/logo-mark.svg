@@ -1,8 +1,25 @@
 <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect x="8" y="8" width="48" height="48" rx="14" fill="#0B0F0C"/>
-  <rect x="8.75" y="8.75" width="46.5" height="46.5" rx="13.25" stroke="#E6C45F" stroke-opacity=".55" stroke-width="1.5"/>
-  <path d="M20 44H44" stroke="#E6C45F" stroke-width="3" stroke-linecap="round"/>
-  <path d="M24 39V27L32 19L40 27V39" stroke="#F4F0DE" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M32 39V30" stroke="#38D88B" stroke-width="3" stroke-linecap="round"/>
-  <circle cx="32" cy="19" r="3" fill="#38D88B"/>
+  <path d="M11 17C15 8 27 6 36 9C45 11 55 18 56 29C57 40 50 54 37 57C25 60 12 55 8 44C4 34 7 25 11 17Z" fill="#10141B"/>
+  <path d="M11 17C15 8 27 6 36 9C45 11 55 18 56 29C57 40 50 54 37 57C25 60 12 55 8 44C4 34 7 25 11 17Z" fill="url(#paint0_radial)"/>
+  <path d="M14 40C21 49 35 52 46 43" stroke="#FFE45E" stroke-width="3.2" stroke-linecap="round" opacity=".8"/>
+  <path d="M20 36.5L32 24L44 36.5V45H20V36.5Z" fill="#FFF7D8" stroke="#171A20" stroke-width="2.4" stroke-linejoin="round"/>
+  <path d="M25 35L32 28L39 35" stroke="#FF7AD9" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M29 45V36.5C29 34.8 30.3 33.5 32 33.5C33.7 33.5 35 34.8 35 36.5V45" fill="#61F7A4"/>
+  <path d="M26 45H38" stroke="#171A20" stroke-width="2.4" stroke-linecap="round"/>
+  <path d="M32 10C36 14 39 17 38 21.5C37.4 24.7 34.8 26.8 32 27.2C29.2 26.8 26.6 24.7 26 21.5C25.1 17 28 14 32 10Z" fill="#B9FF66"/>
+  <path d="M32 13C34.2 15.6 35.8 18 35.2 20.5C34.8 22.3 33.4 23.4 32 23.7C30.6 23.4 29.2 22.3 28.8 20.5C28.2 18 29.8 15.6 32 13Z" fill="#78ECFF"/>
+  <circle cx="24.3" cy="39.5" r="2.1" fill="#171A20"/>
+  <circle cx="39.7" cy="39.5" r="2.1" fill="#171A20"/>
+  <path d="M29 43C30.8 44.8 33.2 44.8 35 43" stroke="#171A20" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="20" cy="42" r="1.8" fill="#FF8066" opacity=".75"/>
+  <circle cx="44" cy="42" r="1.8" fill="#FF8066" opacity=".75"/>
+  <path d="M49.5 17.5L51 21L54.5 22.5L51 24L49.5 27.5L48 24L44.5 22.5L48 21L49.5 17.5Z" fill="#FFE45E"/>
+  <path d="M15 23L16.2 25.7L19 27L16.2 28.3L15 31L13.8 28.3L11 27L13.8 25.7L15 23Z" fill="#FF7AD9"/>
+  <defs>
+    <radialGradient id="paint0_radial" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(24 16) rotate(52) scale(53 54)">
+      <stop stop-color="#FF7AD9" stop-opacity=".6"/>
+      <stop offset=".45" stop-color="#78ECFF" stop-opacity=".34"/>
+      <stop offset="1" stop-color="#B9FF66" stop-opacity=".22"/>
+    </radialGradient>
+  </defs>
 </svg>

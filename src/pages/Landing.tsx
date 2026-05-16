@@ -6,6 +6,8 @@ import { useReadContract } from 'wagmi'
 import { RIALO_TEMPLE_ABI, RIALO_TEMPLE_ADDRESS } from '@/config/contracts'
 import { parseTotals, TIERS } from '@/lib/rialo'
 
+const AMBIENT_MOVES = ['Grialo', 'PTS', 'Food', 'Film']
+
 export default function Landing() {
   const [activeMove, setActiveMove] = useState('Grialo')
   const { data } = useReadContract({
@@ -16,15 +18,30 @@ export default function Landing() {
   })
   const totals = parseTotals(data)
 
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setActiveMove((current) => {
+        const index = AMBIENT_MOVES.indexOf(current)
+        return AMBIENT_MOVES[(index + 1) % AMBIENT_MOVES.length]
+      })
+    }, 3000)
+
+    return () => window.clearInterval(timer)
+  }, [])
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
       <CursorBuddy />
       <section className="grid min-h-[calc(100vh-5.5rem)] gap-5 py-5 lg:grid-cols-[0.9fr_1.1fr]">
         <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55 }} className="hero-playground temple-rune-panel temple-card spark-field flex flex-col justify-between overflow-hidden rounded-lg p-6 sm:p-8">
+          <div className="hero-comet" />
+          <div className="hero-floater floater-one" />
+          <div className="hero-floater floater-two" />
+          <div className="hero-floater floater-three" />
           <div className="relative z-10">
             <div className="mb-8 flex items-center justify-between gap-4">
               <div className="flex items-center gap-3">
-                <img src="/logo-mark.svg" alt="" className="h-12 w-12" />
+                <img src="/logo-mark.svg" alt="" className="landing-logo h-12 w-12" />
                 <div>
                   <p className="temple-wordmark text-lg font-black">Rialo Temple</p>
                   <p className="text-xs text-[var(--temple-muted)]">Arc Testnet playground</p>
@@ -87,9 +104,9 @@ export default function Landing() {
                 <motion.div
                   key={activeMove}
                   initial={{ scale: 0.82, rotate: -6, y: 8 }}
-                  animate={{ scale: 1, rotate: [0, -3, 3, 0], y: 0 }}
-                  transition={{ type: 'spring', stiffness: 260, damping: 13 }}
-                  className="flame-buddy h-32 w-28"
+                  animate={{ scale: [1, 1.06, 0.99, 1.03, 1], rotate: [0, -3, 4, -2, 0], y: [0, -8, 2, -5, 0] }}
+                  transition={{ duration: 2.8, ease: 'easeInOut', repeat: Infinity }}
+                  className="flame-buddy hero-critter h-32 w-28"
                 />
                 <motion.div
                   key={`${activeMove}-bubble`}
@@ -102,7 +119,7 @@ export default function Landing() {
               </div>
               <div className="relative z-10 mt-64 grid grid-cols-3 gap-2 text-center">
                 {[activeMove, '+PTS', 'Rank'].map((item) => (
-                  <span key={item} className="rounded-md border border-[var(--temple-border)] bg-black/30 px-3 py-2 text-xs font-black text-[var(--temple-gold)]">{item}</span>
+                  <span key={item} className="mini-score-pill rounded-md border border-[var(--temple-border)] bg-black/30 px-3 py-2 text-xs font-black text-[var(--temple-gold)]">{item}</span>
                 ))}
               </div>
             </div>

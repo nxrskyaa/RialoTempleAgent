@@ -184,21 +184,26 @@
   .logo-charm::after {
     content: '';
     position: absolute;
-    top: 58%;
-    width: 5px;
-    height: 5px;
+    top: 8px;
+    width: 4px;
+    height: 4px;
     border-radius: 999px;
-    background: var(--temple-lime);
+    background: var(--temple-gold);
     opacity: 0.9;
     z-index: 1;
+    box-shadow: 0 0 12px currentColor;
   }
 
   .logo-charm::before {
-    left: 9px;
+    left: 7px;
+    color: var(--temple-gold);
   }
 
   .logo-charm::after {
-    right: 9px;
+    right: 6px;
+    top: 30px;
+    color: var(--temple-pink);
+    background: var(--temple-pink);
   }
 
   .logo-spark {
@@ -325,6 +330,103 @@
       linear-gradient(115deg, transparent 0 36%, rgba(255, 228, 94, 0.18) 36% 37.4%, transparent 37.4% 100%),
       linear-gradient(245deg, transparent 0 54%, rgba(255, 122, 217, 0.16) 54% 55.4%, transparent 55.4% 100%),
       radial-gradient(circle at 86% 12%, rgba(120, 236, 255, 0.2), transparent 12rem);
+  }
+
+  .landing-logo {
+    filter: drop-shadow(0 12px 18px rgba(255, 122, 217, 0.22));
+    animation: logo-wiggle 3.4s ease-in-out infinite;
+    transform-origin: 50% 70%;
+  }
+
+  .hero-comet {
+    position: absolute;
+    left: -18%;
+    top: 22%;
+    z-index: 1;
+    width: 84px;
+    height: 12px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, transparent, var(--temple-cyan), var(--temple-gold));
+    filter: blur(0.2px) drop-shadow(0 0 16px rgba(120, 236, 255, 0.45));
+    opacity: 0.72;
+    animation: comet-loop 7s cubic-bezier(0.45, 0, 0.2, 1) infinite;
+  }
+
+  .hero-comet::after {
+    content: '';
+    position: absolute;
+    right: -5px;
+    top: -4px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--temple-gold);
+    box-shadow: 0 0 26px rgba(255, 228, 94, 0.7);
+  }
+
+  .hero-floater {
+    position: absolute;
+    z-index: 1;
+    pointer-events: none;
+    border: 1px solid rgba(255, 249, 233, 0.18);
+    box-shadow: 0 16px 30px rgba(0, 0, 0, 0.16), 0 0 24px currentColor;
+    opacity: 0.74;
+  }
+
+  .hero-floater::before,
+  .hero-floater::after {
+    content: '';
+    position: absolute;
+    border-radius: 999px;
+    background: rgba(255, 249, 233, 0.68);
+  }
+
+  .hero-floater::before {
+    left: 24%;
+    top: 32%;
+    width: 11%;
+    height: 11%;
+    box-shadow: 28px 1px 0 rgba(255, 249, 233, 0.68);
+  }
+
+  .hero-floater::after {
+    left: 42%;
+    top: 58%;
+    width: 24%;
+    height: 8%;
+  }
+
+  .floater-one {
+    right: 12%;
+    top: 17%;
+    width: 54px;
+    height: 42px;
+    color: rgba(255, 122, 217, 0.36);
+    border-radius: 40% 58% 48% 50%;
+    background: linear-gradient(135deg, var(--temple-pink), var(--temple-peach));
+    animation: floater-drift 5.2s ease-in-out infinite;
+  }
+
+  .floater-two {
+    right: 29%;
+    bottom: 19%;
+    width: 38px;
+    height: 38px;
+    color: rgba(120, 236, 255, 0.34);
+    border-radius: 48% 42% 60% 44%;
+    background: linear-gradient(135deg, var(--temple-cyan), var(--temple-lime));
+    animation: floater-drift 6.4s ease-in-out infinite 0.5s;
+  }
+
+  .floater-three {
+    left: 12%;
+    bottom: 29%;
+    width: 30px;
+    height: 46px;
+    color: rgba(255, 228, 94, 0.34);
+    border-radius: 58% 44% 50% 46%;
+    background: linear-gradient(160deg, var(--temple-gold), var(--temple-coral));
+    animation: floater-drift 5.8s ease-in-out infinite 1s;
   }
 
   .playful-stage {
@@ -468,6 +570,10 @@
     overflow: visible;
   }
 
+  .hero-critter {
+    filter: drop-shadow(0 18px 24px rgba(0, 0, 0, 0.2));
+  }
+
   .speech-pop {
     border: 1px solid rgba(255, 122, 217, 0.36);
     background: linear-gradient(135deg, #fff1a8, #ffd4f0);
@@ -487,6 +593,20 @@
     border-bottom: 1px solid rgba(255, 122, 217, 0.36);
     border-right: 1px solid rgba(255, 122, 217, 0.36);
     transform: rotate(45deg);
+  }
+
+  .mini-score-pill {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .mini-score-pill::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 -80%;
+    width: 60%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.26), transparent);
+    animation: score-shimmer 2.4s ease-in-out infinite;
   }
 
   .action-tile {
@@ -838,10 +958,39 @@
   45% { transform: translate3d(2px, -4px, 0) rotate(8deg) scale(1.16); }
 }
 
+@keyframes logo-wiggle {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(-2deg) scale(1); }
+  36% { transform: translate3d(1px, -3px, 0) rotate(4deg) scale(1.04); }
+  68% { transform: translate3d(-1px, 1px, 0) rotate(-4deg) scale(0.99); }
+}
+
+@keyframes comet-loop {
+  0% { transform: translate3d(0, 0, 0) rotate(-9deg) scaleX(0.7); opacity: 0; }
+  12% { opacity: 0.75; }
+  54% { transform: translate3d(118vw, 76px, 0) rotate(-9deg) scaleX(1); opacity: 0.75; }
+  64%, 100% { transform: translate3d(118vw, 76px, 0) rotate(-9deg) scaleX(1); opacity: 0; }
+}
+
+@keyframes floater-drift {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(-4deg) scale(1); }
+  35% { transform: translate3d(7px, -13px, 0) rotate(7deg) scale(1.07); }
+  70% { transform: translate3d(-6px, 4px, 0) rotate(-8deg) scale(0.98); }
+}
+
+@keyframes score-shimmer {
+  0%, 35% { transform: translateX(0); opacity: 0; }
+  50% { opacity: 1; }
+  85%, 100% { transform: translateX(310%); opacity: 0; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .spin-orbit,
   .interactive-machine::before,
   .floating-sprinkle,
+  .landing-logo,
+  .hero-comet,
+  .hero-floater,
+  .mini-score-pill::before,
   .cursor-trail,
   .cursor-buddy .flame-buddy,
   .logo-spark,
