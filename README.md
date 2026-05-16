@@ -1,73 +1,50 @@
-# React + TypeScript + Vite
+# Rialo Temple
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Rialo Temple is a Vite React app for Arc Testnet rituals: profile setup, daily Grialo check-ins, food and film review stamps, leaderboard rankings, and the no-wallet Rialo City simulator.
 
-Currently, two official plugins are available:
+## Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- React 19, TypeScript, Vite
+- Tailwind CSS with local Rialo Temple theme styles
+- wagmi, RainbowKit, viem
+- Foundry smart contract in `contracts/src/RialoTemple.sol`
 
-## React Compiler
+## Local Setup
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1. Install dependencies:
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+2. Create `.env` from `.env.example` and set your WalletConnect/Reown project id:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+VITE_RIALO_TEMPLE_ADDRESS=0x677D6d43C8F235a22Fec0efE8A571447E30D0f72
+VITE_WALLETCONNECT_PROJECT_ID=your_project_id
 ```
+
+3. Run the app:
+
+```bash
+npm run dev
+```
+
+The Vite server is configured for `http://localhost:3000/`.
+
+## Build
+
+```bash
+npm run build
+```
+
+The production files are emitted to `dist/`.
+
+## Contract
+
+```bash
+npm run contracts:build
+npm run contracts:test
+```
+
+The frontend defaults to the deployed address in `src/config/contracts.ts`, but `VITE_RIALO_TEMPLE_ADDRESS` overrides it for another deployment.
