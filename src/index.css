@@ -167,49 +167,12 @@
   }
 
   .brand-pill:hover .logo-charm {
-    transform: rotate(-7deg) scale(1.04);
+    transform: rotate(-5deg) scale(1.05);
   }
 
   .logo-charm {
-    border: 1px solid rgba(255, 228, 94, 0.34);
-    background:
-      radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.26), transparent 20%),
-      linear-gradient(145deg, rgba(185, 255, 102, 0.24), rgba(255, 122, 217, 0.18)),
-      #111410;
-    box-shadow: 0 12px 0 rgba(0, 0, 0, 0.18), 0 0 28px rgba(255, 122, 217, 0.14);
+    filter: drop-shadow(0 12px 16px rgba(0, 0, 0, 0.26)) drop-shadow(0 0 18px rgba(255, 122, 217, 0.2));
     transition: transform 220ms cubic-bezier(0.18, 0.8, 0.28, 1.2);
-  }
-
-  .logo-charm::before,
-  .logo-charm::after {
-    content: '';
-    position: absolute;
-    top: 8px;
-    width: 4px;
-    height: 4px;
-    border-radius: 999px;
-    background: var(--temple-gold);
-    opacity: 0.9;
-    z-index: 1;
-    box-shadow: 0 0 12px currentColor;
-  }
-
-  .logo-charm::before {
-    left: 7px;
-    color: var(--temple-gold);
-  }
-
-  .logo-charm::after {
-    right: 6px;
-    top: 30px;
-    color: var(--temple-pink);
-    background: var(--temple-pink);
-  }
-
-  .logo-spark {
-    color: var(--temple-pink);
-    filter: drop-shadow(0 0 10px rgba(255, 122, 217, 0.55));
-    animation: logo-spark-bounce 2.2s ease-in-out infinite;
   }
 
   .nav-bubble {
@@ -289,8 +252,9 @@
 
   .temple-wordmark {
     font-family: 'Inter', system-ui, sans-serif;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    letter-spacing: 0.01em;
+    text-transform: none;
+    text-shadow: 0 2px 18px rgba(255, 228, 94, 0.12);
   }
 
   .arcade-title {
@@ -953,11 +917,6 @@
   50% { transform: translate3d(-6px, -6px, 0) scale(1.22); opacity: 1; }
 }
 
-@keyframes logo-spark-bounce {
-  0%, 100% { transform: translate3d(0, 0, 0) rotate(-8deg) scale(1); }
-  45% { transform: translate3d(2px, -4px, 0) rotate(8deg) scale(1.16); }
-}
-
 @keyframes logo-wiggle {
   0%, 100% { transform: translate3d(0, 0, 0) rotate(-2deg) scale(1); }
   36% { transform: translate3d(1px, -3px, 0) rotate(4deg) scale(1.04); }
@@ -993,7 +952,6 @@
   .mini-score-pill::before,
   .cursor-trail,
   .cursor-buddy .flame-buddy,
-  .logo-spark,
   .review-mascot,
   .flame-buddy::before {
     animation: none;

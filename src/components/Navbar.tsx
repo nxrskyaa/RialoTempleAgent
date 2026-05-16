@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { motion } from 'framer-motion'
-import { Flame, MessageSquareText, Sparkles, Trophy, UserCircle } from 'lucide-react'
+import { MessageSquareText, Sparkles, Trophy, UserCircle } from 'lucide-react'
 
 const NAV = [
   { path: '/review', label: 'Reviews', icon: MessageSquareText },
@@ -17,11 +17,10 @@ export default function Navbar() {
     <nav className="fixed left-0 right-0 top-0 z-50 px-3 pt-3 sm:px-6">
       <div className="nav-cloud mx-auto flex h-[68px] max-w-7xl items-center justify-between gap-2 px-3 sm:px-5">
         <Link to="/" className="brand-pill group flex min-w-0 items-center gap-2 rounded-full px-2 py-1.5 transition">
-          <span className="logo-charm relative flex h-11 w-11 items-center justify-center rounded-full">
-            <img src="/logo-mark.svg" alt="" className="relative z-10 h-7 w-7 transition group-hover:scale-110" />
-            <Flame className="logo-spark absolute -right-1 -top-1 h-4 w-4" />
+          <span className="logo-charm relative flex h-12 w-12 items-center justify-center rounded-full">
+            <img src="/logo-mark.svg" alt="" className="relative z-10 h-12 w-12 transition group-hover:scale-110" />
           </span>
-          <span className="temple-wordmark hidden text-base font-black text-[var(--temple-text)] sm:inline">Rialo Temple</span>
+          <span className="temple-wordmark hidden text-lg font-black text-[var(--temple-text)] sm:inline">Rialo Temple</span>
         </Link>
         <div className="nav-bubble flex items-center gap-1 rounded-full p-1">
           {NAV.map(item => {

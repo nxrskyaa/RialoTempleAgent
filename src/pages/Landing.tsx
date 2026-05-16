@@ -41,7 +41,7 @@ export default function Landing() {
           <div className="relative z-10">
             <div className="mb-8 flex items-center justify-between gap-4">
               <div className="flex items-center gap-3">
-                <img src="/logo-mark.svg" alt="" className="landing-logo h-12 w-12" />
+                <img src="/logo-mark.svg" alt="" className="landing-logo h-14 w-14" />
                 <div>
                   <p className="temple-wordmark text-lg font-black">Rialo Temple</p>
                   <p className="text-xs text-[var(--temple-muted)]">Arc Testnet playground</p>
