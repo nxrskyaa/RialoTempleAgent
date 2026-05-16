@@ -5,6 +5,7 @@ import ReviewPage from './pages/ReviewPage'
 import Profile from './pages/Profile'
 import Grialo from './pages/Grialo'
 import Leaderboard from './pages/Leaderboard'
+import ScalePlaygroundPage from './pages/ScalePlaygroundPage'
 
 export default function App() {
   return (
@@ -13,6 +14,7 @@ export default function App() {
         <Route path="/" element={<Landing />} />
         <Route path="/review" element={<ReviewPage />} />
         <Route path="/grialo" element={<Grialo />} />
+        <Route path="/scale-playground" element={<ScalePlaygroundPage />} />
         <Route path="/leaderboard" element={<Leaderboard />} />
         <Route path="/profile" element={<Profile />} />
       </Route>

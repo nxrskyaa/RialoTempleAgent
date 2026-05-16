@@ -4,26 +4,28 @@
 
 @layer base {
   :root {
-    --temple-bg: #090b0a;
-    --temple-panel: rgba(14, 17, 15, 0.82);
-    --temple-panel-strong: #111612;
-    --temple-border: rgba(224, 214, 164, 0.13);
-    --temple-text: #f3efe1;
-    --temple-muted: #a6ac9e;
-    --temple-soft: #697164;
-    --temple-emerald: #38d88b;
-    --temple-gold: #e6c45f;
-    --temple-violet: #9b8cff;
-    --temple-red: #fb7185;
+    --temple-bg: #0b0d0b;
+    --temple-panel: rgba(245, 239, 218, 0.065);
+    --temple-panel-strong: #171a16;
+    --temple-border: rgba(245, 239, 218, 0.14);
+    --temple-text: #f7f1df;
+    --temple-muted: #b7b09d;
+    --temple-soft: #807966;
+    --temple-emerald: #57e39f;
+    --temple-gold: #f2c866;
+    --temple-violet: #b7a7ff;
+    --temple-red: #ff7c8f;
+    --temple-coral: #ff9c73;
+    --temple-sky: #8bd3ff;
     --radius: 0.5rem;
   }
 
   html, body, #root {
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     background:
-      radial-gradient(circle at 18% -8%, rgba(56, 216, 139, 0.14), transparent 24rem),
-      radial-gradient(circle at 83% 0%, rgba(230, 196, 95, 0.12), transparent 22rem),
-      linear-gradient(160deg, #070807 0%, #0c100d 48%, #080909 100%);
+      linear-gradient(135deg, rgba(87, 227, 159, 0.12), transparent 28rem),
+      linear-gradient(225deg, rgba(255, 156, 115, 0.10), transparent 24rem),
+      linear-gradient(180deg, #0b0d0b 0%, #10130f 46%, #0c0d0b 100%);
     color: var(--temple-text);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -51,10 +53,9 @@
     min-height: 100vh;
     overflow-x: hidden;
     background:
-      linear-gradient(90deg, rgba(230, 196, 95, 0.035) 1px, transparent 1px),
-      linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
-      radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.045), transparent 38rem);
-    background-size: 96px 96px, 96px 96px, auto;
+      radial-gradient(circle at 1px 1px, rgba(247, 241, 223, 0.12) 1px, transparent 0),
+      linear-gradient(180deg, rgba(247, 241, 223, 0.03), transparent 18rem);
+    background-size: 28px 28px, auto;
   }
 
   .temple-shell::before {
@@ -63,51 +64,50 @@
     inset: 0;
     pointer-events: none;
     background:
-      linear-gradient(90deg, rgba(230, 196, 95, 0.08), transparent 18%, transparent 82%, rgba(56, 216, 139, 0.07)),
-      radial-gradient(circle at 50% 28%, transparent 0 15rem, rgba(0, 0, 0, 0.22) 34rem);
-    mix-blend-mode: screen;
-    opacity: 0.55;
+      linear-gradient(110deg, transparent 0 52%, rgba(242, 200, 102, 0.055) 52% 52.5%, transparent 52.5%),
+      linear-gradient(250deg, transparent 0 62%, rgba(87, 227, 159, 0.045) 62% 62.5%, transparent 62.5%);
+    opacity: 0.7;
   }
 
   .temple-card {
     border: 1px solid var(--temple-border);
     background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.055), transparent 34%),
+      linear-gradient(180deg, rgba(247, 241, 223, 0.05), transparent 28%),
       var(--temple-panel);
-    box-shadow: 0 18px 58px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(18px);
+    box-shadow: 0 12px 34px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(247, 241, 223, 0.08);
+    backdrop-filter: blur(16px);
   }
 
   .temple-button {
-    border: 1px solid rgba(230, 196, 95, 0.38);
-    background: linear-gradient(135deg, #38d88b 0%, #e6c45f 96%);
-    color: #07100a;
-    box-shadow: 0 14px 34px rgba(56, 216, 139, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(242, 200, 102, 0.45);
+    background: #f2c866;
+    color: #15140f;
+    box-shadow: 0 10px 24px rgba(242, 200, 102, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.38);
     transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease;
   }
 
   .temple-button:hover {
     transform: translateY(-1px);
-    filter: saturate(1.05);
-    box-shadow: 0 18px 42px rgba(56, 216, 139, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    filter: brightness(1.03);
+    box-shadow: 0 14px 32px rgba(242, 200, 102, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.4);
   }
 
   .temple-button-secondary {
     border: 1px solid var(--temple-border);
-    background: rgba(255, 255, 255, 0.035);
+    background: rgba(247, 241, 223, 0.055);
     color: var(--temple-text);
   }
 
   .temple-input {
     border: 1px solid var(--temple-border);
-    background: rgba(4, 7, 5, 0.74);
+    background: rgba(247, 241, 223, 0.055);
     color: var(--temple-text);
     outline: none;
   }
 
   .temple-input:focus {
-    border-color: rgba(50, 213, 131, 0.5);
-    box-shadow: 0 0 0 3px rgba(50, 213, 131, 0.1);
+    border-color: rgba(87, 227, 159, 0.55);
+    box-shadow: 0 0 0 3px rgba(87, 227, 159, 0.12);
   }
 
   .temple-rune-panel {
@@ -121,20 +121,29 @@
     inset: 0;
     pointer-events: none;
     background:
-      linear-gradient(115deg, transparent 0 38%, rgba(230, 196, 95, 0.08) 38% 39%, transparent 39% 100%),
-      linear-gradient(245deg, transparent 0 58%, rgba(56, 216, 139, 0.07) 58% 59%, transparent 59% 100%);
-    opacity: 0.8;
+      repeating-linear-gradient(135deg, transparent 0 18px, rgba(247, 241, 223, 0.035) 18px 19px, transparent 19px 38px);
+    opacity: 0.55;
   }
 
   .temple-orbit {
     background:
-      conic-gradient(from 210deg, rgba(56, 216, 139, 0.08), rgba(230, 196, 95, 0.9), rgba(56, 216, 139, 0.78), rgba(230, 196, 95, 0.12), rgba(56, 216, 139, 0.08));
-    box-shadow: 0 0 70px rgba(56, 216, 139, 0.12);
+      conic-gradient(from 210deg, rgba(87, 227, 159, 0.10), rgba(242, 200, 102, 0.85), rgba(139, 211, 255, 0.68), rgba(255, 156, 115, 0.64), rgba(87, 227, 159, 0.10));
+    box-shadow: 0 0 48px rgba(87, 227, 159, 0.10);
   }
 
   .temple-wordmark {
     font-family: ui-serif, Georgia, Cambria, 'Times New Roman', serif;
     letter-spacing: 0.02em;
+  }
+
+  .temple-sticker {
+    border: 1px solid rgba(247, 241, 223, 0.16);
+    background: rgba(247, 241, 223, 0.075);
+    box-shadow: inset 0 1px 0 rgba(247, 241, 223, 0.08);
+  }
+
+  .temple-accent-strip {
+    background: linear-gradient(90deg, var(--temple-emerald), var(--temple-gold), var(--temple-coral), var(--temple-sky));
   }
 }
 

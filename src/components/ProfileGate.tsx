@@ -1,9 +1,9 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import { motion } from 'framer-motion'
 import { Loader2, Sparkles, UserRound } from 'lucide-react'
-import { useAccount, useReadContract, useWriteContract } from 'wagmi'
-import { RIALO_TEMPLE_ABI, RIALO_TEMPLE_ADDRESS } from '@/config/contracts'
+import { useAccount, useReadContract, useWaitForTransactionReceipt, useWriteContract } from 'wagmi'
+import { ARC_CHAIN, RIALO_TEMPLE_ABI, RIALO_TEMPLE_ADDRESS } from '@/config/contracts'
 import { EMPTY_PROFILE, EMPTY_STATS, normalizeXHandle, parseProfileResult, toXAvatarUrl, toXUrl, type ProfileData, type UserStatsData } from '@/lib/rialo'
 
 type Props = {
@@ -12,17 +12,20 @@ type Props = {
 }
 
 export default function ProfileGate({ children, compact = false }: Props) {
-  const { isConnected } = useAccount()
+  const { address, isConnected } = useAccount()
   const [name, setName] = useState('')
   const [xInput, setXInput] = useState('')
   const [message, setMessage] = useState('')
+  const [profileHash, setProfileHash] = useState<`0x${string}` | undefined>()
 
   const { data, isLoading, refetch } = useReadContract({
     address: RIALO_TEMPLE_ADDRESS,
     abi: RIALO_TEMPLE_ABI,
-    functionName: 'getMyProfile',
+    functionName: 'getProfile',
+    args: address ? [address] : undefined,
+    chainId: ARC_CHAIN.id,
     query: {
-      enabled: isConnected,
+      enabled: Boolean(address),
       staleTime: 60_000,
       refetchOnWindowFocus: false,
       refetchOnReconnect: true,
@@ -33,13 +36,24 @@ export default function ProfileGate({ children, compact = false }: Props) {
 
   const { writeContract, isPending } = useWriteContract({
     mutation: {
-      onSuccess: () => {
-        setMessage('Profile sealed on-chain.')
-        setTimeout(() => refetch(), 1200)
+      onSuccess: (hash) => {
+        setProfileHash(hash)
+        setMessage('Profile transaction sent. Waiting for Arc confirmation...')
       },
       onError: (error) => setMessage(error.message.split('\n')[0] || 'Profile transaction failed.'),
     },
   })
+
+  const { isLoading: isConfirmingProfile, isSuccess: profileConfirmed } = useWaitForTransactionReceipt({
+    hash: profileHash,
+    query: { enabled: Boolean(profileHash) },
+  })
+
+  useEffect(() => {
+    if (!profileConfirmed) return
+    setMessage('Profile sealed on-chain.')
+    void refetch()
+  }, [profileConfirmed, refetch])
 
   function submitProfile() {
     const handle = normalizeXHandle(xInput)
@@ -52,6 +66,7 @@ export default function ProfileGate({ children, compact = false }: Props) {
       address: RIALO_TEMPLE_ADDRESS,
       abi: RIALO_TEMPLE_ABI,
       functionName: 'setupProfile',
+      chainId: ARC_CHAIN.id,
       args: [
         name.trim(),
         toXUrl(xInput || handle),
@@ -78,8 +93,16 @@ export default function ProfileGate({ children, compact = false }: Props) {
 
   if (isLoading && !data) {
     return (
-      <div className="flex items-center justify-center py-20 text-sm text-[var(--temple-muted)]">
-        <Loader2 className="mr-2 h-4 w-4 animate-spin text-[var(--temple-emerald)]" /> Reading profile
+      <div className="mx-auto max-w-xl px-4 py-10">
+        <div className="temple-card rounded-lg p-5">
+          <div className="flex items-center gap-3">
+            <Loader2 className="h-4 w-4 animate-spin text-[var(--temple-emerald)]" />
+            <p className="text-sm text-[var(--temple-muted)]">Syncing wallet profile...</p>
+          </div>
+          <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/[0.05]">
+            <div className="h-full w-1/3 rounded-full bg-[var(--temple-emerald)]/70" />
+          </div>
+        </div>
       </div>
     )
   }
@@ -118,9 +141,9 @@ export default function ProfileGate({ children, compact = false }: Props) {
 
           {message && <p className="text-sm text-[var(--temple-gold)]">{message}</p>}
 
-          <button type="button" onClick={submitProfile} disabled={isPending} className="temple-button inline-flex w-full items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-bold disabled:opacity-60">
-            {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-            Seal profile on-chain
+          <button type="button" onClick={submitProfile} disabled={isPending || isConfirmingProfile} className="temple-button inline-flex w-full items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-bold disabled:opacity-60">
+            {isPending || isConfirmingProfile ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+            {isPending ? 'Open wallet' : isConfirmingProfile ? 'Confirming profile' : 'Seal profile on-chain'}
           </button>
         </div>
       </motion.div>
