@@ -27,21 +27,21 @@ export default function Landing() {
                 <img src="/logo-mark.svg" alt="" className="h-12 w-12" />
                 <div>
                   <p className="temple-wordmark text-lg font-black">Rialo Temple</p>
-                  <p className="text-xs text-[var(--temple-muted)]">Arc Testnet arcade</p>
+                  <p className="text-xs text-[var(--temple-muted)]">Arc Testnet playground</p>
                 </div>
               </div>
               <div className="sticker-note candy-sticker hidden rounded-lg px-3 py-2 text-xs font-black sm:block">1 USDC / move</div>
             </div>
 
             <h1 className="arcade-title max-w-xl text-5xl font-black leading-[0.92] tracking-normal sm:text-7xl">
-              Tiny rituals. Real on-chain proof.
+              Tiny check-ins. Real on-chain proof.
             </h1>
             <p className="mt-6 max-w-lg text-base leading-7 text-[var(--temple-muted)]">
               Feed the flame, drop food and film notes, and let your wallet carry the proof. Weirdly cozy, fully on-chain.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link to="/grialo" className="temple-button inline-flex items-center gap-2 rounded-lg px-5 py-3 text-sm font-bold">
-                <Flame className="h-4 w-4" /> Check in <ArrowRight className="h-4 w-4" />
+                <Flame className="h-4 w-4" /> Start streak <ArrowRight className="h-4 w-4" />
               </Link>
               <Link to="/review" className="temple-button-secondary inline-flex items-center gap-2 rounded-lg px-5 py-3 text-sm font-semibold">
                 <MessageSquareText className="h-4 w-4 text-[var(--temple-coral)]" /> Write review
@@ -70,7 +70,7 @@ export default function Landing() {
             <div className="floating-sprinkle sprinkle-three" />
             <div className="relative z-10 flex flex-col justify-between">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-[var(--temple-cyan)]">Ritual console</p>
+                <p className="text-xs font-semibold uppercase tracking-wider text-[var(--temple-cyan)]">Rialo playground</p>
                 <h2 className="mt-2 text-3xl font-black">Pick a move. Watch it wiggle.</h2>
               </div>
               <div className="toy-grid mt-8 grid grid-cols-2 gap-3">

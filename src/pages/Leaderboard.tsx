@@ -26,7 +26,7 @@ export default function Leaderboard() {
       <header className="temple-card spark-field mb-6 overflow-hidden rounded-lg p-5 sm:flex sm:items-end sm:justify-between sm:p-6">
         <div>
           <p className="text-xs font-black uppercase tracking-wider text-[var(--temple-cyan)]">Leaderboard</p>
-          <h1 className="arcade-title mt-2 text-4xl font-black tracking-normal">Ritual scoreboard</h1>
+          <h1 className="arcade-title mt-2 text-4xl font-black tracking-normal">Rialo Streaks</h1>
           <p className="mt-2 text-sm text-[var(--temple-muted)]">PTS first, streaks second, pure consistency energy after that.</p>
         </div>
         <div className="mt-4 grid grid-cols-2 gap-2 sm:mt-0 sm:w-72">
