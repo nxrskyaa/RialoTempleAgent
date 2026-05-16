@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion'
-import { ArrowRight, Clapperboard, Flame, MessageSquareText, Star, Trophy, Utensils, type LucideIcon } from 'lucide-react'
+import { ArrowRight, Clapperboard, Flame, Map, MessageSquareText, Star, Trophy, Utensils, type LucideIcon } from 'lucide-react'
 import { useReadContract } from 'wagmi'
 import { RIALO_TEMPLE_ABI, RIALO_TEMPLE_ADDRESS } from '@/config/contracts'
 import { parseTotals, TIERS } from '@/lib/rialo'
@@ -62,6 +62,9 @@ export default function Landing() {
               </Link>
               <Link to="/review" className="temple-button-secondary inline-flex items-center gap-2 rounded-lg px-5 py-3 text-sm font-semibold">
                 <MessageSquareText className="h-4 w-4 text-[var(--temple-coral)]" /> Write review
+              </Link>
+              <Link to="/rialo-city" className="temple-button-secondary inline-flex items-center gap-2 rounded-lg px-5 py-3 text-sm font-semibold">
+                <Map className="h-4 w-4 text-[var(--temple-cyan)]" /> Explore Rialo City
               </Link>
             </div>
           </div>
@@ -130,6 +133,13 @@ export default function Landing() {
               <p className="text-xs font-semibold uppercase tracking-wider text-[var(--temple-soft)]">Tier ladder</p>
               <Link to="/leaderboard" className="inline-flex items-center gap-1 text-xs font-semibold text-[var(--temple-gold)]"><Trophy className="h-3.5 w-3.5" /> leaderboard</Link>
             </div>
+            <Link to="/rialo-city" className="mb-4 flex items-center justify-between gap-4 rounded-lg border border-[var(--temple-border)] bg-white/[0.045] p-4 transition hover:-translate-y-0.5 hover:bg-white/[0.07]">
+              <div>
+                <p className="text-sm font-black">Explore Rialo City</p>
+                <p className="mt-1 text-xs leading-5 text-[var(--temple-muted)]">A no-wallet visual simulator for real-world data, privacy, automation, Web2 connectivity, Omni Account, and gasless UX.</p>
+              </div>
+              <Map className="h-6 w-6 shrink-0 text-[var(--temple-cyan)]" />
+            </Link>
             <div className="grid gap-2 md:grid-cols-5">
               {TIERS.map((tier) => (
                 <div key={tier.name} className="stamp-card rounded-lg border border-[var(--temple-border)] bg-white/[0.025] p-3 transition hover:-translate-y-0.5 hover:bg-white/[0.055]">

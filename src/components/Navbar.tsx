@@ -1,11 +1,12 @@
 import { Link, useLocation } from 'react-router-dom'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { motion } from 'framer-motion'
-import { MessageSquareText, Sparkles, Trophy, UserCircle } from 'lucide-react'
+import { Map, MessageSquareText, Sparkles, Trophy, UserCircle } from 'lucide-react'
 
 const NAV = [
   { path: '/review', label: 'Reviews', icon: MessageSquareText },
   { path: '/grialo', label: 'Grialo', icon: Sparkles },
+  { path: '/rialo-city', label: 'Rialo City', icon: Map },
   { path: '/leaderboard', label: 'Rank', icon: Trophy },
   { path: '/profile', label: 'Profile', icon: UserCircle },
 ]
@@ -24,7 +25,7 @@ export default function Navbar() {
         </Link>
         <div className="nav-bubble flex items-center gap-1 rounded-full p-1">
           {NAV.map(item => {
-            const active = location.pathname === item.path
+            const active = item.path === '/rialo-city' ? location.pathname.startsWith('/rialo-city') : location.pathname === item.path
             return (
               <Link key={item.path} to={item.path}
                 className="nav-link relative flex items-center gap-1.5 rounded-full px-2.5 py-2 text-[11px] font-black transition-colors sm:px-3"
