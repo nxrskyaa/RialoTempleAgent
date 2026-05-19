@@ -5,7 +5,11 @@ import ReviewPage from './pages/ReviewPage'
 import Profile from './pages/Profile'
 import Grialo from './pages/Grialo'
 import Leaderboard from './pages/Leaderboard'
+import RialoCity from './pages/RialoCity'
+import RialoCityModule from './pages/RialoCityModule'
+import RialoCityPassport from './pages/RialoCityPassport'
 import ScalePlaygroundPage from './pages/ScalePlaygroundPage'
+import SignatureCardPage from './pages/SignatureCardPage'
 
 export default function App() {
   return (
@@ -14,7 +18,11 @@ export default function App() {
         <Route path="/" element={<Landing />} />
         <Route path="/review" element={<ReviewPage />} />
         <Route path="/grialo" element={<Grialo />} />
+        <Route path="/rialo-city" element={<RialoCity />} />
+        <Route path="/rialo-city/module/:slug" element={<RialoCityModule />} />
+        <Route path="/rialo-city/passport" element={<RialoCityPassport />} />
         <Route path="/scale-playground" element={<ScalePlaygroundPage />} />
+        <Route path="/signature-card" element={<SignatureCardPage />} />
         <Route path="/leaderboard" element={<Leaderboard />} />
         <Route path="/profile" element={<Profile />} />
       </Route>

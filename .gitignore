@@ -27,3 +27,5 @@ broadcast
 *.njsproj
 *.sln
 *.sw?
+
+.vercel

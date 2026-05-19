@@ -483,11 +483,15 @@ export default function ScalePlaygroundPage() {
   }
 
   return (
-    <div className="relative mx-auto max-w-[1500px] px-4 py-6 sm:px-6">
+    <div className="scale-playground-stage relative mx-auto max-w-[1500px] px-4 py-6 sm:px-6">
       <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
         <div className="absolute left-[8%] top-16 h-64 w-64 rounded-full bg-[var(--temple-emerald)]/10 blur-3xl" />
         <div className="absolute right-[12%] top-36 h-80 w-80 rounded-full bg-[var(--temple-sky)]/10 blur-3xl" />
         <div className="absolute bottom-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-[var(--temple-gold)]/10 blur-3xl" />
+        <div className="hero-comet top-24" />
+        <span className="floating-sprinkle left-[7%] top-44" />
+        <span className="floating-sprinkle right-[18%] top-28" style={{ animationDelay: '0.6s' }} />
+        <span className="floating-sprinkle bottom-28 left-[42%]" style={{ animationDelay: '1.1s' }} />
       </div>
 
       <Hero />
@@ -540,22 +544,63 @@ export default function ScalePlaygroundPage() {
 
 function Hero() {
   return (
-    <section className="temple-rune-panel temple-card overflow-hidden rounded-lg p-5 sm:p-7">
-      <div className="relative z-10 grid gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
+    <section className="scale-hero temple-rune-panel temple-card overflow-hidden rounded-lg p-5 sm:p-7">
+      <div className="relative z-10 grid gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
         <div>
-          <h1 className="text-4xl font-black tracking-normal sm:text-6xl">SCALE Ritual Playground</h1>
+          <h1 className="text-4xl font-black tracking-normal sm:text-6xl">Scale Playground</h1>
           <p className="mt-4 max-w-3xl text-base leading-7 text-[var(--temple-muted)]">
-            Summon agents, lock mock rewards, assign judges, and watch SCALE-style settlement happen.
+            A cute arcade simulator for agent work, judge checks, mock rewards, and proof stamps.
           </p>
           <p className="mt-3 max-w-3xl text-sm leading-6 text-[var(--temple-soft)]">
-            Simulate how Rialo SCALE can coordinate AI agent work with clear tasks, rewards, deadlines, judge review, and settlement logic.
+            Pick a task, summon an agent, let the judge score it, then watch the settlement toy print a temporary proof.
           </p>
+          <div className="mt-6 flex flex-wrap gap-2">
+            {['task', 'agent', 'judge', 'proof'].map((item, index) => (
+              <span key={item} className="scale-hero-chip mini-score-pill rounded-full border border-[var(--temple-border)] bg-black/25 px-3 py-2 text-xs font-black text-[var(--temple-text)]" style={{ transform: `rotate(${index % 2 === 0 ? -1.5 : 1.5}deg)` }}>
+                {item}
+              </span>
+            ))}
+          </div>
         </div>
-        <div className="rounded-lg border border-[var(--temple-border)] bg-black/25 p-4 text-sm leading-6 text-[var(--temple-muted)] lg:max-w-sm">
-          This is an offchain concept simulator. No wallet, payment, storage, or contract interaction is involved.
+        <div className="interactive-machine scale-hero-machine relative min-h-[280px] overflow-hidden rounded-lg border border-[var(--temple-border)] bg-black/25 p-5">
+          <div className="scale-arcade-screen">
+            <div className="scale-arcade-marquee">SCALE TOY</div>
+            <div className="scale-hero-track">
+              {['task', 'agent', 'judge', 'proof'].map(item => (
+                <span key={item}>{item}</span>
+              ))}
+            </div>
+            <ScaleMascot mood="happy" />
+            <div className="scale-arcade-coins">
+              <span />
+              <span />
+              <span />
+            </div>
+          </div>
+          <div className="absolute bottom-5 left-5 right-5 rounded-lg border border-[var(--temple-border)] bg-black/45 p-3 text-xs leading-5 text-[var(--temple-muted)]">
+            Offchain concept simulator. No wallet, payment, storage, or contract interaction is involved.
+          </div>
         </div>
       </div>
     </section>
+  )
+}
+
+function ScaleMascot({ mood, small = false }: { mood: 'happy' | 'busy' | 'party'; small?: boolean }) {
+  const label = mood === 'party' ? 'paid!' : mood === 'busy' ? 'judge!' : 'scale!'
+
+  return (
+    <div className={cx('scale-mascot cursor-buddy relative', small && 'is-small')}>
+      <div className="cursor-buddy-shadow" />
+      <div className="flame-buddy" />
+      <div className="scale-mascot-face">
+        {mood === 'party' ? <Sparkles className="h-5 w-5" /> : <Scale className="h-5 w-5" />}
+      </div>
+      <span className="cursor-buddy-tag">{label}</span>
+      <span className="cursor-trail trail-one" />
+      <span className="cursor-trail trail-two" />
+      <span className="cursor-trail trail-three" />
+    </div>
   )
 }
 
@@ -563,7 +608,7 @@ function StatusPanel() {
   return (
     <section className="mt-5 grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
       {STATUS_ITEMS.map(([label, value]) => (
-        <div key={label} className="temple-sticker rounded-lg p-3">
+        <div key={label} className="scale-status-pill temple-sticker rounded-lg p-3">
           <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--temple-soft)]">{label}</p>
           <p className="mt-1 text-sm font-semibold text-[var(--temple-text)]">{value}</p>
         </div>
@@ -602,7 +647,7 @@ function ContractSetup({
   onJudgeChange: (judge: JudgeId) => void
 }) {
   return (
-    <section className="space-y-5">
+    <section className="scale-setup-column space-y-5">
       <Panel title="Contract Setup" icon={FlaskConical}>
         <FieldTitle icon={ScrollText} title="Task Scroll" />
         <div className="grid gap-2">
@@ -614,7 +659,7 @@ function ContractSetup({
               onClick={() => onChooseTemplate(template)}
               aria-pressed={selectedTemplate === template}
               className={cx(
-                'rounded-lg border px-3 py-2 text-left text-xs font-semibold transition disabled:cursor-not-allowed disabled:opacity-50',
+                'scale-task-scroll rounded-lg border px-3 py-2 text-left text-xs font-black transition disabled:cursor-not-allowed disabled:opacity-50',
                 selectedTemplate === template
                   ? 'border-[var(--temple-emerald)] bg-[var(--temple-emerald)]/12 text-[var(--temple-text)] shadow-[0_0_24px_rgba(87,227,159,0.12)]'
                   : 'border-[var(--temple-border)] bg-black/20 text-[var(--temple-muted)] hover:bg-white/[0.045]',
@@ -743,73 +788,83 @@ function RitualChamber({
 }) {
   const ActiveAgentIcon = agent?.icon ?? Bot
   const JudgeIcon = judge?.icon ?? VenetianMask
+  const arcadeSteps = [
+    { id: 'task', label: 'Task', icon: ScrollText, state: steps[0]?.state ?? 'pending' },
+    { id: 'agent', label: 'Agent', icon: ActiveAgentIcon, state: steps[2]?.state ?? 'pending' },
+    { id: 'judge', label: 'Judge', icon: JudgeIcon, state: steps[4]?.state ?? 'pending' },
+    { id: 'settle', label: 'Settle', icon: Gem, state: steps[5]?.state ?? 'pending' },
+    { id: 'proof', label: 'Proof', icon: FileCheck2, state: proofState(steps, result) },
+  ]
 
   return (
-    <section className="temple-card temple-rune-panel overflow-hidden rounded-lg p-5 sm:p-6">
+    <section className="scale-chamber-shell temple-card temple-rune-panel overflow-hidden rounded-lg p-5 sm:p-6">
       <div className="relative z-10">
         <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-[var(--temple-gold)]">Center Chamber</p>
-            <h2 className="mt-2 text-3xl font-black tracking-normal">SCALE Ritual Chamber</h2>
+            <p className="text-xs font-semibold uppercase tracking-wider text-[var(--temple-gold)]">Arcade Chamber</p>
+            <h2 className="mt-2 text-3xl font-black tracking-normal">SCALE Settlement Toy</h2>
           </div>
-          <div className="rounded-lg border border-[var(--temple-border)] bg-black/25 px-3 py-2 text-xs text-[var(--temple-muted)]">
-            React state only
+          <div className="scale-live-badge rounded-full border border-[var(--temple-border)] bg-black/25 px-3 py-2 text-xs font-black text-[var(--temple-muted)]">
+            {isRunning ? 'toy running' : result ? 'proof printed' : 'ready to play'}
           </div>
         </div>
 
-        <div className="relative min-h-[520px] overflow-hidden rounded-lg border border-[var(--temple-border)] bg-[#050807]/70 p-4 sm:min-h-[620px] sm:p-6">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(87,227,159,0.13),transparent_22rem)]" />
-          <div className="pointer-events-none absolute inset-0 opacity-70" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(139,211,255,0.18) 1px, transparent 0)', backgroundSize: '38px 38px' }} />
-
-          <div className="relative mx-auto flex min-h-[390px] max-w-[620px] items-center justify-center sm:min-h-[470px]">
-            <motion.div
-              className="absolute h-[280px] w-[280px] rounded-full p-[1px] sm:h-[390px] sm:w-[390px]"
-              animate={{ rotate: isRunning ? 360 : 0 }}
-              transition={{ duration: 16, repeat: isRunning ? Infinity : 0, ease: 'linear' }}
-              style={{
-                background: 'conic-gradient(from 180deg, rgba(87,227,159,0.05), rgba(139,211,255,0.92), rgba(242,200,102,0.82), rgba(87,227,159,0.62), rgba(87,227,159,0.05))',
-                boxShadow: '0 0 70px rgba(87,227,159,0.18)',
-              }}
-            >
-              <div className="h-full w-full rounded-full bg-[#070a08]" />
-            </motion.div>
-            <div className="absolute h-[210px] w-[210px] rounded-full border border-[var(--temple-border)] bg-black/45 sm:h-[290px] sm:w-[290px]" />
-            <div className="absolute h-[132px] w-[132px] rounded-full border border-[var(--temple-emerald)]/30 bg-[var(--temple-emerald)]/8 shadow-[0_0_60px_rgba(87,227,159,0.16)] sm:h-[170px] sm:w-[170px]" />
-
-            <div className="relative z-10 text-center">
-              <motion.div
-                animate={{ scale: isRunning ? [1, 1.08, 1] : 1 }}
-                transition={{ duration: 1.2, repeat: isRunning ? Infinity : 0 }}
-                className="mx-auto flex h-20 w-20 items-center justify-center rounded-lg border border-[var(--temple-border)] bg-black/40 shadow-[0_0_34px_rgba(139,211,255,0.18)]"
-              >
-                <Scale className="h-9 w-9 text-[var(--temple-sky)]" />
-              </motion.div>
-              <p className="mt-4 text-sm font-semibold text-[var(--temple-text)]">Ritual Core</p>
-              <p className="mt-1 text-xs text-[var(--temple-muted)]">mock labor contract</p>
+        <div className="scale-machine relative overflow-hidden rounded-lg border border-[var(--temple-border)] bg-[#050807]/70 p-4 sm:p-5">
+          <div className="scale-arcade-cabinet">
+            <div className="scale-arcade-top">
+              <span>Task</span>
+              <span>Agent</span>
+              <span>Judge</span>
+              <span>Settle</span>
+              <span>Proof</span>
             </div>
 
-            {steps.map((step, index) => {
-              const angle = -90 + index * 60
-              const radius = 42
-              const x = 50 + Math.cos((angle * Math.PI) / 180) * radius
-              const y = 50 + Math.sin((angle * Math.PI) / 180) * radius
-              return (
-                <RitualNode key={step.id} step={step} style={{ left: `${x}%`, top: `${y}%` }} />
-              )
-            })}
+            <div className={cx('scale-flow-lane', isRunning && 'is-running', result && 'has-result')}>
+              {arcadeSteps.map((step, index) => (
+                <ArcadeStep key={step.id} step={step} index={index} running={isRunning} />
+              ))}
+              <motion.div
+                className="scale-flow-token"
+                animate={{
+                  left: isRunning ? ['10%', '30%', '50%', '70%', '90%'] : result ? '90%' : '10%',
+                  scale: isRunning ? [1, 1.08, 1, 1.08, 1] : result ? 1.08 : 1,
+                }}
+                transition={{ duration: 3.8, repeat: isRunning ? Infinity : 0, ease: 'easeInOut' }}
+              >
+                <Sparkles className="h-4 w-4" />
+              </motion.div>
+            </div>
+
+            <div className="scale-arcade-body">
+              <div className="scale-core-panel">
+                <ScaleMascot mood={result?.outcome === 'Approved' ? 'party' : isRunning ? 'busy' : 'happy'} />
+                <p className="mt-3 text-sm font-black text-[var(--temple-text)]">{isRunning ? 'Processing task...' : result ? 'Proof printed!' : 'Ready for SCALE'}</p>
+                <p className="mt-1 text-xs text-[var(--temple-muted)]">{result ? result.rewardStatus : 'Choose task, agent, judge, then run.'}</p>
+              </div>
+              <div className={cx('scale-reward-printer', result?.outcome === 'Approved' && 'is-approved')}>
+                <div className="scale-ticket">
+                  <p>mock reward</p>
+                  <strong>{reward} USDC</strong>
+                </div>
+                <div className="scale-proof-pop">
+                  <FileCheck2 className="h-5 w-5" />
+                  <span>{result ? 'stamped' : 'waiting'}</span>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div className="relative z-10 mt-2 grid gap-3 sm:grid-cols-3">
-            <MiniRelic label="Summoned Entity" value={agent?.name ?? 'No agent'} icon={ActiveAgentIcon} active={isRunning && Boolean(agent)} />
+          <div className="relative z-10 mt-4 grid gap-3 sm:grid-cols-3">
+            <MiniRelic label="Summoned Entity" value={agent?.name ?? 'No agent'} icon={ActiveAgentIcon} active={(isRunning || Boolean(result)) && Boolean(agent)} />
             <MiniRelic label="Escrow Crystal" value={`${reward} mock USDC`} icon={Gem} active={isRunning} />
-            <MiniRelic label="Tribunal Mask" value={judge?.name ?? 'No judge'} icon={JudgeIcon} active={isRunning && Boolean(judge)} />
+            <MiniRelic label="Tribunal Mask" value={judge?.name ?? 'No judge'} icon={JudgeIcon} active={(isRunning || Boolean(result)) && Boolean(judge)} />
           </div>
 
           <div className="relative z-10 mt-4 grid gap-3 sm:grid-cols-[auto_1fr] sm:items-center">
             <DeadlineRelic deadline={deadline} active={isRunning} countdown={countdown} />
-            <div className="grid gap-2 sm:grid-cols-3">
+            <div className="scale-step-lane grid gap-2 sm:grid-cols-2 2xl:grid-cols-3">
               {steps.map(step => (
-                <div key={step.id} className="rounded-lg border border-[var(--temple-border)] bg-black/25 p-3">
+                <div key={step.id} className={cx('scale-step-tile rounded-lg border p-3', step.state === 'active' ? 'is-active' : step.state === 'complete' ? 'is-done' : step.state === 'failed' ? 'is-failed' : '')}>
                   <div className="flex items-center justify-between gap-2">
                     <p className="text-xs font-semibold">{step.label}</p>
                     <StepStatus state={step.state} />
@@ -821,12 +876,12 @@ function RitualChamber({
           </div>
         </div>
 
-        <div className="mt-5 grid gap-3 sm:grid-cols-3">
+        <div className="scale-runway mt-5 grid gap-3 sm:grid-cols-3">
           <button
             type="button"
             disabled={!canRun}
             onClick={onRun}
-            className="temple-button inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-bold disabled:cursor-not-allowed disabled:opacity-45 sm:col-span-1"
+            className="temple-button inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-black disabled:cursor-not-allowed disabled:opacity-45 sm:col-span-1"
           >
             <Play className="h-4 w-4" /> Run SCALE Ritual
           </button>
@@ -834,7 +889,7 @@ function RitualChamber({
             type="button"
             disabled={isRunning}
             onClick={onReset}
-            className="temple-button-secondary inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-45"
+            className="temple-button-secondary inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-black disabled:cursor-not-allowed disabled:opacity-45"
           >
             <RotateCcw className="h-4 w-4 text-[var(--temple-gold)]" /> Reset Chamber
           </button>
@@ -842,13 +897,33 @@ function RitualChamber({
             type="button"
             disabled={isRunning || !result}
             onClick={onTryAgain}
-            className="temple-button-secondary inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-45"
+            className="temple-button-secondary inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-black disabled:cursor-not-allowed disabled:opacity-45"
           >
             <RefreshCw className="h-4 w-4 text-[var(--temple-emerald)]" /> Try Another Run
           </button>
         </div>
       </div>
     </section>
+  )
+}
+
+function proofState(steps: RitualStep[], result: Result | null): StepState {
+  if (result) return result.outcome === 'Rejected' ? 'failed' : 'complete'
+  const activeSettlement = steps[5]?.state
+  if (activeSettlement === 'active') return 'active'
+  return 'pending'
+}
+
+function ArcadeStep({ step, index, running }: { step: RitualStep; index: number; running: boolean }) {
+  const Icon = step.icon
+  return (
+    <div className={cx('scale-arcade-step', step.state === 'active' && 'is-active', step.state === 'complete' && 'is-done', step.state === 'failed' && 'is-failed')} style={{ transitionDelay: `${index * 45}ms` }}>
+      <span className="scale-arcade-step-icon">
+        <Icon className="h-4 w-4" />
+      </span>
+      <span>{step.label}</span>
+      {running && step.state === 'active' && <span className="scale-step-spark" />}
+    </div>
   )
 }
 
@@ -888,7 +963,7 @@ function SettlementResult({ result }: { result: Result | null }) {
 
   return (
     <Panel title="Settlement Verdict" icon={Gavel}>
-      <div className="mb-4 flex items-center justify-between gap-3 rounded-lg border border-[var(--temple-border)] bg-black/25 p-3">
+      <div className={cx('scale-verdict-card mb-4 flex items-center justify-between gap-3 rounded-lg border p-3', result.outcome === 'Approved' ? 'is-approved' : 'is-rejected')}>
         <div>
           <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--temple-soft)]">Final Verdict Stamp</p>
           <p className={cx('mt-1 text-2xl font-black', outcomeColor(result.outcome))}>{result.outcome}</p>
@@ -921,7 +996,8 @@ function TemporaryProofScroll({ proof }: { proof: Proof | null }) {
             <p className="mt-2 text-xs leading-5 text-[var(--temple-muted)]">Proof appears after settlement and disappears on reset or refresh.</p>
           </motion.div>
         ) : (
-          <motion.div key={proof.proofId} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="rounded-lg border border-[var(--temple-gold)]/35 bg-[linear-gradient(180deg,rgba(242,200,102,0.10),rgba(0,0,0,0.20))] p-4 shadow-[0_0_34px_rgba(242,200,102,0.10)]">
+          <motion.div key={proof.proofId} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="scale-proof-card rounded-lg border border-[var(--temple-gold)]/35 bg-[linear-gradient(180deg,rgba(242,200,102,0.10),rgba(0,0,0,0.20))] p-4 shadow-[0_0_34px_rgba(242,200,102,0.10)]">
+            <div className="scale-proof-stamp">stamped</div>
             <ProofLine label="Proof ID" value={proof.proofId} />
             <ProofLine label="Task" value={proof.taskType} />
             <ProofLine label="Agent" value={proof.agent} />
@@ -1058,34 +1134,6 @@ function DeadlineRelic({ deadline, active, countdown }: { deadline: number | nul
       <p className="mt-2 text-lg font-black">{countdown !== null ? countdown : deadline ?? '--'}s</p>
       <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--temple-soft)]">Deadline Relic</p>
     </div>
-  )
-}
-
-function RitualNode({ step, style }: { step: RitualStep; style: React.CSSProperties }) {
-  const Icon = step.icon
-  const active = step.state === 'active'
-  const complete = step.state === 'complete'
-  const failed = step.state === 'failed'
-  return (
-    <motion.div
-      className="absolute z-20 -translate-x-1/2 -translate-y-1/2 text-center"
-      style={style}
-      animate={{ scale: active ? [1, 1.12, 1] : 1 }}
-      transition={{ duration: 0.9, repeat: active ? Infinity : 0 }}
-    >
-      <div
-        className={cx(
-          'mx-auto flex h-14 w-14 items-center justify-center rounded-lg border bg-black/55 shadow-lg sm:h-16 sm:w-16',
-          active && 'border-[var(--temple-sky)] text-[var(--temple-sky)] shadow-[0_0_28px_rgba(139,211,255,0.22)]',
-          complete && 'border-[var(--temple-emerald)] text-[var(--temple-emerald)]',
-          failed && 'border-[var(--temple-red)] text-[var(--temple-red)]',
-          step.state === 'pending' && 'border-[var(--temple-border)] text-[var(--temple-muted)]',
-        )}
-      >
-        <Icon className="h-5 w-5" />
-      </div>
-      <p className="mt-2 hidden max-w-24 text-[10px] font-semibold leading-4 text-[var(--temple-muted)] sm:block">{step.label}</p>
-    </motion.div>
   )
 }
 
