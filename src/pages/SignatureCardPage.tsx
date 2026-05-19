@@ -1,6 +1,6 @@
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { motion } from 'framer-motion'
-import { Download, ImagePlus, PenLine, RefreshCcw, Sparkles, WalletCards } from 'lucide-react'
+import { Download, PenLine, RefreshCcw, Sparkles, WalletCards } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useAccount, useChainId, useReadContract, useSwitchChain, useWaitForTransactionReceipt, useWriteContract } from 'wagmi'
 import CardPreview, { type SignatureCardRecord } from '../components/signature-card/CardPreview'
@@ -31,8 +31,6 @@ export default function SignatureCardPage() {
   const receipt = useWaitForTransactionReceipt({ hash: mintHash })
 
   const [xUsername, setXUsername] = useState('')
-  const [manualImageUrl, setManualImageUrl] = useState('')
-  const [localImageUrl, setLocalImageUrl] = useState('')
   const [signatureLabel, setSignatureLabel] = useState('')
   const [signatureImage, setSignatureImage] = useState('')
   const [hasDrawnSignature, setHasDrawnSignature] = useState(false)
@@ -45,8 +43,7 @@ export default function SignatureCardPage() {
 
   const cleanHandle = normalizeXHandle(xUsername)
   const unavatarUrl = getXAvatarUrl(xUsername)
-  const previewImageUrl = localImageUrl || manualImageUrl.trim() || unavatarUrl
-  const contractImageUrl = manualImageUrl.trim() || unavatarUrl || ''
+  const profileImageUrl = unavatarUrl || ''
   const isWrongNetwork = isConnected && chainId !== ARC_CHAIN.id
   const isConfirming = receipt.isLoading
 
@@ -88,18 +85,6 @@ export default function SignatureCardPage() {
     void myCardsQuery.refetch()
   }, [myCardsQuery, recentCardsQuery, receipt.isSuccess, totalCardsQuery])
 
-  useEffect(() => {
-    return () => {
-      if (localImageUrl) URL.revokeObjectURL(localImageUrl)
-    }
-  }, [localImageUrl])
-
-  function handleLocalImage(file?: File) {
-    if (!file) return
-    if (localImageUrl) URL.revokeObjectURL(localImageUrl)
-    setLocalImageUrl(URL.createObjectURL(file))
-  }
-
   async function handleDownload() {
     setDownloadError('')
     if (!cardRef.current) return
@@ -109,7 +94,7 @@ export default function SignatureCardPage() {
         cardNumber: previewCardNumber,
       })
     } catch {
-      setDownloadError('PNG export failed. Try uploading an image manually if the remote avatar blocks export.')
+      setDownloadError('PNG export failed. The remote avatar may be blocking image export.')
     }
   }
 
@@ -133,7 +118,7 @@ export default function SignatureCardPage() {
       functionName: 'mintCard',
       args: [
         cleanHandle,
-        contractImageUrl,
+        profileImageUrl,
         signatureLabel.trim() || cleanHandle,
         borderGradient,
         cardTheme,
@@ -167,7 +152,7 @@ export default function SignatureCardPage() {
             <CardPreview
               cardNumber={previewCardNumber}
               xUsername={cleanHandle}
-              profileImageUrl={previewImageUrl}
+              profileImageUrl={profileImageUrl}
               signatureLabel={signatureLabel.trim() || cleanHandle}
               signatureImage={signatureImage}
               borderGradient={borderGradient}
@@ -202,23 +187,6 @@ export default function SignatureCardPage() {
                 Avatar URL: {unavatarUrl || 'enter a username to generate Unavatar URL'}
               </span>
             </label>
-
-            <div className="grid gap-4 md:grid-cols-2">
-              <label className="grid gap-2">
-                <span className="signature-label">Fallback image URL</span>
-                <input
-                  value={manualImageUrl}
-                  onChange={event => setManualImageUrl(event.target.value)}
-                  placeholder="https://..."
-                  className="temple-input rounded-xl px-4 py-3 text-sm font-bold"
-                />
-              </label>
-              <label className="signature-upload-control">
-                <ImagePlus className="h-5 w-5" />
-                <span>Upload local preview image</span>
-                <input type="file" accept="image/*" onChange={event => handleLocalImage(event.target.files?.[0])} />
-              </label>
-            </div>
 
             <label className="grid gap-2">
               <span className="signature-label">Signature label</span>
@@ -278,7 +246,7 @@ export default function SignatureCardPage() {
             </div>
             <div className="signature-status-row">
               <span>Contract image</span>
-              <strong>{contractImageUrl ? 'Remote URL' : 'Empty'}</strong>
+              <strong>{profileImageUrl ? 'Unavatar URL' : 'Empty'}</strong>
             </div>
           </div>
 
