@@ -19,7 +19,7 @@ type CardPreviewProps = {
   signatureLabel: string
   signatureImage?: string
   borderGradient: string
-  cardTheme: string
+  cardTheme?: string
   compact?: boolean
 }
 
@@ -35,7 +35,6 @@ export default function CardPreview({
   signatureLabel,
   signatureImage,
   borderGradient,
-  cardTheme,
   compact = false,
 }: CardPreviewProps) {
   const showImage = Boolean(profileImageUrl)
@@ -77,8 +76,6 @@ export default function CardPreview({
             {initial}
           </div>
         </div>
-
-        <div className="signature-card-theme">{cardTheme}</div>
 
         <footer className="signature-card-bottom">
           <div className="signature-card-logo">
