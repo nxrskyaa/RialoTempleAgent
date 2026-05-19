@@ -29,3 +29,4 @@ broadcast
 *.sw?
 
 .vercel
+tmp
