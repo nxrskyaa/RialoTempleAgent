@@ -4,10 +4,10 @@ import { motion } from 'framer-motion'
 import { AlertCircle, CheckCircle2, Loader2, Sparkles, UserRound } from 'lucide-react'
 import { useAccount, useReadContract, useWaitForTransactionReceipt, useWriteContract } from 'wagmi'
 import { ARC_CHAIN, RIALO_TEMPLE_ABI, RIALO_TEMPLE_ADDRESS } from '@/config/contracts'
-import { EMPTY_PROFILE, EMPTY_STATS, normalizeXHandle, parseProfileResult, toXAvatarUrl, toXUrl, type ProfileData, type UserStatsData } from '@/lib/rialo'
+import { EMPTY_GRIALO_STATS, EMPTY_PROFILE, normalizeXHandle, parseUnifiedUser, toXAvatarUrl, type GrialoStatsData, type ProfileData } from '@/lib/rialo'
 
 type Props = {
-  children: (profile: ProfileData, stats: UserStatsData, refetch: () => void) => ReactNode
+  children: (profile: ProfileData, stats: GrialoStatsData, refetch: () => void) => ReactNode
   compact?: boolean
 }
 
@@ -20,7 +20,7 @@ export default function ProfileGate({ children, compact = false }: Props) {
   const { data, error: readError, isLoading, refetch } = useReadContract({
     address: RIALO_TEMPLE_ADDRESS,
     abi: RIALO_TEMPLE_ABI,
-    functionName: 'getProfile',
+    functionName: 'getUser',
     args: address ? [address] : undefined,
     query: {
       enabled: Boolean(address),
@@ -31,7 +31,8 @@ export default function ProfileGate({ children, compact = false }: Props) {
     },
   })
 
-  const { profile, stats } = useMemo(() => parseProfileResult(data), [data])
+  const user = useMemo(() => parseUnifiedUser(data), [data])
+  const stats = user
 
   const { data: profileTxHash, writeContract, isPending, reset } = useWriteContract({
     mutation: {
@@ -76,15 +77,8 @@ export default function ProfileGate({ children, compact = false }: Props) {
       address: RIALO_TEMPLE_ADDRESS,
       abi: RIALO_TEMPLE_ABI,
       chainId: ARC_CHAIN.id,
-      functionName: 'setupProfile',
-      args: [
-        name.trim(),
-        toXUrl(xInput || handle),
-        handle,
-        toXAvatarUrl(handle),
-        0n,
-        0n,
-      ],
+      functionName: 'sealProfile',
+      args: [name.trim(), handle],
     })
   }
 
@@ -112,7 +106,7 @@ export default function ProfileGate({ children, compact = false }: Props) {
     )
   }
 
-  if (profile.exists) return <>{children(profile, stats, () => void refetch())}</>
+  if (user.exists) return <>{children(user, stats, () => void refetch())}</>
 
   return (
     <div className={`mx-auto grid max-w-5xl gap-5 px-4 py-8 ${compact ? '' : 'lg:grid-cols-[1.05fr_0.95fr]'}`}>
@@ -123,13 +117,13 @@ export default function ProfileGate({ children, compact = false }: Props) {
           </div>
           <div>
             <p className="text-xs font-black uppercase tracking-wider text-[var(--temple-cyan)]">Player card</p>
-            <h1 className="text-2xl font-black">Set up your Rialo profile</h1>
-            <p className="text-sm text-[var(--temple-muted)]">Name the wallet. Light the tiny ritual.</p>
+            <h1 className="text-2xl font-black">Seal Rialo Temple Profile</h1>
+            <p className="text-sm text-[var(--temple-muted)]">Choose a username and X handle for Grialo.</p>
           </div>
         </div>
 
         <div className="space-y-4">
-          <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--temple-soft)]">Display name</label>
+          <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--temple-soft)]">Username</label>
           <input className="temple-input w-full rounded-lg px-3 py-3 text-sm" value={name} onChange={(event) => setName(event.target.value)} placeholder="Rialo Builder" />
 
           <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--temple-soft)]">X link or handle</label>
@@ -154,7 +148,7 @@ export default function ProfileGate({ children, compact = false }: Props) {
 
           <button type="button" onClick={submitProfile} disabled={isSaving} className="temple-button inline-flex w-full items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-black disabled:cursor-not-allowed disabled:opacity-60">
             {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-            {isConfirming ? 'Confirming on Arc' : isPending ? 'Waiting for wallet' : 'Seal profile on-chain'}
+            {isConfirming ? 'Confirming on Arc' : isPending ? 'Waiting for wallet' : 'Seal Profile'}
           </button>
         </div>
       </motion.div>
@@ -171,7 +165,7 @@ export default function ProfileGate({ children, compact = false }: Props) {
               </div>
             </div>
             <div className="mt-5 grid grid-cols-3 gap-2 text-center">
-              {[['PTS', EMPTY_STATS.totalPts], ['Spins', EMPTY_STATS.totalCheckIns], ['Reviews', EMPTY_STATS.reviewCount]].map(([label, value]) => (
+              {[['PTS', EMPTY_GRIALO_STATS.totalPts], ['Spins', EMPTY_GRIALO_STATS.totalSpins], ['Streak', EMPTY_GRIALO_STATS.currentStreak]].map(([label, value]) => (
                 <div key={label} className="rounded-lg bg-white/[0.035] p-3">
                   <p className="text-lg font-semibold text-[var(--temple-emerald)]">{value}</p>
                   <p className="text-[10px] uppercase tracking-wider text-[var(--temple-soft)]">{label}</p>
@@ -187,5 +181,5 @@ export default function ProfileGate({ children, compact = false }: Props) {
 }
 
 export function useEmptyProfile() {
-  return { profile: EMPTY_PROFILE, stats: EMPTY_STATS }
+  return { profile: EMPTY_PROFILE, stats: EMPTY_GRIALO_STATS }
 }

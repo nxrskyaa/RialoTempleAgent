@@ -10,7 +10,7 @@ import {
   fmtCountdown,
   getGrialoRarity,
   parseGrialoSpin,
-  parseGrialoStats,
+  parseUnifiedUser,
   type GrialoSpinData,
   type GrialoStatsData,
 } from '@/lib/rialo'
@@ -20,14 +20,14 @@ type GrialoStage = 'idle' | 'spinning' | 'boxRevealed' | 'opening' | 'revealed' 
 export default function Grialo() {
   return (
     <ProfileGate>
-      {(profile, _stats, refetchProfile) => (
-        <GrialoInner profileName={profile.name} refetchProfile={refetchProfile} />
+      {(profile, stats, refetchProfile) => (
+        <GrialoInner profileName={profile.name} fallbackStats={stats} refetchProfile={refetchProfile} />
       )}
     </ProfileGate>
   )
 }
 
-function GrialoInner({ profileName, refetchProfile }: { profileName: string; refetchProfile: () => void }) {
+function GrialoInner({ profileName, fallbackStats, refetchProfile }: { profileName: string; fallbackStats: GrialoStatsData; refetchProfile: () => void }) {
   const { address } = useAccount()
   const chainId = useChainId()
   const { switchChain, isPending: isSwitching } = useSwitchChain()
@@ -38,10 +38,10 @@ function GrialoInner({ profileName, refetchProfile }: { profileName: string; ref
 
   const isWrongNetwork = Boolean(address) && chainId !== ARC_CHAIN.id
 
-  const statsQuery = useReadContract({
+  const userQuery = useReadContract({
     address: RIALO_TEMPLE_ADDRESS,
     abi: RIALO_TEMPLE_ABI,
-    functionName: 'getUserStats',
+    functionName: 'getUser',
     args: address ? [address] : undefined,
     query: { enabled: Boolean(address), refetchInterval: 7000, retry: 1 },
   })
@@ -92,7 +92,8 @@ function GrialoInner({ profileName, refetchProfile }: { profileName: string; ref
     query: { enabled: Boolean(spinHash), refetchOnWindowFocus: false },
   })
 
-  const stats = useMemo(() => parseGrialoStats(statsQuery.data), [statsQuery.data])
+  const user = useMemo(() => parseUnifiedUser(userQuery.data), [userQuery.data])
+  const stats = user.exists ? user : fallbackStats
   const latestSpin = useMemo(() => parseGrialoSpin(latestSpinQuery.data), [latestSpinQuery.data])
   const canSpin = Boolean(canSpinQuery.data) && cooldown === 0 && !isWrongNetwork
   const isBusy = isPending || receipt.isLoading || stage === 'spinning' || stage === 'opening'
@@ -118,12 +119,12 @@ function GrialoInner({ profileName, refetchProfile }: { profileName: string; ref
       setRevealedSpin(parseGrialoSpin(result.data))
       setStage('boxRevealed')
     })
-    void statsQuery.refetch()
+    void userQuery.refetch()
     void canSpinQuery.refetch()
     void waitQuery.refetch()
     void refetchProfile()
     reset()
-  }, [canSpinQuery, latestSpinQuery, receipt.isSuccess, refetchProfile, reset, statsQuery, waitQuery])
+  }, [canSpinQuery, latestSpinQuery, receipt.isSuccess, refetchProfile, reset, userQuery, waitQuery])
 
   useEffect(() => {
     if (cooldown > 0 && stage === 'idle') setStage('cooldown')
@@ -150,7 +151,7 @@ function GrialoInner({ profileName, refetchProfile }: { profileName: string; ref
     window.setTimeout(() => {
       setStage('revealed')
       setTxMessage('Grialo revealed.')
-      void statsQuery.refetch()
+      void userQuery.refetch()
       void canSpinQuery.refetch()
       void waitQuery.refetch()
     }, displayRarity.id >= 5 ? 7600 : displayRarity.id >= 3 ? 6800 : 5600)
@@ -209,9 +210,9 @@ function GrialoInner({ profileName, refetchProfile }: { profileName: string; ref
         </div>
       </section>
 
-      {(txMessage || statsQuery.error || latestSpinQuery.error) && (
+      {(txMessage || userQuery.error || latestSpinQuery.error) && (
         <div className="mt-4 rounded-lg border border-[var(--temple-border)] bg-white/[0.045] px-4 py-3 text-sm font-semibold text-[var(--temple-muted)]">
-          {statsQuery.error || latestSpinQuery.error ? 'Contract read is warming up. If this stays visible, refresh after the latest Arc RPC sync.' : txMessage}
+          {userQuery.error || latestSpinQuery.error ? 'Contract read is warming up. If this stays visible, refresh after the latest Arc RPC sync.' : txMessage}
         </div>
       )}
 

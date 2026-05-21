@@ -13,12 +13,12 @@ type WriteKind = 'food' | 'film'
 export default function ReviewPage() {
   return (
     <ProfileGate>
-      {(_, stats, refetchProfile) => <ReviewInner reviewCount={stats.reviewCount} refetchProfile={refetchProfile} />}
+      {(_, _stats, refetchProfile) => <ReviewInner refetchProfile={refetchProfile} />}
     </ProfileGate>
   )
 }
 
-function ReviewInner({ reviewCount, refetchProfile }: { reviewCount: number; refetchProfile: () => void }) {
+function ReviewInner({ refetchProfile }: { refetchProfile: () => void }) {
   const [tab, setTab] = useState<Tab>('all')
   const [kind, setKind] = useState<WriteKind>('food')
   const [title, setTitle] = useState('')
@@ -118,7 +118,7 @@ function ReviewInner({ reviewCount, refetchProfile }: { reviewCount: number; ref
           <div>
             <p className="text-xs font-black uppercase tracking-wider text-[var(--temple-cyan)]">Review studio</p>
             <h1 className="arcade-title mt-2 text-4xl font-black tracking-normal">Make a tiny poster</h1>
-            <p className="mt-2 max-w-md text-sm leading-6 text-[var(--temple-muted)]">Food and film notes become on-chain collectible stamps. Your profile has {reviewCount} reviews.</p>
+            <p className="mt-2 max-w-md text-sm leading-6 text-[var(--temple-muted)]">Food and film notes become on-chain collectible stamps beside your Grialo profile.</p>
           </div>
           <div className="review-mascot machine-screen hidden h-16 w-16 items-center justify-center rounded-full border border-[var(--temple-border)] sm:flex">
             {kind === 'food' ? <Utensils className="h-6 w-6 text-[var(--temple-emerald)]" /> : <Clapperboard className="h-6 w-6 text-[var(--temple-gold)]" />}

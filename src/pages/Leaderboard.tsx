@@ -10,14 +10,14 @@ export default function Leaderboard() {
   const ptsQuery = useReadContract({
     address: RIALO_TEMPLE_ADDRESS,
     abi: RIALO_TEMPLE_ABI,
-    functionName: 'getTopPlayersByPts',
+    functionName: 'getTopByPts',
     args: [LIMIT],
     query: { refetchInterval: 8000, retry: 1 },
   })
   const streakQuery = useReadContract({
     address: RIALO_TEMPLE_ADDRESS,
     abi: RIALO_TEMPLE_ABI,
-    functionName: 'getTopPlayersByStreak',
+    functionName: 'getTopByStreak',
     args: [LIMIT],
     query: { refetchInterval: 8000, retry: 1 },
   })
@@ -78,7 +78,7 @@ function RankPanel({ title, icon: Icon, entries, mode }: { title: string; icon: 
           </div>
           <div>
             <h2 className="text-2xl font-black">{title}</h2>
-            <p className="text-xs font-bold text-[var(--temple-soft)]">Grialo PTS / streak / best tier / spins</p>
+            <p className="text-xs font-bold text-[var(--temple-soft)]">Username / X / wallet / PTS / spins / tier</p>
           </div>
         </div>
       </div>
@@ -99,14 +99,15 @@ function RankPanel({ title, icon: Icon, entries, mode }: { title: string; icon: 
                   #{index + 1}
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-black">{fmtAddress(entry.user)}</p>
+                  <p className="truncate text-sm font-black">{entry.username || fmtAddress(entry.user)}</p>
+                  <p className="truncate text-xs font-bold text-[var(--temple-muted)]">@{entry.xHandle || 'xhandle'} / {fmtAddress(entry.user)}</p>
                   <p className="text-xs font-bold" style={{ color: rarity.color }}>{rarity.tier} / {rarity.boxName}</p>
                 </div>
               </div>
               <div className="grid grid-cols-3 gap-2 text-right">
                 <Mini label="PTS" value={entry.totalPts} />
-                <Mini label="Best" value={`${entry.bestStreak}d`} />
                 <Mini label="Spins" value={entry.totalSpins} />
+                <Mini label="Best" value={`${entry.bestStreak}d`} />
               </div>
             </motion.div>
           )

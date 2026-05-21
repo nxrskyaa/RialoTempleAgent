@@ -3,36 +3,30 @@ import { Clock, Copy, ExternalLink, Flame, Sparkles, Star, Trophy, UserRound, Wa
 import { useAccount, useBalance, useReadContract } from 'wagmi'
 import ProfileGate from '@/components/ProfileGate'
 import { ARC_CHAIN, RIALO_TEMPLE_ABI, RIALO_TEMPLE_ADDRESS } from '@/config/contracts'
-import { fmtAddress, fmtCountdown, getGrialoRarity, parseGrialoStats, type ProfileData } from '@/lib/rialo'
+import { fmtAddress, fmtCountdown, getGrialoRarity, parseUnifiedUser, type GrialoStatsData, type ProfileData } from '@/lib/rialo'
 
 export default function Profile() {
   return (
     <ProfileGate>
-      {(profile) => <ProfileInner profile={profile} />}
+      {(profile, stats) => <ProfileInner profile={profile} fallbackStats={stats} />}
     </ProfileGate>
   )
 }
 
-function ProfileInner({ profile }: { profile: ProfileData }) {
+function ProfileInner({ profile, fallbackStats }: { profile: ProfileData; fallbackStats: GrialoStatsData }) {
   const { address } = useAccount()
   const [copied, setCopied] = useState(false)
   const { data: balance } = useBalance({ address, query: { enabled: Boolean(address), refetchInterval: 10000 } })
   const statsQuery = useReadContract({
     address: RIALO_TEMPLE_ADDRESS,
     abi: RIALO_TEMPLE_ABI,
-    functionName: 'getUserStats',
+    functionName: 'getUser',
     args: address ? [address] : undefined,
     query: { enabled: Boolean(address), refetchInterval: 8000, retry: 1 },
   })
-  const waitQuery = useReadContract({
-    address: RIALO_TEMPLE_ADDRESS,
-    abi: RIALO_TEMPLE_ABI,
-    functionName: 'timeUntilNextSpin',
-    args: address ? [address] : undefined,
-    query: { enabled: Boolean(address), refetchInterval: 5000, retry: 1 },
-  })
-  const grialoStats = parseGrialoStats(statsQuery.data)
-  const waitTime = typeof waitQuery.data === 'bigint' ? Number(waitQuery.data) : grialoStats.waitTime
+  const user = parseUnifiedUser(statsQuery.data)
+  const grialoStats = user.exists ? user : fallbackStats
+  const waitTime = grialoStats.waitTime
   const bestRarity = getGrialoRarity(grialoStats.bestTier)
 
   function copyAddress() {
@@ -69,6 +63,9 @@ function ProfileInner({ profile }: { profile: ProfileData }) {
             </div>
             <p className="text-xs text-[var(--temple-muted)]">{copied ? 'Copied wallet address.' : `${ARC_CHAIN.name} / native ${ARC_CHAIN.nativeCurrency.symbol}`}</p>
             <p className="mt-3 text-2xl font-black text-[var(--temple-emerald)]">{balance?.formatted ? Number(balance.formatted).toFixed(4) : '0.0000'} USDC</p>
+            <p className="mt-2 text-[10px] font-semibold uppercase tracking-wider text-[var(--temple-soft)]">
+              Last spin: {grialoStats.lastSpinAt > 0 ? new Date(grialoStats.lastSpinAt * 1000).toLocaleString() : 'No Grialo yet'}
+            </p>
           </div>
         </section>
 
