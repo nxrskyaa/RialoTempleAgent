@@ -3,6 +3,7 @@ import type { CSSProperties } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Box, Loader2, RotateCcw, Share2, Zap } from 'lucide-react'
 import { useAccount, useChainId, useReadContract, useSwitchChain, useWaitForTransactionReceipt, useWriteContract } from 'wagmi'
+import { decodeEventLog, type Log } from 'viem'
 import ProfileGate from '@/components/ProfileGate'
 import { ARC_CHAIN, RIALO_TEMPLE_ABI, RIALO_TEMPLE_ADDRESS } from '@/config/contracts'
 import {
@@ -120,16 +121,35 @@ function GrialoInner({ profileName, fallbackStats, refetchProfile }: { profileNa
   useEffect(() => {
     if (!receipt.isSuccess) return
     setTxMessage('Mystery Box formed. Open it when the temple seal settles.')
-    void latestSpinQuery.refetch().then((result) => {
-      setRevealedSpin(parseGrialoSpin(result.data))
+    const eventSpin = parseSpinFromReceipt(receipt.data?.logs)
+    if (eventSpin) {
+      setRevealedSpin(eventSpin)
       setStage('boxRevealed')
+    }
+    void latestSpinQuery.refetch().then((result) => {
+      const chainSpin = parseGrialoSpin(result.data)
+      if (chainSpin.spunAt > 0) {
+        setRevealedSpin(chainSpin)
+        setStage('boxRevealed')
+      } else if (!eventSpin) {
+        setStage('boxRevealed')
+      }
+    }).catch(() => {
+      if (!eventSpin) setStage('boxRevealed')
     })
     void userQuery.refetch()
     void canSpinQuery.refetch()
     void waitQuery.refetch()
     void refetchProfile()
     reset()
-  }, [canSpinQuery, latestSpinQuery, receipt.isSuccess, refetchProfile, reset, userQuery, waitQuery])
+  }, [canSpinQuery, latestSpinQuery, receipt.data?.logs, receipt.isSuccess, refetchProfile, reset, userQuery, waitQuery])
+
+  useEffect(() => {
+    if (!receipt.isError) return
+    setStage(cooldown > 0 ? 'cooldown' : 'idle')
+    setTxMessage(receipt.error?.message.split('\n')[0] || 'Spin transaction failed.')
+    reset()
+  }, [cooldown, receipt.error, receipt.isError, reset])
 
   useEffect(() => {
     if (cooldown > 0 && stage === 'idle') setStage('cooldown')
@@ -225,6 +245,34 @@ function GrialoInner({ profileName, fallbackStats, refetchProfile }: { profileNa
       <SpinHistory address={address} />
     </main>
   )
+}
+
+function parseSpinFromReceipt(logs?: readonly Log[]): GrialoSpinData | null {
+  for (const log of logs ?? []) {
+    if (log.address.toLowerCase() !== RIALO_TEMPLE_ADDRESS.toLowerCase()) continue
+
+    try {
+      const decoded = decodeEventLog({
+        abi: RIALO_TEMPLE_ABI,
+        data: log.data,
+        topics: log.topics,
+      })
+
+      if (decoded.eventName !== 'GrialoSpun') continue
+      const args = decoded.args as Record<string, unknown>
+
+      return {
+        tier: Number(args.tier ?? 0),
+        ptsGained: Number(args.pts ?? 0),
+        streakAfter: Number(args.streakAfterSpin ?? 0),
+        spunAt: Number(args.timestamp ?? 0),
+      }
+    } catch {
+      // Ignore unrelated logs in the receipt.
+    }
+  }
+
+  return null
 }
 
 function GrialoDashboard({ stats }: { stats: GrialoStatsData }) {
