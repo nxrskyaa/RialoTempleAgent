@@ -1,0 +1,7 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-label="memory-orb item">
+  <defs><radialGradient id="r" cx="45%" cy="35%" r="70%"><stop offset="0" stop-color="#ff8066" stop-opacity=".9"/><stop offset=".55" stop-color="#ff8066" stop-opacity=".28"/><stop offset="1" stop-color="#0b0d0b" stop-opacity=".05"/></radialGradient><filter id="g"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+  <circle cx="48" cy="48" r="38" fill="url(#r)" opacity=".42"/>
+  <path d="M48 12 L72 30 L66 66 L48 84 L30 66 L24 30 Z" fill="rgba(10,13,11,.88)" stroke="#ff8066" stroke-width="3" filter="url(#g)"/>
+  <path d="M31 48 H65 M48 28 V68 M35 35 L61 61 M61 35 L35 61" stroke="#f7f1df" stroke-opacity=".58" stroke-width="3" stroke-linecap="round"/>
+  <text x="48" y="90" text-anchor="middle" font-family="Inter,Arial" font-size="8" font-weight="900" fill="#f7f1df">MEMORY-ORB</text>
+</svg>

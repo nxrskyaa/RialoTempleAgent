@@ -1,0 +1,16 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 680" role="img" aria-label="Identity Homes">
+  <defs>
+    <radialGradient id="a" cx="50%" cy="40%" r="60%"><stop offset="0" stop-color="#57e39f" stop-opacity=".38"/><stop offset=".55" stop-color="#f2c866" stop-opacity=".12"/><stop offset="1" stop-color="#0b0d0b"/></radialGradient>
+    <linearGradient id="floor" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#131812"/><stop offset="1" stop-color="#050706"/></linearGradient>
+    <filter id="blur"><feGaussianBlur stdDeviation="7"/></filter>
+  </defs>
+  <rect width="1200" height="680" fill="#0b0d0b"/>
+  <rect width="1200" height="680" fill="url(#a)"/>
+  <path d="M0 590 L600 350 L1200 590 L1200 680 L0 680 Z" fill="url(#floor)" stroke="rgba(245,239,218,.16)"/>
+  <g opacity=".18" stroke="#f7f1df"><path d="M120 620 L600 392 L1080 620"/><path d="M260 650 L600 424 L940 650"/><path d="M600 350 V680"/></g>
+  <g opacity=".5" filter="url(#blur)"><circle cx="600" cy="260" r="110" fill="#57e39f" opacity=".35"/><circle cx="870" cy="205" r="74" fill="#f2c866" opacity=".18"/></g>
+  <g transform="translate(470 190)"><path d="M130 0 L250 70 L130 142 L10 70 Z" fill="rgba(245,239,218,.07)" stroke="#57e39f" stroke-width="3"/><path d="M130 28 L202 70 L130 114 L58 70 Z" fill="rgba(0,0,0,.28)" stroke="#f2c866"/></g>
+  <g fill="none" stroke="#57e39f" stroke-width="2" opacity=".5"><circle cx="600" cy="260" r="170"/><circle cx="600" cy="260" r="220"/><path d="M430 260 H770 M600 90 V430 M480 140 L720 380 M720 140 L480 380"/></g>
+  <text x="600" y="82" text-anchor="middle" font-family="Inter,Arial" font-size="32" font-weight="900" fill="#f7f1df">Identity Homes</text>
+  <text x="600" y="122" text-anchor="middle" font-family="Inter,Arial" font-size="17" fill="#c7c9c1">wallet homes and memory threads</text>
+</svg>
