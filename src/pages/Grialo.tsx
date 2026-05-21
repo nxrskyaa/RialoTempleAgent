@@ -166,6 +166,7 @@ function GrialoInner({ profileName, fallbackStats, refetchProfile }: { profileNa
       abi: RIALO_TEMPLE_ABI,
       chainId: ARC_CHAIN.id,
       functionName: 'spinGrialo',
+      gas: 900000n,
     })
   }
 
