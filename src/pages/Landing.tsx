@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom'
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion'
 import { ArrowRight, Clapperboard, Flame, Map, MessageSquareText, Star, Trophy, Utensils, type LucideIcon } from 'lucide-react'
 import { useReadContract } from 'wagmi'
-import { RIALO_TEMPLE_ABI, RIALO_TEMPLE_ADDRESS } from '@/config/contracts'
-import { GRIALO_RARITIES, parseTotals } from '@/lib/rialo'
+import { ARC_CHAIN, RIALO_TEMPLE_ABI, RIALO_TEMPLE_ADDRESS } from '@/config/contracts'
+import { GRIALO_RARITIES } from '@/lib/rialo'
 
 const AMBIENT_MOVES = ['Grialo', 'PTS', 'Food', 'Film']
 
@@ -13,10 +13,11 @@ export default function Landing() {
   const { data } = useReadContract({
     address: RIALO_TEMPLE_ADDRESS,
     abi: RIALO_TEMPLE_ABI,
-    functionName: 'getTotals',
+    chainId: ARC_CHAIN.id,
+    functionName: 'getPlayerCount',
     query: { staleTime: 60_000, refetchOnWindowFocus: false },
   })
-  const totals = parseTotals(data)
+  const playerCount = typeof data === 'bigint' ? Number(data) : 0
 
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -71,8 +72,8 @@ export default function Landing() {
 
           <div className="relative z-10 mt-10 grid grid-cols-3 gap-2">
             {[
-              ['Users', totals.totalUsers],
-              ['Reviews', totals.totalReviews],
+              ['Players', playerCount],
+              ['Contract', 'Unified'],
               ['Chain', 'Arc'],
             ].map(([label, value]) => (
               <div key={label} className="gumdrop-stat pixel-panel rounded-lg border border-[var(--temple-border)] p-3">

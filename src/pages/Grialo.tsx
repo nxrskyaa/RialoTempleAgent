@@ -41,6 +41,7 @@ function GrialoInner({ profileName, fallbackStats, refetchProfile }: { profileNa
   const userQuery = useReadContract({
     address: RIALO_TEMPLE_ADDRESS,
     abi: RIALO_TEMPLE_ABI,
+    chainId: ARC_CHAIN.id,
     functionName: 'getUser',
     args: address ? [address] : undefined,
     query: { enabled: Boolean(address), refetchInterval: 7000, retry: 1 },
@@ -49,6 +50,7 @@ function GrialoInner({ profileName, fallbackStats, refetchProfile }: { profileNa
   const canSpinQuery = useReadContract({
     address: RIALO_TEMPLE_ADDRESS,
     abi: RIALO_TEMPLE_ABI,
+    chainId: ARC_CHAIN.id,
     functionName: 'canSpin',
     args: address ? [address] : undefined,
     query: { enabled: Boolean(address), refetchInterval: 5000, retry: 1 },
@@ -57,6 +59,7 @@ function GrialoInner({ profileName, fallbackStats, refetchProfile }: { profileNa
   const waitQuery = useReadContract({
     address: RIALO_TEMPLE_ADDRESS,
     abi: RIALO_TEMPLE_ABI,
+    chainId: ARC_CHAIN.id,
     functionName: 'timeUntilNextSpin',
     args: address ? [address] : undefined,
     query: { enabled: Boolean(address), refetchInterval: 5000, retry: 1 },
@@ -65,6 +68,7 @@ function GrialoInner({ profileName, fallbackStats, refetchProfile }: { profileNa
   const nextSpinQuery = useReadContract({
     address: RIALO_TEMPLE_ADDRESS,
     abi: RIALO_TEMPLE_ABI,
+    chainId: ARC_CHAIN.id,
     functionName: 'nextSpinAt',
     args: address ? [address] : undefined,
     query: { enabled: Boolean(address), refetchInterval: 12000, retry: 1 },
@@ -73,6 +77,7 @@ function GrialoInner({ profileName, fallbackStats, refetchProfile }: { profileNa
   const latestSpinQuery = useReadContract({
     address: RIALO_TEMPLE_ADDRESS,
     abi: RIALO_TEMPLE_ABI,
+    chainId: ARC_CHAIN.id,
     functionName: 'getLatestSpin',
     args: address ? [address] : undefined,
     query: { enabled: Boolean(address), retry: 1 },
@@ -381,6 +386,7 @@ function SpinHistory({ address }: { address?: `0x${string}` }) {
   const historyQuery = useReadContract({
     address: RIALO_TEMPLE_ADDRESS,
     abi: RIALO_TEMPLE_ABI,
+    chainId: ARC_CHAIN.id,
     functionName: 'getSpinHistory',
     args: address ? [address] : undefined,
     query: { enabled: Boolean(address), refetchInterval: 12000, retry: 1 },

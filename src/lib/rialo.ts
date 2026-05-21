@@ -299,10 +299,10 @@ export function parseGrialoSpin(data: unknown): GrialoSpinData {
   const row = (data ?? {}) as Record<string, unknown>
   const arr = Array.isArray(data) ? data : []
   return {
-    tier: toNumber(row.tier ?? arr[0]),
-    ptsGained: toNumber(row.ptsGained ?? arr[1]),
-    streakAfter: toNumber(row.streakAfterSpin ?? row.streakAfter ?? arr[2]),
-    spunAt: toNumber(row.spunAt ?? arr[3]),
+    tier: toNumber(row.tier ?? arr[1]),
+    ptsGained: toNumber(row.pts ?? row.ptsGained ?? arr[2]),
+    streakAfter: toNumber(row.streakAfterSpin ?? row.streakAfter ?? arr[3]),
+    spunAt: toNumber(row.timestamp ?? row.spunAt ?? arr[4]),
   }
 }
 

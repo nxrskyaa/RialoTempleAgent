@@ -20,6 +20,7 @@ export default function ProfileGate({ children, compact = false }: Props) {
   const { data, error: readError, isLoading, refetch } = useReadContract({
     address: RIALO_TEMPLE_ADDRESS,
     abi: RIALO_TEMPLE_ABI,
+    chainId: ARC_CHAIN.id,
     functionName: 'getUser',
     args: address ? [address] : undefined,
     query: {
@@ -85,6 +86,9 @@ export default function ProfileGate({ children, compact = false }: Props) {
   const previewHandle = normalizeXHandle(xInput)
   const previewAvatar = toXAvatarUrl(previewHandle)
   const isSaving = isPending || isConfirming
+  const profileReadMessage = readError
+    ? `Could not read the Grialo contract on Arc Testnet. Check that ${RIALO_TEMPLE_ADDRESS} is the deployed RialoTempleGrialo address.`
+    : message
 
   if (!isConnected) {
     return (
@@ -139,10 +143,10 @@ export default function ProfileGate({ children, compact = false }: Props) {
             </div>
           )}
 
-          {(message || readError) && (
+          {profileReadMessage && (
             <div className="flex items-start gap-2 rounded-lg border border-[var(--temple-border)] bg-white/[0.04] px-3 py-2 text-sm text-[var(--temple-text)]">
               {readError ? <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-[var(--temple-red)]" /> : isConfirmed ? <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[var(--temple-emerald)]" /> : <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-[var(--temple-gold)]" />}
-              <span>{readError ? 'Could not read your profile. You can still try sealing it, or refresh the page.' : message}</span>
+              <span>{profileReadMessage}</span>
             </div>
           )}
 

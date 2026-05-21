@@ -20,6 +20,7 @@ function ProfileInner({ profile, fallbackStats }: { profile: ProfileData; fallba
   const statsQuery = useReadContract({
     address: RIALO_TEMPLE_ADDRESS,
     abi: RIALO_TEMPLE_ABI,
+    chainId: ARC_CHAIN.id,
     functionName: 'getUser',
     args: address ? [address] : undefined,
     query: { enabled: Boolean(address), refetchInterval: 8000, retry: 1 },

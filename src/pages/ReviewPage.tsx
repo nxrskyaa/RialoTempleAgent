@@ -41,6 +41,7 @@ function ReviewInner({ refetchProfile }: { refetchProfile: () => void }) {
   const { data, isLoading, refetch } = useReadContract({
     address: RIALO_TEMPLE_ADDRESS,
     abi: RIALO_TEMPLE_ABI,
+    chainId: ARC_CHAIN.id,
     functionName: query.functionName,
     args: query.args,
     query: { refetchInterval: 7000 },

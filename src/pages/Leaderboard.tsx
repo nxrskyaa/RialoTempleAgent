@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import { Crown, Flame, Loader2, Sparkles, Trophy, WalletCards, type LucideIcon } from 'lucide-react'
 import { useReadContract } from 'wagmi'
-import { RIALO_TEMPLE_ABI, RIALO_TEMPLE_ADDRESS } from '@/config/contracts'
+import { ARC_CHAIN, RIALO_TEMPLE_ABI, RIALO_TEMPLE_ADDRESS } from '@/config/contracts'
 import { fmtAddress, getGrialoRarity, parseGrialoLeaderboard, type GrialoLeaderboardData } from '@/lib/rialo'
 
 const LIMIT = 30n
@@ -10,6 +10,7 @@ export default function Leaderboard() {
   const ptsQuery = useReadContract({
     address: RIALO_TEMPLE_ADDRESS,
     abi: RIALO_TEMPLE_ABI,
+    chainId: ARC_CHAIN.id,
     functionName: 'getTopByPts',
     args: [LIMIT],
     query: { refetchInterval: 8000, retry: 1 },
@@ -17,6 +18,7 @@ export default function Leaderboard() {
   const streakQuery = useReadContract({
     address: RIALO_TEMPLE_ADDRESS,
     abi: RIALO_TEMPLE_ABI,
+    chainId: ARC_CHAIN.id,
     functionName: 'getTopByStreak',
     args: [LIMIT],
     query: { refetchInterval: 8000, retry: 1 },
@@ -24,6 +26,7 @@ export default function Leaderboard() {
   const playerCountQuery = useReadContract({
     address: RIALO_TEMPLE_ADDRESS,
     abi: RIALO_TEMPLE_ABI,
+    chainId: ARC_CHAIN.id,
     functionName: 'getPlayerCount',
     query: { refetchInterval: 15000, retry: 1 },
   })
