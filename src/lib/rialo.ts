@@ -46,6 +46,32 @@ export type LeaderboardData = {
   totalPts: number
 }
 
+export type GrialoStatsData = {
+  totalSpins: number
+  totalPts: number
+  currentStreak: number
+  bestStreak: number
+  lastSpinAt: number
+  bestTier: number
+  spinReady: boolean
+  waitTime: number
+}
+
+export type GrialoSpinData = {
+  tier: number
+  ptsGained: number
+  streakAfter: number
+  spunAt: number
+}
+
+export type GrialoLeaderboardData = {
+  user: Address
+  totalPts: number
+  bestStreak: number
+  bestTier: number
+  totalSpins: number
+}
+
 export type TotalsData = {
   totalUsers: number
   totalReviews: number
@@ -71,6 +97,24 @@ export const EMPTY_STATS: UserStatsData = {
   totalPts: 0,
 }
 
+export const EMPTY_GRIALO_STATS: GrialoStatsData = {
+  totalSpins: 0,
+  totalPts: 0,
+  currentStreak: 0,
+  bestStreak: 0,
+  lastSpinAt: 0,
+  bestTier: 0,
+  spinReady: false,
+  waitTime: 0,
+}
+
+export const EMPTY_GRIALO_SPIN: GrialoSpinData = {
+  tier: 0,
+  ptsGained: 0,
+  streakAfter: 0,
+  spunAt: 0,
+}
+
 export const TIERS = [
   { name: 'RialOne', range: '0-2 days', min: 0, pts: 10, color: '#32d583' },
   { name: 'Rialo club member', range: '3-6 days', min: 3, pts: 10, color: '#7dd3fc' },
@@ -78,6 +122,20 @@ export const TIERS = [
   { name: 'Rialo Builders', range: '14-29 days', min: 14, pts: 15, color: '#fb923c' },
   { name: 'Rialo Master', range: '30+ days', min: 30, pts: 20, color: '#d8b4fe' },
 ] as const
+
+export const GRIALO_RARITIES = [
+  { id: 0, tier: 'Common', boxName: 'Stone', text: 'grialo', color: '#9ca3af', accent: '#d1d5db', aura: 'stone', ptsHint: 'faint glow' },
+  { id: 1, tier: 'Uncommon', boxName: 'Jade', text: 'Grialo!', color: '#57e39f', accent: '#b9ffd8', aura: 'jade', ptsHint: 'rune sparkle' },
+  { id: 2, tier: 'Rare', boxName: 'Sapphire', text: 'GRIALO', color: '#4f8cff', accent: '#d9f4ff', aura: 'sapphire', ptsHint: 'hologram seal' },
+  { id: 3, tier: 'Epic', boxName: 'Amethyst', text: 'GRIALOOO', color: '#b76cff', accent: '#f0d7ff', aura: 'amethyst', ptsHint: 'gem vortex' },
+  { id: 4, tier: 'Legendary', boxName: 'Gold', text: 'GRIALO ✦', color: '#f2c866', accent: '#fff4c2', aura: 'gold', ptsHint: 'temple rays' },
+  { id: 5, tier: 'Mythic', boxName: 'Crown', text: 'GRIALO KING', color: '#ff7ad9', accent: '#57e39f', aura: 'crown', ptsHint: 'royal shimmer' },
+  { id: 6, tier: 'Secret', boxName: 'Void', text: 'grialo?', color: '#111827', accent: '#f7f1df', aura: 'void', ptsHint: 'reality tear' },
+] as const
+
+export function getGrialoRarity(tier: number) {
+  return GRIALO_RARITIES.find((item) => item.id === tier) ?? GRIALO_RARITIES[0]
+}
 
 export function getTier(streak: number) {
   return [...TIERS].reverse().find((tier) => streak >= tier.min) ?? TIERS[0]
@@ -99,6 +157,13 @@ export function fmtTime(seconds: number) {
   const m = Math.floor((seconds % 3600) / 60)
   const s = seconds % 60
   return `${h}h ${m}m ${s}s`
+}
+
+export function fmtCountdown(seconds: number) {
+  const h = Math.floor(seconds / 3600).toString().padStart(2, '0')
+  const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0')
+  const s = Math.floor(seconds % 60).toString().padStart(2, '0')
+  return `${h}:${m}:${s}`
 }
 
 export function normalizeXHandle(value: string) {
@@ -171,6 +236,47 @@ export function parseTotals(data: unknown): TotalsData {
     totalReviews: toNumber(row.totalReviews ?? arr[1]),
     balance: toBigInt(row.balance ?? arr[2]),
   }
+}
+
+export function parseGrialoStats(data: unknown): GrialoStatsData {
+  const row = (data ?? {}) as Record<string, unknown>
+  const arr = Array.isArray(data) ? data : []
+  return {
+    totalSpins: toNumber(row.totalSpins ?? arr[0]),
+    totalPts: toNumber(row.totalPts ?? arr[1]),
+    currentStreak: toNumber(row.currentStreak ?? arr[2]),
+    bestStreak: toNumber(row.bestStreak ?? arr[3]),
+    lastSpinAt: toNumber(row.lastSpinAt ?? arr[4]),
+    bestTier: toNumber(row.bestTier ?? arr[5]),
+    spinReady: Boolean(row.spinReady ?? arr[6] ?? false),
+    waitTime: toNumber(row.waitTime ?? arr[7]),
+  }
+}
+
+export function parseGrialoSpin(data: unknown): GrialoSpinData {
+  const row = (data ?? {}) as Record<string, unknown>
+  const arr = Array.isArray(data) ? data : []
+  return {
+    tier: toNumber(row.tier ?? arr[0]),
+    ptsGained: toNumber(row.ptsGained ?? arr[1]),
+    streakAfter: toNumber(row.streakAfter ?? arr[2]),
+    spunAt: toNumber(row.spunAt ?? arr[3]),
+  }
+}
+
+export function parseGrialoLeaderboard(data: unknown): GrialoLeaderboardData[] {
+  if (!Array.isArray(data)) return []
+  return data.map((item) => {
+    const row = item as Record<string, unknown>
+    const arr = Array.isArray(item) ? item : []
+    return {
+      user: String(row.user ?? arr[0] ?? '0x0000000000000000000000000000000000000000') as Address,
+      totalPts: toNumber(row.totalPts ?? arr[1]),
+      bestStreak: toNumber(row.bestStreak ?? arr[2]),
+      bestTier: toNumber(row.bestTier ?? arr[3]),
+      totalSpins: toNumber(row.totalSpins ?? arr[4]),
+    }
+  })
 }
 
 function parseProfile(data: unknown): ProfileData {

@@ -4,7 +4,7 @@ import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion'
 import { ArrowRight, Clapperboard, Flame, Map, MessageSquareText, Star, Trophy, Utensils, type LucideIcon } from 'lucide-react'
 import { useReadContract } from 'wagmi'
 import { RIALO_TEMPLE_ABI, RIALO_TEMPLE_ADDRESS } from '@/config/contracts'
-import { parseTotals, TIERS } from '@/lib/rialo'
+import { GRIALO_RARITIES, parseTotals } from '@/lib/rialo'
 
 const AMBIENT_MOVES = ['Grialo', 'PTS', 'Food', 'Film']
 
@@ -47,18 +47,18 @@ export default function Landing() {
                   <p className="text-xs text-[var(--temple-muted)]">Arc Testnet playground</p>
                 </div>
               </div>
-              <div className="sticker-note candy-sticker hidden rounded-lg px-3 py-2 text-xs font-black sm:block">1 USDC / move</div>
+              <div className="sticker-note candy-sticker hidden rounded-lg px-3 py-2 text-xs font-black sm:block">Arc Testnet rituals</div>
             </div>
 
             <h1 className="arcade-title max-w-xl text-5xl font-black leading-[0.92] tracking-normal sm:text-7xl">
-              Tiny check-ins. Real on-chain proof.
+              Daily mystery boxes. Real on-chain proof.
             </h1>
             <p className="mt-6 max-w-lg text-base leading-7 text-[var(--temple-muted)]">
-              Feed the flame, drop food and film notes, and let your wallet carry the proof. Weirdly cozy, fully on-chain.
+              Channel Grialo, open temple boxes, drop food and film notes, and let your wallet carry the proof. Weirdly cozy, fully on-chain.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link to="/grialo" className="temple-button inline-flex items-center gap-2 rounded-lg px-5 py-3 text-sm font-bold">
-                <Flame className="h-4 w-4" /> Start streak <ArrowRight className="h-4 w-4" />
+                <Flame className="h-4 w-4" /> Channel Grialo <ArrowRight className="h-4 w-4" />
               </Link>
               <Link to="/review" className="temple-button-secondary inline-flex items-center gap-2 rounded-lg px-5 py-3 text-sm font-semibold">
                 <MessageSquareText className="h-4 w-4 text-[var(--temple-coral)]" /> Write review
@@ -94,7 +94,7 @@ export default function Landing() {
                 <h2 className="mt-2 text-3xl font-black">Pick a move. Watch it wiggle.</h2>
               </div>
               <div className="toy-grid mt-8 grid grid-cols-2 gap-3">
-                <ActionTile icon={Flame} title="Grialo" text="24h flame tap" to="/grialo" tone="mint" onPreview={setActiveMove} />
+                <ActionTile icon={Flame} title="Grialo" text="Daily mystery box" to="/grialo" tone="mint" onPreview={setActiveMove} />
                 <ActionTile icon={Star} title="PTS" text="Rank fuel" to="/leaderboard" tone="gold" onPreview={setActiveMove} />
                 <ActionTile icon={Utensils} title="Food" text="Taste log" to="/review" tone="coral" onPreview={setActiveMove} />
                 <ActionTile icon={Clapperboard} title="Film" text="Scene notes" to="/review" tone="cyan" onPreview={setActiveMove} />
@@ -117,7 +117,7 @@ export default function Landing() {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   className="speech-pop absolute -right-5 top-7 rounded-lg px-3 py-2 text-xs font-black"
                 >
-                  {activeMove === 'Food' ? 'nom!' : activeMove === 'Film' ? 'roll!' : activeMove === 'PTS' ? '+pts!' : 'tap!'}
+                  {activeMove === 'Food' ? 'nom!' : activeMove === 'Film' ? 'roll!' : activeMove === 'PTS' ? '+pts!' : 'box!'}
                 </motion.div>
               </div>
               <div className="relative z-10 mt-64 grid grid-cols-3 gap-2 text-center">
@@ -141,11 +141,11 @@ export default function Landing() {
               <Map className="h-6 w-6 shrink-0 text-[var(--temple-cyan)]" />
             </Link>
             <div className="grid gap-2 md:grid-cols-5">
-              {TIERS.map((tier) => (
-                <div key={tier.name} className="stamp-card rounded-lg border border-[var(--temple-border)] bg-white/[0.025] p-3 transition hover:-translate-y-0.5 hover:bg-white/[0.055]">
-                  <p className="truncate text-sm font-semibold">{tier.name}</p>
-                  <p className="mt-2 text-xs text-[var(--temple-muted)]">{tier.range}</p>
-                  <p className="mt-3 text-lg font-black" style={{ color: tier.color }}>+{tier.pts}</p>
+              {GRIALO_RARITIES.slice(0, 5).map((tier) => (
+                <div key={tier.tier} className="stamp-card rounded-lg border border-[var(--temple-border)] bg-white/[0.025] p-3 transition hover:-translate-y-0.5 hover:bg-white/[0.055]">
+                  <p className="truncate text-sm font-semibold">{tier.tier}</p>
+                  <p className="mt-2 text-xs text-[var(--temple-muted)]">{tier.boxName} box</p>
+                  <p className="mt-3 text-lg font-black" style={{ color: tier.color }}>{tier.text}</p>
                 </div>
               ))}
             </div>

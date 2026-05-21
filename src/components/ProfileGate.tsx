@@ -97,7 +97,7 @@ export default function ProfileGate({ children, compact = false }: Props) {
       <div className="temple-card spark-field mx-auto flex max-w-xl flex-col items-center rounded-lg px-6 py-12 text-center">
         <div className="flame-buddy mb-5 h-20 w-16" />
         <h2 className="arcade-title text-2xl font-black">Connect wallet to wake the flame</h2>
-        <p className="mt-2 max-w-sm text-sm leading-6 text-[var(--temple-muted)]">Your profile, check-ins, reviews, and PTS all live behind your Arc Testnet wallet.</p>
+        <p className="mt-2 max-w-sm text-sm leading-6 text-[var(--temple-muted)]">Your profile, Grialo spins, reviews, and PTS all live behind your Arc Testnet wallet.</p>
       </div>
     )
   }
@@ -171,14 +171,14 @@ export default function ProfileGate({ children, compact = false }: Props) {
               </div>
             </div>
             <div className="mt-5 grid grid-cols-3 gap-2 text-center">
-              {[['PTS', EMPTY_STATS.totalPts], ['Checks', EMPTY_STATS.totalCheckIns], ['Reviews', EMPTY_STATS.reviewCount]].map(([label, value]) => (
+              {[['PTS', EMPTY_STATS.totalPts], ['Spins', EMPTY_STATS.totalCheckIns], ['Reviews', EMPTY_STATS.reviewCount]].map(([label, value]) => (
                 <div key={label} className="rounded-lg bg-white/[0.035] p-3">
                   <p className="text-lg font-semibold text-[var(--temple-emerald)]">{value}</p>
                   <p className="text-[10px] uppercase tracking-wider text-[var(--temple-soft)]">{label}</p>
                 </div>
               ))}
             </div>
-            <p className="mt-5 text-xs leading-relaxed text-[var(--temple-muted)]">This profile unlocks Grialo daily streaks, food reviews, film reviews, and leaderboard identity.</p>
+            <p className="mt-5 text-xs leading-relaxed text-[var(--temple-muted)]">This profile unlocks Grialo mystery boxes, food reviews, film reviews, and leaderboard identity.</p>
           </div>
         </div>
       )}

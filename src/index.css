@@ -4,16 +4,16 @@
 
 @layer base {
   :root {
-    --temple-bg: #07080f;
-    --temple-panel: rgba(12, 18, 24, 0.82);
-    --temple-panel-strong: #101823;
-    --temple-border: rgba(185, 255, 202, 0.2);
-    --temple-text: #fff9e9;
+    --temple-bg: #0b0d0b;
+    --temple-panel: rgba(245, 239, 218, 0.065);
+    --temple-panel-strong: #121511;
+    --temple-border: rgba(245, 239, 218, 0.14);
+    --temple-text: #f7f1df;
     --temple-muted: #c7c9c1;
     --temple-soft: #8c928b;
-    --temple-emerald: #61f7a4;
-    --temple-mint-soft: rgba(97, 247, 164, 0.13);
-    --temple-gold: #ffe45e;
+    --temple-emerald: #57e39f;
+    --temple-mint-soft: rgba(87, 227, 159, 0.13);
+    --temple-gold: #f2c866;
     --temple-coral: #ff8066;
     --temple-cyan: #78ecff;
     --temple-sky: #78ecff;
@@ -2471,6 +2471,339 @@
   50% { filter: saturate(1.4); opacity: 0.62; }
 }
 
+.grialo-hero,
+.grialo-leaderboard-hero {
+  position: relative;
+  background:
+    radial-gradient(circle at 18% 16%, rgba(242, 200, 102, 0.14), transparent 20rem),
+    radial-gradient(circle at 86% 22%, rgba(87, 227, 159, 0.13), transparent 22rem),
+    linear-gradient(145deg, rgba(245, 239, 218, 0.075), rgba(245, 239, 218, 0.032));
+}
+
+.grialo-hero::before,
+.grialo-leaderboard-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(245, 239, 218, 0.055) 1px, transparent 1px),
+    linear-gradient(rgba(245, 239, 218, 0.035) 1px, transparent 1px);
+  background-size: 34px 34px;
+  mask-image: radial-gradient(circle at 70% 45%, black, transparent 72%);
+}
+
+.grialo-stage-shell {
+  --grialo-rarity: #57e39f;
+  --grialo-accent: #f7f1df;
+  position: relative;
+  min-height: 560px;
+  overflow: hidden;
+  border: 1px solid rgba(245, 239, 218, 0.14);
+  border-radius: 0.5rem;
+  background:
+    radial-gradient(circle at 50% 32%, color-mix(in srgb, var(--grialo-rarity) 28%, transparent), transparent 17rem),
+    radial-gradient(circle at 50% 92%, rgba(242, 200, 102, 0.12), transparent 20rem),
+    rgba(7, 10, 8, 0.58);
+  box-shadow: inset 0 1px 0 rgba(247, 241, 223, 0.08), 0 28px 90px rgba(0, 0, 0, 0.26);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.grialo-aurora {
+  position: absolute;
+  inset: -30%;
+  pointer-events: none;
+  background:
+    conic-gradient(from 180deg at 50% 50%, transparent, color-mix(in srgb, var(--grialo-rarity) 36%, transparent), transparent, rgba(242, 200, 102, 0.18), transparent);
+  opacity: 0.52;
+  filter: blur(38px);
+  animation: grialo-aurora 9s ease-in-out infinite;
+}
+
+.grialo-rune-ring {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  animation: grialo-rune-spin 22s linear infinite;
+}
+
+.grialo-rune-ring span {
+  position: absolute;
+  width: 12px;
+  height: 28px;
+  border: 1px solid color-mix(in srgb, var(--grialo-rarity) 70%, #f7f1df);
+  border-radius: 999px 999px 2px 2px;
+  box-shadow: 0 0 18px color-mix(in srgb, var(--grialo-rarity) 45%, transparent);
+  opacity: 0.34;
+}
+
+.grialo-orb-panel,
+.grialo-box-card,
+.grialo-reveal {
+  position: relative;
+  z-index: 2;
+  margin-inline: auto;
+  width: min(100%, 430px);
+  text-align: center;
+}
+
+.grialo-orb {
+  position: relative;
+  margin: 0 auto;
+  width: clamp(210px, 42vw, 300px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 36% 28%, rgba(247, 241, 223, 0.9), transparent 12%),
+    radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--grialo-rarity) 34%, transparent), transparent 42%),
+    radial-gradient(circle, rgba(87, 227, 159, 0.18), rgba(11, 13, 11, 0.82) 68%);
+  border: 1px solid color-mix(in srgb, var(--grialo-rarity) 48%, rgba(245, 239, 218, 0.14));
+  box-shadow:
+    0 0 44px color-mix(in srgb, var(--grialo-rarity) 30%, transparent),
+    inset 0 0 42px rgba(247, 241, 223, 0.12);
+  animation: grialo-orb-idle 3.8s ease-in-out infinite;
+}
+
+.grialo-orb::before,
+.grialo-orb::after {
+  content: '';
+  position: absolute;
+  inset: 14%;
+  border-radius: 50%;
+  border: 1px dashed rgba(247, 241, 223, 0.2);
+}
+
+.grialo-orb::after {
+  inset: 28%;
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--grialo-rarity) 38%, transparent);
+  filter: blur(1px);
+}
+
+.grialo-orb.is-spinning {
+  animation: grialo-orb-channel 1.05s ease-in-out infinite;
+}
+
+.grialo-stone {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 28px;
+  height: 34px;
+  border-radius: 12px 12px 8px 8px;
+  background:
+    linear-gradient(135deg, rgba(247, 241, 223, 0.24), transparent),
+    color-mix(in srgb, var(--grialo-rarity) 68%, #1b1d1a);
+  border: 1px solid rgba(247, 241, 223, 0.2);
+  box-shadow: 0 0 22px color-mix(in srgb, var(--grialo-rarity) 34%, transparent);
+}
+
+.stone-1 { animation: grialo-stone-orbit 4.2s linear infinite; }
+.stone-2 { animation: grialo-stone-orbit 4.8s linear infinite reverse; animation-delay: -1s; }
+.stone-3 { animation: grialo-stone-orbit 5.4s linear infinite; animation-delay: -2s; }
+.stone-4 { animation: grialo-stone-orbit 6s linear infinite reverse; animation-delay: -3s; }
+
+.grialo-box-card {
+  padding: 28px 18px;
+  border: 1px solid color-mix(in srgb, var(--grialo-rarity) 38%, rgba(245, 239, 218, 0.14));
+  border-radius: 0.5rem;
+  background: rgba(11, 13, 11, 0.52);
+  box-shadow: inset 0 1px 0 rgba(247, 241, 223, 0.08), 0 0 58px color-mix(in srgb, var(--grialo-rarity) 20%, transparent);
+}
+
+.grialo-box-light {
+  position: absolute;
+  inset: 16% 18% auto;
+  height: 160px;
+  border-radius: 999px;
+  background: radial-gradient(circle, color-mix(in srgb, var(--grialo-rarity) 32%, transparent), transparent 70%);
+  filter: blur(24px);
+  opacity: 0.84;
+}
+
+.grialo-mystery-box {
+  position: relative;
+  z-index: 2;
+  margin: 34px auto 0;
+  width: 170px;
+  height: 160px;
+  animation: grialo-box-float 3s ease-in-out infinite;
+}
+
+.grialo-box-lid,
+.grialo-box-body,
+.grialo-box-seal {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.grialo-box-lid {
+  top: 20px;
+  width: 150px;
+  height: 44px;
+  border-radius: 16px 16px 8px 8px;
+  background:
+    linear-gradient(135deg, rgba(247, 241, 223, 0.34), transparent),
+    color-mix(in srgb, var(--grialo-rarity) 66%, #27251e);
+  border: 1px solid rgba(247, 241, 223, 0.26);
+  transform-origin: 8% 100%;
+  transition: transform 900ms cubic-bezier(0.18, 0.9, 0.32, 1.18);
+}
+
+.grialo-box-body {
+  top: 58px;
+  width: 132px;
+  height: 92px;
+  border-radius: 10px 10px 22px 22px;
+  background:
+    linear-gradient(115deg, rgba(247, 241, 223, 0.18), transparent 40%),
+    repeating-linear-gradient(90deg, transparent 0 17px, rgba(247, 241, 223, 0.08) 17px 18px),
+    color-mix(in srgb, var(--grialo-rarity) 54%, #11130f);
+  border: 1px solid rgba(247, 241, 223, 0.2);
+  box-shadow: inset 0 16px 18px rgba(0, 0, 0, 0.18);
+}
+
+.grialo-box-seal {
+  top: 52px;
+  width: 44px;
+  height: 64px;
+  border-radius: 999px;
+  background: radial-gradient(circle, var(--grialo-accent), var(--grialo-rarity) 60%, rgba(11, 13, 11, 0.9));
+  border: 1px solid rgba(247, 241, 223, 0.3);
+  box-shadow: 0 0 28px color-mix(in srgb, var(--grialo-rarity) 55%, transparent);
+}
+
+.grialo-box-card.is-opening .grialo-mystery-box {
+  animation: grialo-opening-shake 1.4s ease-in-out infinite;
+}
+
+.grialo-box-card.is-opening .grialo-box-lid {
+  transform: translateX(-50%) rotate(-24deg) translate(-10px, -34px);
+}
+
+.grialo-box-card.is-opening .grialo-box-seal {
+  animation: grialo-seal-break 1.2s ease-in-out forwards;
+}
+
+.grialo-reveal {
+  padding: 36px 18px;
+  border-radius: 0.5rem;
+  background:
+    radial-gradient(circle at 50% 18%, color-mix(in srgb, var(--grialo-rarity) 28%, transparent), transparent 14rem),
+    rgba(245, 239, 218, 0.055);
+  border: 1px solid color-mix(in srgb, var(--grialo-rarity) 40%, rgba(245, 239, 218, 0.14));
+  box-shadow: 0 0 78px color-mix(in srgb, var(--grialo-rarity) 22%, transparent);
+}
+
+.grialo-reveal h2 {
+  color: var(--grialo-accent);
+  text-shadow: 0 0 26px color-mix(in srgb, var(--grialo-rarity) 55%, transparent);
+  animation: grialo-reveal-float 2.8s ease-in-out infinite;
+}
+
+.grialo-reveal-shine {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.grialo-reveal-shine::before {
+  content: '';
+  position: absolute;
+  inset: -30% auto -30% -35%;
+  width: 36%;
+  transform: rotate(18deg);
+  background: linear-gradient(90deg, transparent, rgba(247, 241, 223, 0.34), transparent);
+  animation: grialo-shine 2.4s ease-in-out infinite;
+}
+
+.grialo-rank-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(170px, 0.65fr);
+  gap: 12px;
+  align-items: center;
+}
+
+.grialo-rank-row:hover {
+  transform: translateY(-1px);
+  background: rgba(245, 239, 218, 0.055);
+}
+
+.grialo-stage-shell.void {
+  background:
+    radial-gradient(circle at 50% 38%, rgba(247, 241, 223, 0.12), transparent 16rem),
+    linear-gradient(135deg, rgba(10, 10, 12, 0.95), rgba(25, 8, 30, 0.72));
+}
+
+.grialo-reveal.void h2,
+.grialo-box-card.void {
+  animation: grialo-glitch 1.5s steps(2, end) infinite;
+}
+
+@keyframes grialo-aurora {
+  0%, 100% { transform: rotate(0deg) scale(1); opacity: 0.44; }
+  50% { transform: rotate(16deg) scale(1.07); opacity: 0.66; }
+}
+
+@keyframes grialo-rune-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes grialo-orb-idle {
+  0%, 100% { transform: translateY(0) scale(1); filter: saturate(1); }
+  50% { transform: translateY(-8px) scale(1.025); filter: saturate(1.12); }
+}
+
+@keyframes grialo-orb-channel {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 38px color-mix(in srgb, var(--grialo-rarity) 30%, transparent); }
+  45% { transform: scale(1.065); box-shadow: 0 0 82px color-mix(in srgb, var(--grialo-rarity) 62%, transparent); }
+}
+
+@keyframes grialo-stone-orbit {
+  from { transform: translate(-50%, -50%) rotate(0deg) translateX(108px) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg) translateX(108px) rotate(-360deg); }
+}
+
+@keyframes grialo-box-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes grialo-opening-shake {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-5px) rotate(-1.5deg); }
+  55% { transform: translateY(-8px) rotate(1.8deg); }
+}
+
+@keyframes grialo-seal-break {
+  to { transform: translateX(-50%) scale(1.7) rotate(24deg); opacity: 0; filter: blur(5px); }
+}
+
+@keyframes grialo-reveal-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
+}
+
+@keyframes grialo-shine {
+  0% { transform: translateX(0) rotate(18deg); opacity: 0; }
+  35% { opacity: 1; }
+  100% { transform: translateX(460%) rotate(18deg); opacity: 0; }
+}
+
+@keyframes grialo-glitch {
+  0%, 100% { filter: none; transform: translate(0); }
+  33% { filter: hue-rotate(90deg) contrast(1.4); transform: translate(1px, -1px); }
+  66% { filter: invert(0.12); transform: translate(-1px, 1px); }
+}
+
 @media (max-width: 1023px) {
   .city-passport-mini,
   .city-module-sidebar,
@@ -2480,6 +2813,25 @@
 }
 
 @media (max-width: 640px) {
+  .grialo-stage-shell {
+    min-height: 510px;
+    padding: 18px;
+  }
+
+  .grialo-rune-ring span {
+    transform: none !important;
+    display: none;
+  }
+
+  .grialo-rank-row {
+    grid-template-columns: 1fr;
+    text-align: left;
+  }
+
+  .grialo-rank-row > .grid {
+    text-align: left;
+  }
+
   .city-preview-building {
     width: 70px;
     min-height: 76px;
@@ -2536,7 +2888,18 @@
 
   .signature-hero::after,
   .signature-card-glow,
-  .signature-card-avatar img {
+  .signature-card-avatar img,
+  .grialo-aurora,
+  .grialo-rune-ring,
+  .grialo-orb,
+  .grialo-orb.is-spinning,
+  .grialo-stone,
+  .grialo-mystery-box,
+  .grialo-box-card.is-opening .grialo-mystery-box,
+  .grialo-reveal h2,
+  .grialo-reveal-shine::before,
+  .grialo-reveal.void h2,
+  .grialo-box-card.void {
     animation: none;
   }
 }

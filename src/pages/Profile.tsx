@@ -1,23 +1,39 @@
 import { useState } from 'react'
-import { CalendarCheck, Copy, ExternalLink, Flame, Star, Trophy, UserRound, Wallet, type LucideIcon } from 'lucide-react'
-import { useAccount, useBalance } from 'wagmi'
+import { Clock, Copy, ExternalLink, Flame, Sparkles, Star, Trophy, UserRound, Wallet, Zap, type LucideIcon } from 'lucide-react'
+import { useAccount, useBalance, useReadContract } from 'wagmi'
 import ProfileGate from '@/components/ProfileGate'
-import { ARC_CHAIN } from '@/config/contracts'
-import { fmtAddress, getTier, type ProfileData, type UserStatsData } from '@/lib/rialo'
+import { ARC_CHAIN, RIALO_TEMPLE_ABI, RIALO_TEMPLE_ADDRESS } from '@/config/contracts'
+import { fmtAddress, fmtCountdown, getGrialoRarity, parseGrialoStats, type ProfileData } from '@/lib/rialo'
 
 export default function Profile() {
   return (
     <ProfileGate>
-      {(profile, stats) => <ProfileInner profile={profile} stats={stats} />}
+      {(profile) => <ProfileInner profile={profile} />}
     </ProfileGate>
   )
 }
 
-function ProfileInner({ profile, stats }: { profile: ProfileData; stats: UserStatsData }) {
+function ProfileInner({ profile }: { profile: ProfileData }) {
   const { address } = useAccount()
   const [copied, setCopied] = useState(false)
   const { data: balance } = useBalance({ address, query: { enabled: Boolean(address), refetchInterval: 10000 } })
-  const tier = getTier(stats.currentStreak)
+  const statsQuery = useReadContract({
+    address: RIALO_TEMPLE_ADDRESS,
+    abi: RIALO_TEMPLE_ABI,
+    functionName: 'getUserStats',
+    args: address ? [address] : undefined,
+    query: { enabled: Boolean(address), refetchInterval: 8000, retry: 1 },
+  })
+  const waitQuery = useReadContract({
+    address: RIALO_TEMPLE_ADDRESS,
+    abi: RIALO_TEMPLE_ABI,
+    functionName: 'timeUntilNextSpin',
+    args: address ? [address] : undefined,
+    query: { enabled: Boolean(address), refetchInterval: 5000, retry: 1 },
+  })
+  const grialoStats = parseGrialoStats(statsQuery.data)
+  const waitTime = typeof waitQuery.data === 'bigint' ? Number(waitQuery.data) : grialoStats.waitTime
+  const bestRarity = getGrialoRarity(grialoStats.bestTier)
 
   function copyAddress() {
     if (!address) return
@@ -60,9 +76,9 @@ function ProfileInner({ profile, stats }: { profile: ProfileData; stats: UserSta
           <div className="temple-card rounded-lg p-5 sm:p-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="text-xs font-black uppercase tracking-wider text-[var(--temple-soft)]">Current tier</p>
-                <h2 className="arcade-title mt-1 text-3xl font-black" style={{ color: tier.color }}>{tier.name}</h2>
-                <p className="text-sm text-[var(--temple-muted)]">{tier.range} / +{tier.pts} PTS tier</p>
+                <p className="text-xs font-black uppercase tracking-wider text-[var(--temple-soft)]">Best Grialo opened</p>
+                <h2 className="arcade-title mt-1 text-3xl font-black" style={{ color: bestRarity.color }}>{bestRarity.tier}</h2>
+                <p className="text-sm text-[var(--temple-muted)]">{bestRarity.boxName} box / Temple Energy profile</p>
               </div>
               <div className="machine-screen flex h-20 w-20 items-center justify-center rounded-lg border border-[var(--temple-border)]" style={{ animation: 'temple-pulse 2.8s ease-in-out infinite' }}>
                 <div className="flame-buddy h-12 w-10" />
@@ -70,18 +86,20 @@ function ProfileInner({ profile, stats }: { profile: ProfileData; stats: UserSta
             </div>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <Metric icon={Flame} label="Streak" value={`${stats.currentStreak}d`} color={tier.color} />
-            <Metric icon={Trophy} label="Best" value={`${stats.bestStreak}d`} color="#f4c95d" />
-            <Metric icon={CalendarCheck} label="Check-ins" value={stats.totalCheckIns} color="#32d583" />
-            <Metric icon={Star} label="Reviews" value={stats.reviewCount} color="#a78bfa" />
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <Metric icon={Zap} label="Total spins" value={grialoStats.totalSpins} color="#57e39f" />
+            <Metric icon={Flame} label="Current streak" value={`${grialoStats.currentStreak}d`} color="#57e39f" />
+            <Metric icon={Trophy} label="Best streak" value={`${grialoStats.bestStreak}d`} color="#f2c866" />
+            <Metric icon={Star} label="Best tier" value={bestRarity.tier} color={bestRarity.color} />
+            <Metric icon={Clock} label="Next spin" value={grialoStats.spinReady || waitTime <= 0 ? 'Ready' : fmtCountdown(waitTime)} color={grialoStats.spinReady || waitTime <= 0 ? '#57e39f' : '#f2c866'} />
+            <Metric icon={Sparkles} label="Temple Energy" value={grialoStats.spinReady || waitTime <= 0 ? 'Ready' : 'Restoring'} color="#78ecff" />
           </div>
 
           <div className="machine-frame rounded-lg p-5 sm:p-6">
             <p className="text-xs font-black uppercase tracking-wider text-[var(--temple-soft)]">Total PTS</p>
             <div className="mt-4 flex items-end gap-3">
-              <p className="text-7xl font-black leading-none text-[var(--temple-emerald)]">{stats.totalPts}</p>
-              <p className="pb-2 text-sm text-[var(--temple-muted)]">synced to leaderboard</p>
+              <p className="text-7xl font-black leading-none text-[var(--temple-emerald)]">{grialoStats.totalPts}</p>
+              <p className="pb-2 text-sm text-[var(--temple-muted)]">from Grialo mystery boxes</p>
             </div>
           </div>
         </section>
