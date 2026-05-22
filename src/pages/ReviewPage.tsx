@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import { motion } from 'framer-motion'
-import { Clapperboard, ExternalLink, ImageIcon, Loader2, Send, Star, Utensils } from 'lucide-react'
+import { Clapperboard, ExternalLink, ImageIcon, Loader2, Send, Sparkles, Star, Utensils } from 'lucide-react'
 import { useReadContract, useWaitForTransactionReceipt, useWriteContract } from 'wagmi'
 import ProfileGate from '@/components/ProfileGate'
 import { ARC_CHAIN, RIALO_TEMPLE_ABI, RIALO_TEMPLE_ADDRESS } from '@/config/contracts'
@@ -113,13 +113,30 @@ function ReviewInner({ refetchProfile }: { refetchProfile: () => void }) {
   }
 
   return (
-    <div className="review-studio mx-auto grid max-w-7xl gap-5 px-4 py-8 sm:px-6 lg:grid-cols-[0.9fr_1.1fr]">
+    <div className="review-studio mx-auto max-w-7xl px-4 py-8 sm:px-6">
+      <section className="review-hero temple-card">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.22em] text-[var(--temple-gold)]">Rialo Review Temple</p>
+          <h1 className="mt-3 text-5xl font-black leading-none text-[var(--temple-text)] sm:text-7xl">Submit reviews that feel collectible.</h1>
+          <p className="mt-4 max-w-2xl text-sm font-semibold leading-6 text-[var(--temple-muted)]">
+            Food and film live in two clean lanes. Pick a lane, craft a stamp, and publish a tiny cultural proof on Arc.
+          </p>
+        </div>
+        <div className="review-hero-art" aria-hidden="true">
+          <img src="/rialo_logo.png" alt="" />
+          <span className="review-orbit-chip food"><Utensils className="h-5 w-5" /> Food</span>
+          <span className="review-orbit-chip film"><Clapperboard className="h-5 w-5" /> Film</span>
+          <span className="review-orbit-star"><Sparkles className="h-5 w-5" /></span>
+        </div>
+      </section>
+
+      <div className="mt-5 grid gap-5 lg:grid-cols-[1.05fr_0.95fr]">
       <section className="review-booth temple-card spark-field rounded-lg p-5 sm:p-6">
         <div className="mb-5 flex items-start justify-between gap-4">
           <div>
             <p className="text-xs font-black uppercase tracking-wider text-[var(--temple-cyan)]">Review studio</p>
-            <h1 className="arcade-title mt-2 text-4xl font-black tracking-normal">Make a tiny poster</h1>
-            <p className="mt-2 max-w-md text-sm leading-6 text-[var(--temple-muted)]">Food and film notes become on-chain collectible stamps beside your Grialo profile.</p>
+            <h2 className="mt-2 text-4xl font-black tracking-normal">Make a clean review stamp</h2>
+            <p className="mt-2 max-w-md text-sm leading-6 text-[var(--temple-muted)]">Separate lanes, cleaner form, richer preview. No more mixed-up wall.</p>
           </div>
           <div className="review-mascot machine-screen hidden h-16 w-16 items-center justify-center rounded-full border border-[var(--temple-border)] sm:flex">
             {kind === 'food' ? <Utensils className="h-6 w-6 text-[var(--temple-emerald)]" /> : <Clapperboard className="h-6 w-6 text-[var(--temple-gold)]" />}
@@ -211,6 +228,7 @@ function ReviewInner({ refetchProfile }: { refetchProfile: () => void }) {
           </div>
         )}
       </section>
+      </div>
     </div>
   )
 }

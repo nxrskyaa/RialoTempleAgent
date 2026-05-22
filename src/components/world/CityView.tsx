@@ -47,10 +47,14 @@ export default function CityView({
       </motion.div>
 
       <div className="world-city-copy">
+        <div className="world-logo-relic" aria-hidden="true">
+          <img src="/rialo_logo.png" alt="" />
+          <span />
+        </div>
         <p className="world-kicker">Rialo World</p>
         <h1>One living temple city for the whole Rialo ecosystem.</h1>
         <p>
-          Click any building. The camera moves inside, the ritual plays, and the idea becomes simple enough to explain without a whitepaper.
+          Click a temple district. Watch value move, proof form, agents work, and identity connect the whole city.
         </p>
       </div>
 

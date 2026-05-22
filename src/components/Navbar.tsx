@@ -4,9 +4,9 @@ import { motion } from 'framer-motion'
 import { Globe2, IdCard, MessageSquareText, Sparkles, Trophy, UserCircle } from 'lucide-react'
 
 const NAV = [
-  { path: '/review', label: 'Reviews', icon: MessageSquareText },
   { path: '/grialo', label: 'Grialo', icon: Sparkles },
   { path: '/world', label: 'World', icon: Globe2 },
+  { path: '/review', label: 'Reviews', icon: MessageSquareText },
   { path: '/signature-card', label: 'Signature Card', icon: IdCard },
   { path: '/leaderboard', label: 'Rank', icon: Trophy },
   { path: '/profile', label: 'Profile', icon: UserCircle },
@@ -20,7 +20,7 @@ export default function Navbar() {
       <div className="nav-cloud mx-auto flex h-[68px] max-w-7xl items-center justify-between gap-2 px-3 sm:px-5">
         <Link to="/" className="brand-pill group flex min-w-0 items-center gap-2 rounded-full px-2 py-1.5 transition">
           <span className="logo-charm relative flex h-12 w-12 items-center justify-center rounded-full">
-            <img src="/logo-mark.svg" alt="" className="relative z-10 h-12 w-12 transition group-hover:scale-110" />
+            <img src="/rialo_logo.png" alt="" className="rialo-nav-logo relative z-10 transition group-hover:scale-110" />
           </span>
           <span className="temple-wordmark hidden text-lg font-black text-[var(--temple-text)] sm:inline">Rialo Temple</span>
         </Link>

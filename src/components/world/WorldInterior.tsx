@@ -104,6 +104,10 @@ export default function WorldInterior({
           <p className="world-kicker">{building.role}</p>
           <h2>{building.shortName}</h2>
           <p>{building.simple}</p>
+          <div className="world-rialo-context">
+            <img src="/rialo_logo.png" alt="" />
+            <span>Rialo turns this feature into a visible ritual: input goes in, rules execute, proof comes out, and users can understand the result without reading code.</span>
+          </div>
           <div className="world-analogy-row">
             <HelpCircle className="h-4 w-4" />
             <span>{building.analogy}</span>
@@ -131,6 +135,9 @@ export default function WorldInterior({
         <div className={`world-workflow-stage ${running ? 'is-running' : ''}`}>
           <RuneBurst color={building.accent} dramatic={building.id === 'oracle'} />
           <LightBeam color={building.accent2} />
+          <div className="world-scene-logo">
+            <img src="/rialo_logo.png" alt="" />
+          </div>
           <div className="world-stage-floor" />
           <div className="world-station-path">
             {steps.map((station, index) => (

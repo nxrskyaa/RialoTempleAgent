@@ -341,18 +341,31 @@ function TempleStage({
       <AnimatePresence mode="wait">
         {!isMystery && !isReveal ? (
           <motion.div key="orb" initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 1.04 }} className="grialo-orb-panel">
-            <div className={`grialo-orb ${stage === 'spinning' ? 'is-spinning' : ''}`}>
-              <span className="grialo-stone stone-1" />
-              <span className="grialo-stone stone-2" />
-              <span className="grialo-stone stone-3" />
-              <span className="grialo-stone stone-4" />
+            <div className={`grialo-roulette ${stage === 'spinning' ? 'is-spinning' : ''}`}>
+              <div className="grialo-roulette-pointer" />
+              <div className="grialo-roulette-wheel">
+                {['Stone', 'Jade', 'Sapphire', 'Amethyst', 'Gold', 'Crown', 'Void', 'PTS'].map((label, index) => (
+                  <span key={label} className={`grialo-roulette-slot slot-${index}`}>
+                    <i>{label}</i>
+                  </span>
+                ))}
+                <div className="grialo-roulette-runes">
+                  {Array.from({ length: 18 }).map((_, index) => <b key={index} style={{ transform: `rotate(${index * 20}deg) translateY(-118px)` }} />)}
+                </div>
+              </div>
+              <div className="grialo-roulette-core">
+                <img src="/rialo_logo.png" alt="" />
+              </div>
+              <span className="grialo-roulette-spark spark-a" />
+              <span className="grialo-roulette-spark spark-b" />
+              <span className="grialo-roulette-spark spark-c" />
             </div>
             <p className="mt-5 text-xs font-black uppercase tracking-[0.18em] text-[var(--temple-gold)]">
               {canSpin ? 'Temple Energy Ready' : 'Energy regenerating'}
             </p>
-            <h2 className="mt-2 text-3xl font-black">{stage === 'spinning' ? 'Channeling...' : 'Mystery waits inside'}</h2>
+            <h2 className="mt-2 text-3xl font-black">{stage === 'spinning' ? 'Rarity wheel channeling...' : 'Spin the Grialo roulette'}</h2>
             <p className="mt-2 text-sm font-semibold text-[var(--temple-muted)]">
-              {stage === 'spinning' ? 'Particles are being drawn into the orb.' : canSpin ? 'Spin to form a Mystery Box.' : `Next Grialo in ${fmtCountdown(cooldown)}`}
+              {stage === 'spinning' ? 'The pointer hunts a rarity, then the temple forms your Mystery Box.' : canSpin ? 'Spin once per Temple Energy cycle to form a Mystery Box.' : `Next Grialo in ${fmtCountdown(cooldown)}`}
             </p>
           </motion.div>
         ) : isReveal ? (
