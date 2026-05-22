@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import AnimatedText from './AnimatedText'
-import CharacterMascot from './CharacterMascot'
+import WorldCharacter from './WorldCharacter'
 
 type WorldHeroProps = {
   explored: number
@@ -12,36 +12,36 @@ export default function WorldHero({ explored, total, nextHint }: WorldHeroProps)
   const progress = total > 0 ? (explored / total) * 100 : 0
 
   return (
-    <section className="world-hero-redesign">
-      <div className="world-hero-copy">
+    <section className="world-landing">
+      <div className="world-landing-copy">
         <AnimatedText eyebrow="Interactive Rialo guide" title="Rialo Temple World">
-          A playful world simulator where every cute temple zone explains Rialo, RWA, agents, SCALE, identity, and onchain movement.
+          Meet tiny temple guides, explore Rialo zones, and learn RWA, agents, SCALE, identity, and onchain movement through playful stories.
         </AnimatedText>
-        <div className="world-hero-actions">
+        <div className="world-landing-actions">
           <a href="#world-map" className="world-primary-cta">Explore zones</a>
-          <span className="world-hero-hint">{nextHint}</span>
+          <span className="world-next-hint">{nextHint}</span>
         </div>
       </div>
 
       <motion.div
-        className="world-hero-stage"
+        className="world-landing-stage"
         initial={{ opacity: 0, y: 18, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.5, delay: 0.14, ease: 'easeOut' }}
       >
-        <div className="world-logo-orbit">
+        <div className="world-rialo-orbit">
           <img src="/rialo_logo.png" alt="Rialo" />
           <span />
           <span />
           <span />
         </div>
-        <CharacterMascot name="Rialo Temple Scout" tone="emerald" size="lg" mood="wave" accessory="scroll" variant="scout" />
-        <div className="world-hero-progress">
+        <WorldCharacter name="Temple Gate Guardian" tone="emerald" size="lg" mood="wave" accessory="scroll" role="gate" />
+        <div className="world-progress-card">
           <div>
             <span>World progress</span>
             <strong>{explored}/{total} zones awake</strong>
           </div>
-          <div className="world-mini-progress"><span style={{ width: `${progress}%` }} /></div>
+          <div className="world-progress-track"><span style={{ width: `${progress}%` }} /></div>
         </div>
       </motion.div>
     </section>

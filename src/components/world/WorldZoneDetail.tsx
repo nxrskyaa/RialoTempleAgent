@@ -1,5 +1,5 @@
 import type { WorldZone } from './WorldZoneCard'
-import CharacterMascot from './CharacterMascot'
+import WorldCharacter from './WorldCharacter'
 import ExplanationPopup from './ExplanationPopup'
 import { glossary, type WorldBuilding } from './worldData'
 
@@ -21,15 +21,15 @@ const technicalNotes: Record<string, string> = {
 
 export default function WorldZoneDetail({ zone, building, advanced, onToggleAdvanced }: WorldZoneDetailProps) {
   return (
-    <aside className={`world-zone-detail tone-${zone?.tone ?? 'gold'}`}>
-      <div className="world-detail-character">
-        <CharacterMascot
+    <aside className={`world-feature-detail tone-${zone?.tone ?? 'gold'}`}>
+      <div className="world-detail-hero">
+        <WorldCharacter
           name={zone?.mascot.name ?? building.shortName}
           tone={zone?.tone ?? 'gold'}
           size="md"
           mood={zone?.mascot.mood ?? 'wave'}
           accessory={zone?.mascot.accessory ?? 'orb'}
-          variant={zone?.mascot.variant ?? 'scout'}
+          role={zone?.mascot.role ?? 'gate'}
         />
         <div>
           <span>{zone?.concept ?? building.role}</span>
@@ -39,11 +39,11 @@ export default function WorldZoneDetail({ zone, building, advanced, onToggleAdva
 
       <p>{zone?.simple ?? building.simple}</p>
 
-      <div className="world-story-card">
+      <div className="world-compare-card">
         <strong>Without Rialo</strong>
         <span>{building.without}</span>
       </div>
-      <div className="world-story-card is-bright">
+      <div className="world-compare-card is-bright">
         <strong>With Rialo</strong>
         <span>{building.with}</span>
       </div>
@@ -53,7 +53,7 @@ export default function WorldZoneDetail({ zone, building, advanced, onToggleAdva
       </button>
       {advanced ? <div className="world-tech-bubble">{technicalNotes[building.id]}</div> : null}
 
-      <div className="world-tip-row">
+      <div className="world-modal-row">
         {glossary.slice(0, 3).map((item) => (
           <ExplanationPopup key={item.term} title={item.term}>{item.simple}</ExplanationPopup>
         ))}

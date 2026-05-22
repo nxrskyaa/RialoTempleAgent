@@ -64,8 +64,8 @@ export default function WorldInterior({
   }
 
   return (
-    <section className="world-explore-shell" style={{ '--world-accent': building.accent, '--world-accent-2': building.accent2 } as CSSProperties}>
-      <div className="world-explore-header">
+    <section className="world-feature-screen" style={{ '--world-accent': building.accent, '--world-accent-2': building.accent2 } as CSSProperties}>
+      <div className="world-feature-header">
         <button type="button" onClick={onBack} className="world-soft-button">
           <ArrowLeft className="h-4 w-4" /> Back to World
         </button>
@@ -77,7 +77,7 @@ export default function WorldInterior({
       </div>
 
       <motion.div
-        className="world-explore-layout"
+        className="world-feature-layout"
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.34, ease: 'easeOut' }}

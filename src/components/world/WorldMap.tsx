@@ -1,6 +1,6 @@
 import { buildings, type WorldBuilding } from './worldData'
 import WorldZoneCard, { type WorldZone } from './WorldZoneCard'
-import CharacterMascot from './CharacterMascot'
+import WorldCharacter from './WorldCharacter'
 
 const buildingById = Object.fromEntries(buildings.map((building) => [building.id, building])) as Record<string, WorldBuilding>
 
@@ -14,7 +14,7 @@ export const worldZones: WorldZone[] = [
     action: 'Visit town hall',
     building: buildingById.hub,
     tone: 'gold',
-    mascot: { name: 'Proposal Keeper', mood: 'wave', accessory: 'scroll', variant: 'scout' },
+    mascot: { name: 'Temple Gate Guardian', mood: 'wave', accessory: 'scroll', role: 'gate' },
   },
   {
     id: 'rwa-vault',
@@ -25,7 +25,7 @@ export const worldZones: WorldZone[] = [
     action: 'Open vault',
     building: buildingById.treasury,
     tone: 'emerald',
-    mascot: { name: 'Vault Guardian', mood: 'focus', accessory: 'key', variant: 'guardian' },
+    mascot: { name: 'RWA Vault Keeper', mood: 'focus', accessory: 'key', role: 'vault' },
   },
   {
     id: 'agent-camp',
@@ -36,7 +36,7 @@ export const worldZones: WorldZone[] = [
     action: 'Meet agents',
     building: buildingById.oracle,
     tone: 'coral',
-    mascot: { name: 'Task Scout', mood: 'walk', accessory: 'orb', variant: 'agent' },
+    mascot: { name: 'Agent Camp Scout', mood: 'walk', accessory: 'orb', role: 'agent' },
   },
   {
     id: 'scale-lab',
@@ -47,7 +47,7 @@ export const worldZones: WorldZone[] = [
     action: 'Run ritual',
     building: buildingById.spire,
     tone: 'sapphire',
-    mascot: { name: 'Proof Tinkerer', mood: 'tilt', accessory: 'spark', variant: 'lab' },
+    mascot: { name: 'SCALE Lab Helper', mood: 'think', accessory: 'spark', role: 'scale' },
   },
   {
     id: 'quest-board',
@@ -58,7 +58,7 @@ export const worldZones: WorldZone[] = [
     action: 'Browse quests',
     building: buildingById.bazaar,
     tone: 'violet',
-    mascot: { name: 'Market Relic Keeper', mood: 'float', accessory: 'coin', variant: 'keeper' },
+    mascot: { name: 'Quest Board Runner', mood: 'float', accessory: 'coin', role: 'quest' },
   },
   {
     id: 'identity-homes',
@@ -69,7 +69,7 @@ export const worldZones: WorldZone[] = [
     action: 'Enter homes',
     building: buildingById.homes,
     tone: 'cream',
-    mascot: { name: 'Home Lantern', mood: 'wave', accessory: 'orb', variant: 'home' },
+    mascot: { name: 'Portal Explorer', mood: 'wave', accessory: 'map', role: 'portal' },
   },
 ]
 
@@ -80,32 +80,32 @@ type WorldMapProps = {
 
 export default function WorldMap({ visited, onSelect }: WorldMapProps) {
   return (
-    <section id="world-map" className="world-map-redesign">
-      <div className="world-map-header">
+    <section id="world-map" className="world-explore">
+      <div className="world-section-heading">
         <div>
           <span className="world-eyebrow">Choose a zone</span>
-          <h2>One temple world, six simple ideas.</h2>
+          <h2>Pick a Rialo path.</h2>
         </div>
-        <p>Click any zone to zoom into its animated workflow. Each area explains what happens, why it matters, and how Rialo makes it easier.</p>
+        <p>Every card opens a small animated lesson with a guide, short story, and simple Rialo workflow.</p>
       </div>
 
-      <div className="world-map-panel">
-        <div className="world-map-center">
-          <div className="world-central-temple">
+      <div className="world-map">
+        <div className="world-map-core">
+          <div className="world-core-card">
             <img src="/rialo_logo.png" alt="Rialo logo" />
-            <CharacterMascot name="Central Guide" tone="gold" size="sm" mood="float" accessory="spark" variant="scout" />
+            <WorldCharacter name="Rialo Guide" tone="gold" size="sm" mood="float" accessory="spark" role="gate" />
             <div>
               <span>Rialo Core</span>
-              <strong>Explore the temple paths</strong>
+              <strong>Explore the world paths</strong>
             </div>
           </div>
         </div>
-        <div className="world-map-paths" aria-hidden="true">
+        <div className="world-map-lines" aria-hidden="true">
           <span />
           <span />
           <span />
         </div>
-        <div className="world-zone-grid">
+        <div className="world-feature-grid">
           {worldZones.map((zone, index) => (
             <WorldZoneCard
               key={zone.id}

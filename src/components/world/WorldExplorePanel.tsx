@@ -1,7 +1,7 @@
 import type { CSSProperties } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { CheckCircle2, Play, RotateCcw } from 'lucide-react'
-import CharacterMascot from './CharacterMascot'
+import WorldCharacter from './WorldCharacter'
 import WorldFloatingText from './WorldFloatingText'
 import WorldLoadingState from './WorldLoadingState'
 import type { WorldZone } from './WorldZoneCard'
@@ -34,15 +34,15 @@ export default function WorldExplorePanel({
   const tone = zone?.tone ?? 'gold'
 
   return (
-    <section className={`world-explore-panel tone-${tone}`}>
-      <div className="world-explore-sky">
+    <section className={`world-feature-playground tone-${tone}`}>
+      <div className="world-playground-sky">
         <span />
         <span />
         <span />
       </div>
 
-      <div className="world-explore-stage">
-        <div className="world-portal-ring" aria-hidden="true">
+      <div className="world-playground-stage">
+        <div className="world-story-portal" aria-hidden="true">
           <span />
           <span />
           <span />
@@ -51,23 +51,23 @@ export default function WorldExplorePanel({
         <AnimatePresence mode="wait">
           <motion.div
             key={step.key}
-            className="world-step-showcase"
+            className="world-step-scene"
             initial={{ opacity: 0, y: 20, rotate: -1.5 }}
             animate={{ opacity: 1, y: 0, rotate: 0 }}
             exit={{ opacity: 0, y: -14, rotate: 1.5 }}
             transition={{ type: 'spring', stiffness: 190, damping: 18 }}
           >
-            <div className="world-item-token">
+            <div className="world-relic-token">
               <img src={step.item} alt="" />
               <CheckCircle2 className={stepIndex === steps.length - 1 ? 'is-visible' : ''} />
             </div>
-            <CharacterMascot
+            <WorldCharacter
               name={zone?.mascot.name ?? 'Rialo Helper'}
               tone={tone}
               size="md"
               mood={running ? 'walk' : zone?.mascot.mood ?? 'wave'}
               accessory={zone?.mascot.accessory ?? 'orb'}
-              variant={zone?.mascot.variant ?? 'scout'}
+              role={zone?.mascot.role ?? 'gate'}
             />
           </motion.div>
         </AnimatePresence>
@@ -79,13 +79,13 @@ export default function WorldExplorePanel({
         {running ? <WorldLoadingState label="Tiny helpers are moving the ritual forward" /> : null}
       </div>
 
-      <div className="world-step-track">
+      <div className="world-step-menu">
         {steps.map((station, index) => (
           <button
             type="button"
             key={station.key}
             onClick={() => !running && onStep(index)}
-            className={`world-step-chip ${index === stepIndex ? 'is-active' : ''} ${index < stepIndex ? 'is-done' : ''}`}
+            className={`world-step-card ${index === stepIndex ? 'is-active' : ''} ${index < stepIndex ? 'is-done' : ''}`}
             disabled={running}
             style={{ '--step-index': index } as CSSProperties}
           >
@@ -95,7 +95,7 @@ export default function WorldExplorePanel({
         ))}
       </div>
 
-      <div className="world-explore-controls">
+      <div className="world-playground-controls">
         <div className="world-flow-meter">
           <span style={{ width: `${progress}%` }} />
         </div>

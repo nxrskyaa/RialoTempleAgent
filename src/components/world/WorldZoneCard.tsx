@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
-import CharacterMascot from './CharacterMascot'
+import WorldCharacter from './WorldCharacter'
 import type { WorldBuilding } from './worldData'
+import type { WorldCharacterAccessory, WorldCharacterMood, WorldCharacterRole, WorldCharacterTone } from './WorldCharacter'
 
 export type WorldZone = {
   id: string
@@ -10,12 +11,12 @@ export type WorldZone = {
   why: string
   action: string
   building: WorldBuilding
-  tone: 'gold' | 'emerald' | 'coral' | 'sapphire' | 'violet' | 'cream'
+  tone: WorldCharacterTone
   mascot: {
     name: string
-    mood: 'wave' | 'tilt' | 'walk' | 'focus' | 'float'
-    accessory: 'scroll' | 'orb' | 'coin' | 'key' | 'spark'
-    variant: 'scout' | 'guardian' | 'agent' | 'lab' | 'keeper' | 'home'
+    mood: WorldCharacterMood
+    accessory: WorldCharacterAccessory
+    role: WorldCharacterRole
   }
 }
 
@@ -30,7 +31,7 @@ export default function WorldZoneCard({ zone, index, visited, onSelect }: WorldZ
   return (
     <motion.button
       type="button"
-      className={`world-zone-card tone-${zone.tone} ${visited ? 'is-visited' : ''}`}
+      className={`world-feature-card tone-${zone.tone} ${visited ? 'is-visited' : ''}`}
       onClick={() => onSelect(zone.building)}
       initial={{ opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
@@ -38,28 +39,28 @@ export default function WorldZoneCard({ zone, index, visited, onSelect }: WorldZ
       whileHover={{ y: -6 }}
       whileTap={{ scale: 0.985 }}
     >
-      <span className="world-zone-status">{visited ? 'Awake' : 'Explore'}</span>
-      <div className="world-zone-visual">
-        <CharacterMascot
+      <span className="world-feature-status">{visited ? 'Awake' : 'Explore'}</span>
+      <div className="world-feature-visual">
+        <WorldCharacter
           name={zone.mascot.name}
           tone={zone.tone}
           size="sm"
           mood={zone.mascot.mood}
           accessory={zone.mascot.accessory}
-          variant={zone.mascot.variant}
+          role={zone.mascot.role}
         />
-        <span className="world-zone-glyph" aria-hidden="true" />
+        <span className="world-feature-portal" aria-hidden="true" />
       </div>
-      <div className="world-zone-copy">
+      <div className="world-feature-copy">
         <span>{zone.concept}</span>
         <h3>{zone.label}</h3>
         <p>{zone.simple}</p>
       </div>
-      <div className="world-zone-note">
+      <div className="world-feature-note">
         <strong>Why it matters</strong>
         <p>{zone.why}</p>
       </div>
-      <span className="world-zone-action">{zone.action}</span>
+      <span className="world-feature-action">{zone.action}</span>
     </motion.button>
   )
 }
