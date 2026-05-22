@@ -1,5 +1,0 @@
-﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="shockwave effect">
-  <defs><radialGradient id="r"><stop offset="0" stop-color="#f2c866" stop-opacity=".82"/><stop offset=".45" stop-color="#57e39f" stop-opacity=".24"/><stop offset="1" stop-color="#0b0d0b" stop-opacity="0"/></radialGradient><filter id="g"><feGaussianBlur stdDeviation="5"/></filter></defs>
-  <circle cx="120" cy="120" r="105" fill="url(#r)" filter="url(#g)"/>
-  <g fill="none" stroke="#f7f1df" stroke-opacity=".42"><circle cx="120" cy="120" r="86"/><circle cx="120" cy="120" r="56"/><path d="M120 24 V216 M24 120 H216 M52 52 L188 188 M188 52 L52 188"/></g>
-</svg>

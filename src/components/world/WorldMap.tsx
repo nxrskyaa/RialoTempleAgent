@@ -14,7 +14,7 @@ export const worldZones: WorldZone[] = [
     action: 'Visit town hall',
     building: buildingById.hub,
     tone: 'gold',
-    mascot: { name: 'Proposal Keeper', mood: 'wave', accessory: 'scroll' },
+    mascot: { name: 'Proposal Keeper', mood: 'wave', accessory: 'scroll', variant: 'scout' },
   },
   {
     id: 'rwa-vault',
@@ -25,7 +25,7 @@ export const worldZones: WorldZone[] = [
     action: 'Open vault',
     building: buildingById.treasury,
     tone: 'emerald',
-    mascot: { name: 'Vault Guardian', mood: 'focus', accessory: 'key' },
+    mascot: { name: 'Vault Guardian', mood: 'focus', accessory: 'key', variant: 'guardian' },
   },
   {
     id: 'agent-camp',
@@ -36,7 +36,7 @@ export const worldZones: WorldZone[] = [
     action: 'Meet agents',
     building: buildingById.oracle,
     tone: 'coral',
-    mascot: { name: 'Task Scout', mood: 'walk', accessory: 'orb' },
+    mascot: { name: 'Task Scout', mood: 'walk', accessory: 'orb', variant: 'agent' },
   },
   {
     id: 'scale-lab',
@@ -47,7 +47,7 @@ export const worldZones: WorldZone[] = [
     action: 'Run ritual',
     building: buildingById.spire,
     tone: 'sapphire',
-    mascot: { name: 'Proof Tinkerer', mood: 'tilt', accessory: 'spark' },
+    mascot: { name: 'Proof Tinkerer', mood: 'tilt', accessory: 'spark', variant: 'lab' },
   },
   {
     id: 'quest-board',
@@ -58,7 +58,7 @@ export const worldZones: WorldZone[] = [
     action: 'Browse quests',
     building: buildingById.bazaar,
     tone: 'violet',
-    mascot: { name: 'Market Relic Keeper', mood: 'float', accessory: 'coin' },
+    mascot: { name: 'Market Relic Keeper', mood: 'float', accessory: 'coin', variant: 'keeper' },
   },
   {
     id: 'identity-homes',
@@ -69,7 +69,7 @@ export const worldZones: WorldZone[] = [
     action: 'Enter homes',
     building: buildingById.homes,
     tone: 'cream',
-    mascot: { name: 'Home Lantern', mood: 'wave', accessory: 'orb' },
+    mascot: { name: 'Home Lantern', mood: 'wave', accessory: 'orb', variant: 'home' },
   },
 ]
 
@@ -93,7 +93,7 @@ export default function WorldMap({ visited, onSelect }: WorldMapProps) {
         <div className="world-map-center">
           <div className="world-central-temple">
             <img src="/rialo_logo.png" alt="Rialo logo" />
-            <CharacterMascot name="Central Guide" tone="gold" size="sm" mood="float" accessory="spark" />
+            <CharacterMascot name="Central Guide" tone="gold" size="sm" mood="float" accessory="spark" variant="scout" />
             <div>
               <span>Rialo Core</span>
               <strong>Explore the temple paths</strong>

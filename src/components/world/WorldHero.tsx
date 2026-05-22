@@ -35,7 +35,7 @@ export default function WorldHero({ explored, total, nextHint }: WorldHeroProps)
           <span />
           <span />
         </div>
-        <CharacterMascot name="Rialo Temple Scout" tone="emerald" size="lg" mood="wave" accessory="scroll" />
+        <CharacterMascot name="Rialo Temple Scout" tone="emerald" size="lg" mood="wave" accessory="scroll" variant="scout" />
         <div className="world-hero-progress">
           <div>
             <span>World progress</span>

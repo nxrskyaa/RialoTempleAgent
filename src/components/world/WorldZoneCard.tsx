@@ -15,6 +15,7 @@ export type WorldZone = {
     name: string
     mood: 'wave' | 'tilt' | 'walk' | 'focus' | 'float'
     accessory: 'scroll' | 'orb' | 'coin' | 'key' | 'spark'
+    variant: 'scout' | 'guardian' | 'agent' | 'lab' | 'keeper' | 'home'
   }
 }
 
@@ -45,6 +46,7 @@ export default function WorldZoneCard({ zone, index, visited, onSelect }: WorldZ
           size="sm"
           mood={zone.mascot.mood}
           accessory={zone.mascot.accessory}
+          variant={zone.mascot.variant}
         />
         <span className="world-zone-glyph" aria-hidden="true" />
       </div>

@@ -1,4 +1,5 @@
 type MascotTone = 'gold' | 'emerald' | 'coral' | 'sapphire' | 'violet' | 'cream'
+type MascotVariant = 'scout' | 'guardian' | 'agent' | 'lab' | 'keeper' | 'home'
 
 type CharacterMascotProps = {
   name: string
@@ -6,6 +7,7 @@ type CharacterMascotProps = {
   size?: 'sm' | 'md' | 'lg'
   mood?: 'wave' | 'tilt' | 'walk' | 'focus' | 'float'
   accessory?: 'scroll' | 'orb' | 'coin' | 'key' | 'spark'
+  variant?: MascotVariant
 }
 
 const toneClass: Record<MascotTone, string> = {
@@ -23,12 +25,15 @@ export default function CharacterMascot({
   size = 'md',
   mood = 'wave',
   accessory = 'orb',
+  variant = 'scout',
 }: CharacterMascotProps) {
   return (
-    <div className={`world-mascot ${toneClass[tone]} is-${size} mood-${mood}`} aria-label={name} role="img">
+    <div className={`world-mascot ${toneClass[tone]} is-${size} is-${variant} mood-${mood}`} aria-label={name} role="img">
       <div className="world-mascot-shadow" />
       <div className="world-mascot-accessory" data-accessory={accessory} />
       <div className="world-mascot-body">
+        <span className="world-mascot-ear left" />
+        <span className="world-mascot-ear right" />
         <div className="world-mascot-hood">
           <span className="world-mascot-rune" />
         </div>

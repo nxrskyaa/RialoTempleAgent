@@ -14,9 +14,6 @@ export type WorldBuilding = {
   accent: string
   accent2: string
   icon: LucideIcon
-  exterior: string
-  interior: string
-  position: { x: number; y: number; size: 'lg' | 'md' | 'sm' }
 }
 
 export type WorkflowStep = {
@@ -28,15 +25,6 @@ export type WorkflowStep = {
 }
 
 const asset = (path: string) => new URL(`../../assets/world/${path}`, import.meta.url).href
-
-export const characterAssets = {
-  agent: asset('characters/agent.svg'),
-  judge: asset('characters/judge.svg'),
-  guardian: asset('characters/guardian.svg'),
-  citizen: asset('characters/citizen.svg'),
-  merchant: asset('characters/merchant.svg'),
-  scribe: asset('characters/scribe.svg'),
-}
 
 export const itemAssets = {
   scroll: asset('items/scroll.svg'),
@@ -61,15 +49,6 @@ export const itemAssets = {
   hourglass: asset('items/hourglass.svg'),
 }
 
-export const effectAssets = {
-  rune: asset('effects/rune-circle.svg'),
-  aura: asset('effects/aura-burst.svg'),
-  beam: asset('effects/light-beam.svg'),
-  smoke: asset('effects/smoke-ring.svg'),
-  trail: asset('effects/sparkle-trail.svg'),
-  shockwave: asset('effects/shockwave.svg'),
-}
-
 export const buildings: WorldBuilding[] = [
   {
     id: 'hub',
@@ -83,9 +62,6 @@ export const buildings: WorldBuilding[] = [
     accent: '#f2c866',
     accent2: '#57e39f',
     icon: Landmark,
-    exterior: asset('buildings/hub.svg'),
-    interior: asset('interiors/hub.svg'),
-    position: { x: 36, y: 12, size: 'lg' },
   },
   {
     id: 'spire',
@@ -99,9 +75,6 @@ export const buildings: WorldBuilding[] = [
     accent: '#78ecff',
     accent2: '#57e39f',
     icon: RadioTower,
-    exterior: asset('buildings/spire.svg'),
-    interior: asset('interiors/spire.svg'),
-    position: { x: 63, y: 13, size: 'md' },
   },
   {
     id: 'bazaar',
@@ -115,9 +88,6 @@ export const buildings: WorldBuilding[] = [
     accent: '#ff8066',
     accent2: '#f2c866',
     icon: Store,
-    exterior: asset('buildings/bazaar.svg'),
-    interior: asset('interiors/bazaar.svg'),
-    position: { x: 26, y: 43, size: 'md' },
   },
   {
     id: 'treasury',
@@ -131,9 +101,6 @@ export const buildings: WorldBuilding[] = [
     accent: '#f2c866',
     accent2: '#ffad72',
     icon: Vault,
-    exterior: asset('buildings/treasury.svg'),
-    interior: asset('interiors/treasury.svg'),
-    position: { x: 58, y: 43, size: 'md' },
   },
   {
     id: 'oracle',
@@ -147,9 +114,6 @@ export const buildings: WorldBuilding[] = [
     accent: '#c886ff',
     accent2: '#78ecff',
     icon: Scale,
-    exterior: asset('buildings/oracle.svg'),
-    interior: asset('interiors/oracle.svg'),
-    position: { x: 34, y: 72, size: 'md' },
   },
   {
     id: 'homes',
@@ -163,9 +127,6 @@ export const buildings: WorldBuilding[] = [
     accent: '#57e39f',
     accent2: '#f2c866',
     icon: Home,
-    exterior: asset('buildings/homes.svg'),
-    interior: asset('interiors/homes.svg'),
-    position: { x: 66, y: 72, size: 'sm' },
   },
 ]
 
