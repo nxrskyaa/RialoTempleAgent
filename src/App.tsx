@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import Layout from './components/Layout'
 import Landing from './pages/Landing'
 import ReviewPage from './pages/ReviewPage'
@@ -16,9 +16,11 @@ export default function App() {
         <Route path="/review" element={<ReviewPage />} />
         <Route path="/grialo" element={<Grialo />} />
         <Route path="/world" element={<World />} />
+        <Route path="/world-map" element={<Navigate to="/world" replace />} />
         <Route path="/signature-card" element={<SignatureCardPage />} />
         <Route path="/leaderboard" element={<Leaderboard />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>
   )

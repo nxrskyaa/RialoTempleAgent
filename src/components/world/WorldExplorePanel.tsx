@@ -1,7 +1,7 @@
 import type { CSSProperties } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { CheckCircle2, Play, RotateCcw } from 'lucide-react'
-import WorldCharacter from './WorldCharacter'
+import WorldFeatureScene from './WorldFeatureScene'
 import WorldFloatingText from './WorldFloatingText'
 import WorldLoadingState from './WorldLoadingState'
 import type { WorldZone } from './WorldZoneCard'
@@ -35,19 +35,7 @@ export default function WorldExplorePanel({
 
   return (
     <section className={`world-feature-playground tone-${tone}`}>
-      <div className="world-playground-sky">
-        <span />
-        <span />
-        <span />
-      </div>
-
       <div className="world-playground-stage">
-        <div className="world-story-portal" aria-hidden="true">
-          <span />
-          <span />
-          <span />
-        </div>
-
         <AnimatePresence mode="wait">
           <motion.div
             key={step.key}
@@ -57,18 +45,11 @@ export default function WorldExplorePanel({
             exit={{ opacity: 0, y: -14, rotate: 1.5 }}
             transition={{ type: 'spring', stiffness: 190, damping: 18 }}
           >
+            <WorldFeatureScene zone={zone} stepKey={step.key} running={running} />
             <div className="world-relic-token">
               <img src={step.item} alt="" />
               <CheckCircle2 className={stepIndex === steps.length - 1 ? 'is-visible' : ''} />
             </div>
-            <WorldCharacter
-              name={zone?.mascot.name ?? 'Rialo Helper'}
-              tone={tone}
-              size="md"
-              mood={running ? 'walk' : zone?.mascot.mood ?? 'wave'}
-              accessory={zone?.mascot.accessory ?? 'orb'}
-              role={zone?.mascot.role ?? 'gate'}
-            />
           </motion.div>
         </AnimatePresence>
 

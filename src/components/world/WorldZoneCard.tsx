@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import WorldCharacter from './WorldCharacter'
+import WorldFeatureScene from './WorldFeatureScene'
 import type { WorldBuilding } from './worldData'
 import type { WorldCharacterAccessory, WorldCharacterMood, WorldCharacterRole, WorldCharacterTone } from './WorldCharacter'
 
@@ -10,6 +10,7 @@ export type WorldZone = {
   simple: string
   why: string
   action: string
+  points: string[]
   building: WorldBuilding
   tone: WorldCharacterTone
   mascot: {
@@ -41,15 +42,7 @@ export default function WorldZoneCard({ zone, index, visited, onSelect }: WorldZ
     >
       <span className="world-feature-status">{visited ? 'Awake' : 'Explore'}</span>
       <div className="world-feature-visual">
-        <WorldCharacter
-          name={zone.mascot.name}
-          tone={zone.tone}
-          size="sm"
-          mood={zone.mascot.mood}
-          accessory={zone.mascot.accessory}
-          role={zone.mascot.role}
-        />
-        <span className="world-feature-portal" aria-hidden="true" />
+        <WorldFeatureScene zone={zone} compact />
       </div>
       <div className="world-feature-copy">
         <span>{zone.concept}</span>

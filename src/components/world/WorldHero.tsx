@@ -10,6 +10,9 @@ type WorldHeroProps = {
 
 export default function WorldHero({ explored, total, nextHint }: WorldHeroProps) {
   const progress = total > 0 ? (explored / total) * 100 : 0
+  const scrollToMap = () => {
+    document.getElementById('world-map')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
 
   return (
     <section className="world-landing">
@@ -18,7 +21,7 @@ export default function WorldHero({ explored, total, nextHint }: WorldHeroProps)
           Meet tiny temple guides, explore Rialo zones, and learn RWA, agents, SCALE, identity, and onchain movement through playful stories.
         </AnimatedText>
         <div className="world-landing-actions">
-          <a href="#world-map" className="world-primary-cta">Explore zones</a>
+          <button type="button" onClick={scrollToMap} className="world-primary-cta">Explore zones</button>
           <span className="world-next-hint">{nextHint}</span>
         </div>
       </div>

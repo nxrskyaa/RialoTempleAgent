@@ -2,6 +2,7 @@ import type { WorldZone } from './WorldZoneCard'
 import WorldCharacter from './WorldCharacter'
 import ExplanationPopup from './ExplanationPopup'
 import { glossary, type WorldBuilding } from './worldData'
+import WorldFeatureScene from './WorldFeatureScene'
 
 type WorldZoneDetailProps = {
   zone: WorldZone | undefined
@@ -38,6 +39,15 @@ export default function WorldZoneDetail({ zone, building, advanced, onToggleAdva
       </div>
 
       <p>{zone?.simple ?? building.simple}</p>
+
+      <WorldFeatureScene zone={zone} compact />
+
+      {zone?.points?.length ? (
+        <div className="world-happening-card">
+          <strong>What is happening?</strong>
+          {zone.points.map((point) => <span key={point}>{point}</span>)}
+        </div>
+      ) : null}
 
       <div className="world-compare-card">
         <strong>Without Rialo</strong>

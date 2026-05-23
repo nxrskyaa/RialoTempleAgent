@@ -3316,8 +3316,7 @@
     filter: drop-shadow(0 0 16px rgba(242,200,102,.45));
   }
 
-  .world-rialo-orbit span,
-  .world-story-portal span {
+  .world-rialo-orbit span {
     position: absolute;
     inset: 0;
     border: 1px dashed rgba(242,200,102,.38);
@@ -3426,13 +3425,90 @@
   .world-feature-status { position: absolute; right: 12px; top: 12px; z-index: 4; border: 1px solid rgba(245,239,218,.14); border-radius: 999px; background: rgba(5,8,7,.74); padding: 7px 10px; color: rgba(247,241,223,.72); font-size: 10px; font-weight: 950; text-transform: uppercase; }
   .world-feature-card.is-visited .world-feature-status { background: var(--temple-emerald); color: #07100c; }
   .world-feature-visual { position: relative; display: flex; min-height: 122px; align-items: end; justify-content: space-between; margin-bottom: 12px; }
-  .world-feature-portal { width: 74px; aspect-ratio: 1; border: 2px solid color-mix(in srgb, var(--world-tone) 56%, rgba(245,239,218,.18)); border-radius: 38% 62% 48% 52%; background: radial-gradient(circle, color-mix(in srgb, var(--world-tone-2) 24%, transparent), transparent 60%); box-shadow: inset 0 0 28px rgba(255,255,255,.05), 0 0 26px color-mix(in srgb, var(--world-tone) 22%, transparent); animation: worldPortalBreath 3.4s ease-in-out infinite; }
   .world-feature-copy, .world-feature-note, .world-feature-action { position: relative; z-index: 3; }
   .world-feature-copy span, .world-feature-note strong, .world-feature-detail span:first-child, .world-caption-bubble strong { color: var(--world-tone); font-size: 11px; font-weight: 950; letter-spacing: .1em; text-transform: uppercase; }
   .world-feature-copy h3 { margin: 6px 0 0; color: var(--temple-text); font-size: 26px; font-weight: 950; line-height: 1.02; }
   .world-feature-copy p, .world-feature-note p { margin: 8px 0 0; font-size: 13px; }
   .world-feature-note { margin: 12px 0; border: 1px solid rgba(245,239,218,.09); border-radius: 12px; background: rgba(5,8,7,.32); padding: 11px; }
   .world-feature-action { align-self: end; width: max-content; min-height: 38px; padding: 0 14px; font-size: 10px; }
+  .world-feature-card .world-feature-scene { min-height: 138px; }
+  .world-happening-card { display: grid; gap: 8px; border: 1px solid color-mix(in srgb, var(--world-tone) 30%, rgba(245,239,218,.1)); border-radius: 13px; background: color-mix(in srgb, var(--world-tone) 8%, rgba(5,8,7,.34)); padding: 12px; }
+  .world-happening-card strong { color: var(--temple-text); font-size: 12px; font-weight: 950; text-transform: uppercase; }
+  .world-happening-card span { display: grid; grid-template-columns: 12px 1fr; gap: 8px; color: rgba(247,241,223,.74); font-size: 13px; line-height: 1.4; }
+  .world-happening-card span::before { content: ''; width: 10px; height: 10px; margin-top: 4px; border-radius: 50% 50% 50% 2px; background: var(--world-tone); transform: rotate(45deg); box-shadow: 0 0 12px color-mix(in srgb, var(--world-tone) 50%, transparent); }
+
+  .world-feature-scene { --scene-line: rgba(245,239,218,.14); position: relative; display: grid; width: min(720px, 100%); min-height: 330px; place-items: center; overflow: hidden; border: 1px solid rgba(245,239,218,.1); border-radius: 18px; background: radial-gradient(circle at 50% 42%, color-mix(in srgb, var(--world-tone) 18%, transparent), transparent 42%), linear-gradient(180deg, rgba(245,239,218,.055), rgba(5,8,7,.28)); box-shadow: inset 0 1px 0 rgba(255,255,255,.04); isolation: isolate; }
+  .world-feature-scene::before { content: ''; position: absolute; inset: auto 10% 22px; height: 22%; border-radius: 999px; background: radial-gradient(ellipse, color-mix(in srgb, var(--world-tone) 24%, transparent), transparent 68%); filter: blur(10px); opacity: .75; }
+  .world-feature-scene.is-compact { width: 100%; min-height: 138px; border-radius: 14px; background: radial-gradient(circle at 58% 42%, color-mix(in srgb, var(--world-tone) 16%, transparent), transparent 58%), rgba(5,8,7,.25); }
+  .world-feature-scene.is-compact .world-character { transform: scale(.72); transform-origin: center bottom; }
+  .world-feature-scene.is-compact .scene-character { transform: translateY(9px); }
+  .world-feature-scene.is-compact .scene-assets span,
+  .world-feature-scene.is-compact .scene-guide-signs span,
+  .world-feature-scene.is-compact .scene-scale-gates span,
+  .world-feature-scene.is-compact .scene-quest-board span,
+  .world-feature-scene.is-compact .scene-memory-orbs span { font-size: 8px; padding: 5px 7px; }
+  .world-feature-scene.is-compact .scene-vault-house,
+  .world-feature-scene.is-compact .scene-temple-gate,
+  .world-feature-scene.is-compact .scene-wallet-home { transform: scale(.78); }
+  .scene-character { position: absolute; z-index: 5; right: 7%; bottom: 8%; }
+
+  .scene-assets { position: absolute; left: 7%; top: 15%; display: grid; gap: 9px; }
+  .scene-assets span,
+  .scene-guide-signs span,
+  .scene-scale-gates span,
+  .scene-quest-board span,
+  .scene-memory-orbs span,
+  .scene-task-scroll,
+  .scene-result-card,
+  .scene-approved-action,
+  .scene-reward,
+  .scene-wallet-home,
+  .scene-action-orb { border: 2px solid #07100c; border-radius: 12px; background: #f7f1df; color: #07100c; padding: 8px 11px; font-size: 11px; font-weight: 950; box-shadow: 0 8px 0 rgba(0,0,0,.16), 0 0 18px color-mix(in srgb, var(--world-tone) 20%, transparent); }
+  .scene-assets span { animation: worldAssetToVault 4.4s ease-in-out infinite; animation-delay: calc(var(--i) * .32s); }
+  .scene-vault-house { position: absolute; left: 39%; top: 22%; display: grid; width: 150px; height: 144px; place-items: center; border: 4px solid #07100c; border-radius: 24px 24px 14px 14px; background: linear-gradient(180deg, color-mix(in srgb, var(--world-tone) 55%, #f7f1df), #1b211a); box-shadow: 0 14px 0 rgba(0,0,0,.18), 0 0 34px color-mix(in srgb, var(--world-tone) 28%, transparent); }
+  .scene-vault-house strong { z-index: 2; max-width: 90px; color: #07100c; font-size: 13px; font-weight: 950; line-height: 1.05; text-align: center; }
+  .scene-vault-house i { position: absolute; right: -26px; top: 18px; border: 2px solid #07100c; border-radius: 999px; background: var(--temple-emerald); padding: 6px 9px; color: #07100c; font-size: 10px; font-style: normal; font-weight: 950; animation: worldVerifyStamp 2.8s ease-in-out infinite; }
+  .scene-vault-door { position: absolute; bottom: 0; width: 58px; height: 72px; border: 4px solid #07100c; border-bottom: 0; border-radius: 999px 999px 0 0; background: rgba(7,16,12,.72); }
+  .scene-onchain-card { position: absolute; right: 10%; top: 22%; display: grid; gap: 3px; width: 112px; border: 2px solid #07100c; border-radius: 14px; background: linear-gradient(180deg, #f7f1df, color-mix(in srgb, var(--world-tone) 26%, #f7f1df)); padding: 11px; color: #07100c; animation: worldCardArrive 4.4s ease-in-out infinite; }
+  .scene-onchain-card span { height: 8px; border-radius: 999px; background: var(--temple-emerald); }
+  .scene-onchain-card strong { font-size: 12px; font-weight: 950; }
+  .scene-onchain-card small { font-size: 9px; font-weight: 900; opacity: .7; }
+
+  .scene-temple-gate { position: absolute; left: 33%; top: 18%; display: grid; width: 174px; height: 168px; place-items: center; border: 4px solid #07100c; border-radius: 28px 28px 10px 10px; background: linear-gradient(180deg, var(--temple-gold), #2d2415); box-shadow: 0 16px 0 rgba(0,0,0,.18), 0 0 36px rgba(242,200,102,.2); }
+  .scene-temple-gate strong { z-index: 2; margin-top: -88px; color: #07100c; font-size: 13px; font-weight: 950; }
+  .scene-gate-left, .scene-gate-right { position: absolute; bottom: 0; width: 48%; height: 86px; border: 3px solid #07100c; background: rgba(7,16,12,.76); animation: worldGateOpen 4s ease-in-out infinite; }
+  .scene-gate-left { left: 0; transform-origin: left bottom; }
+  .scene-gate-right { right: 0; transform-origin: right bottom; animation-name: worldGateOpenRight; }
+  .scene-guide-signs { position: absolute; left: 7%; top: 16%; display: grid; gap: 10px; }
+  .scene-guide-signs span { animation: worldSignPop 3.5s ease-in-out infinite; animation-delay: calc(var(--i) * .34s); }
+  .scene-walk-path { position: absolute; right: 24%; bottom: 18%; width: 46%; height: 12px; border-radius: 999px; background: linear-gradient(90deg, transparent, var(--temple-emerald), var(--temple-gold), transparent); animation: worldPathMove 2.8s ease-in-out infinite; }
+
+  .scene-agent .scene-task-scroll { position: absolute; left: 7%; top: 18%; animation: worldScrollRead 3.8s ease-in-out infinite; }
+  .scene-agent-row { position: absolute; left: 13%; right: 9%; bottom: 20%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; align-items: end; }
+  .scene-agent-node { position: relative; display: grid; justify-items: center; gap: 5px; }
+  .scene-agent-node > span { border-radius: 999px; background: rgba(5,8,7,.72); padding: 6px 8px; color: rgba(247,241,223,.82); font-size: 10px; font-weight: 950; }
+  .scene-message { position: absolute; bottom: 44%; width: 74px; height: 7px; border-radius: 999px; background: linear-gradient(90deg, var(--world-tone), var(--world-tone-2)); animation: worldAgentMessage 2.4s ease-in-out infinite; }
+  .scene-message.one { left: 31%; }
+  .scene-message.two { left: 57%; animation-delay: .42s; }
+  .scene-result-card { position: absolute; right: 8%; top: 16%; animation: worldCardArrive 3.8s ease-in-out infinite; }
+
+  .scene-action-orb { position: absolute; left: 8%; top: 42%; border-radius: 999px; animation: worldActionThroughGates 4.2s ease-in-out infinite; }
+  .scene-scale-gates { position: absolute; left: 24%; right: 11%; top: 35%; display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; }
+  .scene-scale-gates span { display: grid; min-height: 88px; place-items: center; border-radius: 16px 16px 6px 6px; animation: worldGateCheck 4.2s ease-in-out infinite; animation-delay: calc(var(--i) * .18s); text-align: center; }
+  .scene-scan-beam { position: absolute; left: 26%; top: 31%; width: 12%; height: 106px; border-radius: 999px; background: linear-gradient(90deg, transparent, rgba(87,227,159,.55), transparent); filter: blur(4px); animation: worldScanAcross 4.2s ease-in-out infinite; }
+  .scene-approved-action { position: absolute; right: 8%; bottom: 15%; background: var(--temple-emerald); animation: worldVerifyStamp 3s ease-in-out infinite; }
+
+  .scene-quest-board { position: absolute; left: 10%; top: 16%; display: grid; width: min(360px, 58%); min-height: 180px; gap: 10px; border: 4px solid #07100c; border-radius: 20px; background: linear-gradient(180deg, #6d4a24, #22170d); padding: 18px; box-shadow: 0 16px 0 rgba(0,0,0,.18); }
+  .scene-quest-board span { transform-origin: 10% 0; animation: worldQuestPin 3.8s ease-in-out infinite; animation-delay: calc(var(--i) * .28s); }
+  .scene-reward { position: absolute; right: 10%; top: 18%; background: linear-gradient(135deg, var(--temple-gold), var(--temple-emerald)); animation: worldRewardSpark 2.7s ease-in-out infinite; }
+
+  .scene-wallet-home { position: absolute; left: 13%; bottom: 22%; display: grid; width: 156px; height: 116px; place-items: center; border-radius: 24px 24px 12px 12px; background: linear-gradient(180deg, #f7f1df, var(--world-tone)); text-align: center; }
+  .scene-thread { position: absolute; left: 32%; height: 5px; border-radius: 999px; background: linear-gradient(90deg, var(--world-tone), var(--world-tone-2)); transform-origin: left; animation: worldThreadGlow 2.8s ease-in-out infinite; }
+  .scene-thread.one { top: 34%; width: 46%; transform: rotate(-14deg); }
+  .scene-thread.two { top: 50%; width: 38%; transform: rotate(4deg); animation-delay: -.8s; }
+  .scene-thread.three { top: 66%; width: 43%; transform: rotate(17deg); animation-delay: -1.4s; }
+  .scene-memory-orbs { position: absolute; right: 9%; top: 20%; display: grid; gap: 12px; }
+  .scene-memory-orbs span { border-radius: 999px; animation: worldSignPop 3.2s ease-in-out infinite; }
 
   .world-character { --char-main: #f2c866; --char-dark: #7a5123; --char-face: #fff6df; position: relative; display: grid; place-items: center; width: 118px; height: 138px; isolation: isolate; }
   .world-character.size-sm { width: 92px; height: 108px; }
@@ -3514,15 +3590,7 @@
   .world-modal-close { position: absolute; right: 8px; top: 8px; display: grid; width: 26px; height: 26px; place-items: center; border-radius: 999px; background: rgba(245,239,218,.08); color: var(--temple-text); }
 
   .world-feature-playground { position: relative; overflow: hidden; padding: 16px; }
-  .world-playground-sky { position: absolute; inset: 0; pointer-events: none; }
-  .world-playground-sky span { position: absolute; width: 10px; height: 10px; border-radius: 50% 50% 50% 2px; background: var(--world-tone); opacity: .45; animation: worldSparkle 3.2s ease-in-out infinite; }
-  .world-playground-sky span:nth-child(1) { left: 8%; top: 14%; }
-  .world-playground-sky span:nth-child(2) { right: 12%; top: 18%; animation-delay: -1.4s; }
-  .world-playground-sky span:nth-child(3) { right: 26%; bottom: 18%; animation-delay: -2.1s; }
   .world-playground-stage { position: relative; display: grid; min-height: 430px; place-items: center; overflow: hidden; border: 1px solid rgba(245,239,218,.08); border-radius: 16px; background: radial-gradient(circle at 50% 45%, color-mix(in srgb, var(--world-tone) 14%, transparent), transparent 36%), rgba(5,8,7,.34); }
-  .world-story-portal { position: absolute; width: min(420px, 78%); aspect-ratio: 1; opacity: .8; }
-  .world-story-portal span:nth-child(2) { inset: 14%; animation-duration: 12s; animation-direction: reverse; }
-  .world-story-portal span:nth-child(3) { inset: 30%; animation-duration: 18s; }
   .world-step-scene { position: relative; z-index: 3; display: grid; grid-template-columns: auto auto; gap: clamp(16px, 4vw, 46px); align-items: end; justify-content: center; }
   .world-relic-token { position: relative; display: grid; width: clamp(120px, 18vw, 194px); aspect-ratio: 1; place-items: center; border: 5px solid #07100c; border-radius: 34% 44% 36% 48%; background: linear-gradient(135deg, color-mix(in srgb, var(--world-tone) 72%, #f7f1df), color-mix(in srgb, var(--world-tone-2) 60%, #0b0d0b)); box-shadow: 0 18px 0 rgba(0,0,0,.14), 0 0 40px color-mix(in srgb, var(--world-tone) 24%, transparent); animation: worldRelicWobble 3.2s ease-in-out infinite; }
   .world-relic-token img { width: 58%; height: 58%; object-fit: contain; filter: drop-shadow(0 10px 12px rgba(0,0,0,.28)); }
@@ -3556,9 +3624,23 @@
   @keyframes worldSparkle { 0%,100% { transform: translateY(0) rotate(45deg); opacity: .26; } 50% { transform: translateY(-12px) rotate(55deg); opacity: .72; } }
   @keyframes worldSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
   @keyframes worldPathGlow { 0%,100% { opacity: .22; } 50% { opacity: .72; } }
-  @keyframes worldPortalBreath { 0%,100% { transform: scale(1) rotate(0deg); opacity: .72; } 50% { transform: scale(1.06) rotate(5deg); opacity: 1; } }
   @keyframes worldRelicWobble { 0%,100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-10px) rotate(3deg); } }
   @keyframes worldLoadingPulse { 0%,100% { transform: scaleX(.68); opacity: .45; } 50% { transform: scaleX(1); opacity: 1; } }
+  @keyframes worldAssetToVault { 0%, 18%, 100% { transform: translate(0,0) scale(1); opacity: 1; } 48% { transform: translate(168px, 34px) scale(.86); opacity: .88; } 68% { transform: translate(270px, 24px) scale(.72); opacity: .22; } }
+  @keyframes worldVerifyStamp { 0%, 100% { transform: scale(.92) rotate(-5deg); opacity: .72; } 45% { transform: scale(1.08) rotate(4deg); opacity: 1; } }
+  @keyframes worldCardArrive { 0%, 35% { transform: translateY(18px) scale(.9); opacity: .4; } 62%, 100% { transform: translateY(0) scale(1); opacity: 1; } }
+  @keyframes worldGateOpen { 0%, 35%, 100% { transform: rotateY(0deg); } 58%, 76% { transform: rotateY(-54deg); } }
+  @keyframes worldGateOpenRight { 0%, 35%, 100% { transform: rotateY(0deg); } 58%, 76% { transform: rotateY(54deg); } }
+  @keyframes worldSignPop { 0%, 100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-7px) rotate(2deg); } }
+  @keyframes worldPathMove { 0%, 100% { opacity: .35; transform: scaleX(.6); } 50% { opacity: 1; transform: scaleX(1); } }
+  @keyframes worldScrollRead { 0%, 100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-8px) rotate(2deg); } }
+  @keyframes worldAgentMessage { 0% { transform: translateX(-28px) scaleX(.45); opacity: 0; } 35% { opacity: 1; } 75% { transform: translateX(42px) scaleX(1); opacity: .95; } 100% { transform: translateX(64px) scaleX(.45); opacity: 0; } }
+  @keyframes worldActionThroughGates { 0%, 100% { transform: translateX(0) scale(1); } 55%, 70% { transform: translateX(300px) scale(.92); } }
+  @keyframes worldGateCheck { 0%, 30%, 100% { box-shadow: 0 8px 0 rgba(0,0,0,.16), 0 0 0 color-mix(in srgb, var(--world-tone) 0%, transparent); } 48%, 60% { box-shadow: 0 8px 0 rgba(0,0,0,.16), 0 0 26px color-mix(in srgb, var(--world-tone) 48%, transparent); transform: translateY(-5px); } }
+  @keyframes worldScanAcross { 0%, 100% { transform: translateX(0); opacity: .15; } 52% { transform: translateX(330%); opacity: .9; } }
+  @keyframes worldQuestPin { 0%, 28%, 100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-14px) rotate(3deg); } 62% { transform: translateY(0) rotate(-2deg); } }
+  @keyframes worldRewardSpark { 0%, 100% { transform: scale(.92) rotate(-3deg); filter: brightness(1); } 50% { transform: scale(1.07) rotate(4deg); filter: brightness(1.25); } }
+  @keyframes worldThreadGlow { 0%, 100% { opacity: .36; transform-origin: left; } 50% { opacity: 1; filter: drop-shadow(0 0 12px color-mix(in srgb, var(--world-tone) 60%, transparent)); } }
 
   @media (max-width: 1024px) {
     .world-landing { grid-template-columns: 1fr; min-height: auto; }
@@ -3583,6 +3665,22 @@
     .world-feature-header { grid-template-columns: 1fr; text-align: center; }
     .world-feature-header > strong { justify-self: center; }
     .world-detail-hero { grid-template-columns: 1fr; justify-items: center; text-align: center; }
+    .world-feature-scene { min-height: 420px; }
+    .world-feature-scene.is-compact { min-height: 150px; }
+    .scene-agent-row { left: 5%; right: 5%; gap: 2px; }
+    .scene-agent-row .world-character { width: 72px; height: 86px; }
+    .scene-agent-node > span { font-size: 8px; }
+    .scene-scale-gates { left: 5%; right: 5%; top: 31%; grid-template-columns: repeat(2, 1fr); }
+    .scene-scale-gates span { min-height: 64px; }
+    .scene-action-orb { left: 8%; top: 18%; }
+    .scene-approved-action { right: 8%; bottom: 12%; }
+    .scene-quest-board { left: 7%; width: 68%; }
+    .scene-assets { left: 5%; }
+    .scene-assets span { max-width: 92px; }
+    .scene-vault-house { left: 34%; }
+    .scene-onchain-card { right: 5%; }
+    .scene-temple-gate { left: 25%; }
+    .scene-memory-orbs { right: 5%; }
     .world-modal-row { flex-direction: column; }
     .world-modal-wrap, .world-modal-trigger { width: 100%; }
     .world-modal-card { right: 0; left: 0; width: 100%; }
@@ -3595,8 +3693,6 @@
 
   @media (prefers-reduced-motion: reduce) {
     .world-rialo-orbit span,
-    .world-story-portal span,
-    .world-feature-portal,
     .world-character-body,
     .world-character-head,
     .world-character-eye,
@@ -3604,9 +3700,26 @@
     .world-character-shadow,
     .world-character-accessory,
     .world-character-spark,
-    .world-playground-sky span,
     .world-relic-token,
-    .world-loading-state i {
+    .world-loading-state i,
+    .scene-assets span,
+    .scene-vault-house i,
+    .scene-onchain-card,
+    .scene-gate-left,
+    .scene-gate-right,
+    .scene-guide-signs span,
+    .scene-walk-path,
+    .scene-task-scroll,
+    .scene-message,
+    .scene-result-card,
+    .scene-action-orb,
+    .scene-scale-gates span,
+    .scene-scan-beam,
+    .scene-approved-action,
+    .scene-quest-board span,
+    .scene-reward,
+    .scene-thread,
+    .scene-memory-orbs span {
       animation: none !important;
     }
   }
