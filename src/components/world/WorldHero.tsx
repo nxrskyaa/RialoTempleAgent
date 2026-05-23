@@ -1,50 +1,41 @@
 import { motion } from 'framer-motion'
-import AnimatedText from './AnimatedText'
 import WorldCharacter from './WorldCharacter'
 
 type WorldHeroProps = {
   explored: number
   total: number
-  nextHint: string
+  onStart: () => void
 }
 
-export default function WorldHero({ explored, total, nextHint }: WorldHeroProps) {
-  const progress = total > 0 ? (explored / total) * 100 : 0
-  const scrollToMap = () => {
-    document.getElementById('world-map')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  }
-
+export default function WorldHero({ explored, total, onStart }: WorldHeroProps) {
   return (
-    <section className="world-landing">
-      <div className="world-landing-copy">
-        <AnimatedText eyebrow="Interactive Rialo guide" title="Rialo Temple World">
-          Meet tiny temple guides, explore Rialo zones, and learn RWA, agents, SCALE, identity, and onchain movement through playful stories.
-        </AnimatedText>
-        <div className="world-landing-actions">
-          <button type="button" onClick={scrollToMap} className="world-primary-cta">Explore zones</button>
-          <span className="world-next-hint">{nextHint}</span>
+    <section className="world2-hero">
+      <div className="world2-hero-copy">
+        <span className="world2-eyebrow">Rialo visual simulator</span>
+        <h1>Explore the Rialo Temple World</h1>
+        <p>
+          A playful visual guide to Rialo's real-world blockchain features: live data, API connectivity, privacy, identity, speed, RWA, agents, and SCALE.
+        </p>
+        <div className="world2-hero-actions">
+          <button type="button" onClick={onStart} className="world2-primary">Start Exploring</button>
+          <span>{explored}/{total} zones visited</span>
         </div>
       </div>
 
       <motion.div
-        className="world-landing-stage"
-        initial={{ opacity: 0, y: 18, scale: 0.96 }}
+        className="world2-hero-stage"
+        initial={{ opacity: 0, y: 18, scale: 0.97 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.5, delay: 0.14, ease: 'easeOut' }}
+        transition={{ duration: 0.45, ease: 'easeOut' }}
       >
-        <div className="world-rialo-orbit">
+        <div className="world2-logo-pool">
           <img src="/rialo_logo.png" alt="Rialo" />
-          <span />
-          <span />
-          <span />
+          <span>Real-world blockchain</span>
         </div>
-        <WorldCharacter name="Temple Gate Guardian" tone="emerald" size="lg" mood="wave" accessory="scroll" role="gate" />
-        <div className="world-progress-card">
-          <div>
-            <span>World progress</span>
-            <strong>{explored}/{total} zones awake</strong>
-          </div>
-          <div className="world-progress-track"><span style={{ width: `${progress}%` }} /></div>
+        <WorldCharacter name="Temple Guide" tone="gold" role="guide" accessory="scroll" mood="wave" size="lg" />
+        <div className="world2-hero-sign">
+          <strong>Learn by watching</strong>
+          <span>Every zone shows a real process, not just a glowing card.</span>
         </div>
       </motion.div>
     </section>

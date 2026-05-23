@@ -1,128 +1,133 @@
-import type { WorldZone } from './WorldZoneCard'
 import type { CSSProperties } from 'react'
+import type { WorldZone } from './worldData'
 import WorldCharacter from './WorldCharacter'
 
 type WorldFeatureSceneProps = {
-  zone: WorldZone | undefined
-  stepKey?: string
-  running?: boolean
+  zone: WorldZone
   compact?: boolean
 }
 
-const assetLabels = ['House', 'Invoice', 'Gold', 'Bond']
-const agentLabels = ['Read task', 'Check rules', 'Send action']
-const gateLabels = ['Explore', 'Learn', 'Quest']
-const scaleLabels = ['Policy', 'Permission', 'Limit', 'Verify']
-const questLabels = ['RWA Vault', 'Agent Camp', 'SCALE Lab']
+const sourceLabels = ['Weather', 'Price', 'Bank', 'Shipment', 'Ratings']
+const portalLabels = ['Payment', 'Database', 'Email', 'Delivery']
+const privacyLabels = ['Public note', 'Encrypt', 'Private send']
+const passportLabels = ['Email', 'SMS', 'Social', 'Wallet']
+const assetLabels = ['House', 'Invoice', 'Bond', 'Gold', 'Ticket', 'Doc']
+const agentLabels = ['Request', 'Work', 'Verify', 'Pay']
+const scaleLabels = ['Task Terms', 'Deadline', 'Quality Check', 'Payment Release']
 
-export default function WorldFeatureScene({ zone, stepKey, running = false, compact = false }: WorldFeatureSceneProps) {
-  const id = zone?.id ?? 'temple-gate'
-  const character = (
-    <WorldCharacter
-      name={zone?.mascot.name ?? 'Temple Guide'}
-      tone={zone?.tone ?? 'gold'}
-      size={compact ? 'sm' : 'md'}
-      mood={running ? 'walk' : zone?.mascot.mood ?? 'wave'}
-      accessory={zone?.mascot.accessory ?? 'scroll'}
-      role={zone?.mascot.role ?? 'gate'}
-    />
+export default function WorldFeatureScene({ zone, compact = false }: WorldFeatureSceneProps) {
+  return (
+    <div className={`world-story-scene scene-${zone.id} tone-${zone.tone} ${compact ? 'is-compact' : ''}`}>
+      {renderScene(zone)}
+      <div className="world-scene-guide">
+        <WorldCharacter
+          name={zone.mascot.name}
+          tone={zone.tone}
+          role={zone.mascot.role}
+          accessory={zone.mascot.accessory}
+          mood={zone.mascot.mood}
+          size={compact ? 'sm' : 'md'}
+        />
+      </div>
+    </div>
   )
+}
 
-  if (id === 'rwa-vault') {
+function renderScene(zone: WorldZone) {
+  if (zone.id === 'data-spring') {
     return (
-      <div className={`world-feature-scene scene-vault ${compact ? 'is-compact' : ''}`} data-step={stepKey}>
-        <div className="scene-assets">
+      <>
+        <div className="scene-source-row">
+          {sourceLabels.map((label, index) => <span key={label} style={{ '--i': index } as CSSProperties}>{label}</span>)}
+        </div>
+        <div className="scene-filter">Check</div>
+        <div className="scene-pool"><strong>Onchain data pool</strong></div>
+        <span className="scene-flow-line" />
+      </>
+    )
+  }
+
+  if (zone.id === 'bridge-gate') {
+    return (
+      <>
+        <div className="scene-contract">Smart contract</div>
+        <div className="scene-api-portals">
+          {portalLabels.map((label, index) => <span key={label} style={{ '--i': index } as CSSProperties}>{label}</span>)}
+        </div>
+        <div className="scene-response">Response returns</div>
+        <span className="scene-scroll-message" />
+      </>
+    )
+  }
+
+  if (zone.id === 'privacy-chamber') {
+    return (
+      <>
+        <div className="scene-privacy-steps">
+          {privacyLabels.map((label, index) => <span key={label} style={{ '--i': index } as CSSProperties}>{label}</span>)}
+        </div>
+        <div className="scene-shield-dome">Private chamber</div>
+        <span className="scene-encrypted-scroll" />
+      </>
+    )
+  }
+
+  if (zone.id === 'identity-passport') {
+    return (
+      <>
+        <div className="scene-passport-book">Temple Passport</div>
+        <div className="scene-passport-stamps">
+          {passportLabels.map((label, index) => <span key={label} style={{ '--i': index } as CSSProperties}>{label}</span>)}
+        </div>
+        <div className="scene-entry-door">Enter app</div>
+      </>
+    )
+  }
+
+  if (zone.id === 'speed-engine') {
+    return (
+      <>
+        <div className="scene-event-card">Real-world event</div>
+        <div className="scene-engine-core">Trigger engine</div>
+        <div className="scene-action-card">Onchain action</div>
+        <span className="scene-lightning-path" />
+      </>
+    )
+  }
+
+  if (zone.id === 'rwa-vault') {
+    return (
+      <>
+        <div className="scene-assets-stack">
           {assetLabels.map((label, index) => <span key={label} style={{ '--i': index } as CSSProperties}>{label}</span>)}
         </div>
-        <div className="scene-vault-house">
-          <span className="scene-vault-door" />
-          <strong>Onchain Vault</strong>
-          <i>Verified</i>
-        </div>
-        <div className="scene-onchain-card">
-          <span />
-          <strong>Asset Card</strong>
-          <small>usable by apps</small>
-        </div>
-        <div className="scene-character">{character}</div>
-      </div>
+        <div className="scene-rwa-vault">RWA Vault</div>
+        <div className="scene-asset-card"><strong>Asset card</strong><small>Status updates</small></div>
+        <span className="scene-data-update">live data</span>
+      </>
     )
   }
 
-  if (id === 'agent-camp') {
+  if (zone.id === 'agent-camp') {
     return (
-      <div className={`world-feature-scene scene-agent ${compact ? 'is-compact' : ''}`} data-step={stepKey}>
-        <div className="scene-task-scroll">Task scroll</div>
-        <div className="scene-agent-row">
-          {agentLabels.map((label, index) => (
-            <div className="scene-agent-node" key={label} style={{ '--i': index } as CSSProperties}>
-              <WorldCharacter name={label} tone={zone?.tone ?? 'coral'} size="sm" mood={index === 1 ? 'think' : 'focus'} accessory="orb" role="agent" />
-              <span>{label}</span>
-            </div>
-          ))}
+      <>
+        <div className="scene-agent-board">Task board</div>
+        <div className="scene-agent-steps">
+          {agentLabels.map((label, index) => <span key={label} style={{ '--i': index } as CSSProperties}>{label}</span>)}
         </div>
-        <span className="scene-message one" />
-        <span className="scene-message two" />
-        <div className="scene-result-card">Result confirmed</div>
-      </div>
-    )
-  }
-
-  if (id === 'scale-lab') {
-    return (
-      <div className={`world-feature-scene scene-scale ${compact ? 'is-compact' : ''}`} data-step={stepKey}>
-        <div className="scene-action-orb">Agent action</div>
-        <div className="scene-scale-gates">
-          {scaleLabels.map((label, index) => <span key={label} style={{ '--i': index } as CSSProperties}>{label}</span>)}
-        </div>
-        <div className="scene-scan-beam" />
-        <div className="scene-approved-action">Verified action</div>
-        <div className="scene-character">{character}</div>
-      </div>
-    )
-  }
-
-  if (id === 'quest-board') {
-    return (
-      <div className={`world-feature-scene scene-quest ${compact ? 'is-compact' : ''}`} data-step={stepKey}>
-        <div className="scene-quest-board">
-          {questLabels.map((label, index) => <span key={label} style={{ '--i': index } as CSSProperties}>{label}</span>)}
-        </div>
-        <div className="scene-reward">Reward sparkle</div>
-        <div className="scene-character">{character}</div>
-      </div>
-    )
-  }
-
-  if (id === 'identity-homes') {
-    return (
-      <div className={`world-feature-scene scene-identity ${compact ? 'is-compact' : ''}`} data-step={stepKey}>
-        <div className="scene-wallet-home">Wallet home</div>
-        <span className="scene-thread one" />
-        <span className="scene-thread two" />
-        <span className="scene-thread three" />
-        <div className="scene-memory-orbs">
-          <span>Assets</span>
-          <span>History</span>
-          <span>Reputation</span>
-        </div>
-        <div className="scene-character">{character}</div>
-      </div>
+        <span className="scene-task-scroll-moving" />
+      </>
     )
   }
 
   return (
-    <div className={`world-feature-scene scene-gate ${compact ? 'is-compact' : ''}`} data-step={stepKey}>
-      <div className="scene-temple-gate">
-        <span className="scene-gate-left" />
-        <span className="scene-gate-right" />
-        <strong>Temple Gate</strong>
+    <>
+      <div className="scene-scale-machine">SCALE machine</div>
+      <div className="scene-scale-stations">
+        {scaleLabels.map((label, index) => <span key={label} style={{ '--i': index } as CSSProperties}>{label}</span>)}
       </div>
-      <div className="scene-guide-signs">
-        {gateLabels.map((label, index) => <span key={label} style={{ '--i': index } as CSSProperties}>{label}</span>)}
-      </div>
-      <div className="scene-walk-path" />
-      <div className="scene-character">{character}</div>
-    </div>
+      <div className="scene-approved-output">Approved action</div>
+      <span className="scene-lab-task" />
+    </>
   )
 }

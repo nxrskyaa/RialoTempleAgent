@@ -1,177 +1,196 @@
-import { Gem, Home, Landmark, RadioTower, Scale, Store, Vault, Zap, type LucideIcon } from 'lucide-react'
+import {
+  Bot,
+  DatabaseZap,
+  Fingerprint,
+  Gauge,
+  KeyRound,
+  Link2,
+  Scale,
+  ShieldCheck,
+  type LucideIcon,
+} from 'lucide-react'
+import type { WorldCharacterAccessory, WorldCharacterMood, WorldCharacterRole, WorldCharacterTone } from './WorldCharacter'
 
-export type WorldBuildingId = 'hub' | 'spire' | 'bazaar' | 'treasury' | 'oracle' | 'homes'
+export type WorldZoneId =
+  | 'data-spring'
+  | 'bridge-gate'
+  | 'privacy-chamber'
+  | 'identity-passport'
+  | 'speed-engine'
+  | 'rwa-vault'
+  | 'agent-camp'
+  | 'scale-lab'
 
-export type WorldBuilding = {
-  id: WorldBuildingId
-  name: string
-  shortName: string
-  role: string
-  simple: string
-  analogy: string
-  without: string
-  with: string
-  accent: string
-  accent2: string
-  icon: LucideIcon
+export type WorldStep = {
+  label: string
+  detail: string
 }
 
-export type WorkflowStep = {
-  key: string
+export type WorldZone = {
+  id: WorldZoneId
   title: string
-  what: string
+  concept: string
+  summary: string
+  scene: string
+  points: string[]
+  example: string
   why: string
-  item: string
+  steps: WorldStep[]
+  tone: WorldCharacterTone
+  icon: LucideIcon
+  mascot: {
+    name: string
+    role: WorldCharacterRole
+    accessory: WorldCharacterAccessory
+    mood: WorldCharacterMood
+  }
 }
 
-const asset = (path: string) => new URL(`../../assets/world/${path}`, import.meta.url).href
-
-export const itemAssets = {
-  scroll: asset('items/scroll.svg'),
-  crystal: asset('items/crystal.svg'),
-  mask: asset('items/judge-mask.svg'),
-  coin: asset('items/coin.svg'),
-  token: asset('items/token.svg'),
-  key: asset('items/vault-key.svg'),
-  ledger: asset('items/ledger-stone.svg'),
-  proposal: asset('items/proposal.svg'),
-  yes: asset('items/yes-token.svg'),
-  no: asset('items/no-token.svg'),
-  price: asset('items/price-card.svg'),
-  trade: asset('items/trade-light.svg'),
-  identity: asset('items/identity-card.svg'),
-  home: asset('items/wallet-home.svg'),
-  memory: asset('items/memory-orb.svg'),
-  block: asset('items/block-crystal.svg'),
-  spark: asset('items/mempool-spark.svg'),
-  deed: asset('items/rwa-deed.svg'),
-  proof: asset('items/proof-tablet.svg'),
-  hourglass: asset('items/hourglass.svg'),
-}
-
-export const buildings: WorldBuilding[] = [
+export const worldZones: WorldZone[] = [
   {
-    id: 'hub',
-    name: 'HUB',
-    shortName: 'Governance',
-    role: 'Community decisions',
-    simple: 'Instead of one boss making all decisions, everyone with tokens can vote like a town hall.',
-    analogy: 'Like a school council where every class gets a say, except the result is written on-chain.',
-    without: 'One team decides, votes are hard to audit, and people must trust screenshots.',
-    with: 'Proposals, votes, and results are visible, automatic, and recorded for everyone.',
-    accent: '#f2c866',
-    accent2: '#57e39f',
-    icon: Landmark,
+    id: 'data-spring',
+    title: 'Data Spring',
+    concept: 'Real World Data',
+    summary: 'Apps can use live information from the real world, not just old data already stored onchain.',
+    scene: 'A temple spring pulls data bubbles from weather, markets, banks, shipments, and ratings into an onchain pool.',
+    points: ['Live data enters the app', 'Data can be checked before use', 'Smart contracts can react to current information'],
+    example: 'A lending app can update risk when real-world credit or market data changes.',
+    why: 'Apps become aware of what is happening outside crypto.',
+    steps: [
+      { label: 'Outside source', detail: 'A real-world source produces fresh information.' },
+      { label: 'Check data', detail: 'The Data Keeper filters it before the app trusts it.' },
+      { label: 'Onchain pool', detail: 'The checked value becomes usable by contracts and agents.' },
+    ],
+    tone: 'sapphire',
+    icon: DatabaseZap,
+    mascot: { name: 'Data Keeper', role: 'data', accessory: 'drop', mood: 'focus' },
   },
   {
-    id: 'spire',
-    name: 'SPIRE',
-    shortName: 'Transactions',
-    role: 'Secure movement',
-    simple: 'Every time money, tokens, or data moves on blockchain, the Spire confirms it safely.',
-    analogy: 'Like a post office that stamps many letters into a batch called a block.',
-    without: 'Transfers wait in opaque systems and receipts can be confusing.',
-    with: 'Movements are public, ordered, confirmed, and easy to verify.',
-    accent: '#78ecff',
-    accent2: '#57e39f',
-    icon: RadioTower,
+    id: 'bridge-gate',
+    title: 'Bridge Gate',
+    concept: 'Real World Connectivity',
+    summary: 'Rialo helps apps talk to internet services and real-world systems directly.',
+    scene: 'A message scroll travels from a smart contract through API portals, receives a response, then returns to the temple.',
+    points: ['Apps can call external services', 'Results can return back to the app', 'Less middleware is needed'],
+    example: 'A contract can check if an invoice was paid or if a delivery was completed.',
+    why: 'Blockchain apps can interact with real apps people already use.',
+    steps: [
+      { label: 'Send request', detail: 'The contract asks an external service for a status.' },
+      { label: 'Portal call', detail: 'The Bridge Messenger carries the scroll through an API gate.' },
+      { label: 'Return result', detail: 'The response comes back and updates the app.' },
+    ],
+    tone: 'emerald',
+    icon: Link2,
+    mascot: { name: 'Bridge Messenger', role: 'bridge', accessory: 'scroll', mood: 'walk' },
   },
   {
-    id: 'bazaar',
-    name: 'BAZAAR',
-    shortName: 'Marketplace',
-    role: 'Digital market',
-    simple: 'A market for digital tokens where buyers and sellers meet instantly from anywhere.',
-    analogy: 'Like a food market, but the goods are tokens and prices update globally.',
-    without: 'Markets need many middlemen, paperwork, and delayed settlement.',
-    with: 'Listings, trades, prices, and settlement can happen automatically.',
-    accent: '#ff8066',
-    accent2: '#f2c866',
-    icon: Store,
+    id: 'privacy-chamber',
+    title: 'Privacy Chamber',
+    concept: 'Real World Privacy',
+    summary: 'Some real-world actions need privacy, especially identity, finance, and personal data.',
+    scene: 'A public scroll enters a quiet chamber, folds into an encrypted scroll, and leaves behind a shielded path.',
+    points: ['Sensitive data should not be exposed publicly', 'Apps can use private communication', 'Users can interact more safely'],
+    example: 'A finance app can notify a user privately without exposing personal details to everyone.',
+    why: 'Real-world apps need privacy; not everything should be public.',
+    steps: [
+      { label: 'Plain message', detail: 'The app has information that should not be exposed.' },
+      { label: 'Encrypt', detail: 'The Privacy Guardian seals it in a protected scroll.' },
+      { label: 'Private delivery', detail: 'Only the right person or system can read it.' },
+    ],
+    tone: 'violet',
+    icon: ShieldCheck,
+    mascot: { name: 'Privacy Guardian', role: 'privacy', accessory: 'shield', mood: 'think' },
   },
   {
-    id: 'treasury',
-    name: 'TREASURY',
-    shortName: 'Assets / RWA',
-    role: 'Physical to digital',
-    simple: 'Real-world things like invoices, houses, or gold become digital tokens people can verify.',
-    analogy: 'Like turning a paper certificate into a magical token that moves instantly.',
-    without: 'Documents sit in banks, emails, or filing cabinets and take days to prove.',
-    with: 'Ownership can be verified and used digitally with less friction.',
-    accent: '#f2c866',
-    accent2: '#ffad72',
-    icon: Vault,
+    id: 'identity-passport',
+    title: 'Identity Passport',
+    concept: 'Real World Identity',
+    summary: 'Users should not need confusing crypto setup for every real-world app.',
+    scene: 'A passport desk stamps email, SMS, social, and wallet credentials so a new user can enter the temple.',
+    points: ['Familiar accounts can help onboard users', 'Identity can connect Web2 and Web3', 'Apps can feel less confusing'],
+    example: 'A user could verify with email or phone instead of only using a wallet.',
+    why: 'Normal users can access Web3 without feeling lost.',
+    steps: [
+      { label: 'Familiar login', detail: 'The user starts with email, phone, or social identity.' },
+      { label: 'Passport stamp', detail: 'The Passport Clerk links that proof to the app experience.' },
+      { label: 'Enter Web3', detail: 'The user gets a smoother path into onchain activity.' },
+    ],
+    tone: 'gold',
+    icon: Fingerprint,
+    mascot: { name: 'Passport Clerk', role: 'identity', accessory: 'stamp', mood: 'wave' },
   },
   {
-    id: 'oracle',
-    name: 'ORACLE',
-    shortName: 'Agents / SCALE',
-    role: 'AI work ritual',
-    simple: 'SCALE makes smart contract work easier by using agents to do a task, judges to check it, and proof to settle it.',
-    analogy: 'Like a magical assistant writing a spell, another assistant checking it, then a stone tablet recording proof.',
-    without: 'Smart contract work is hard, manual, and payment trust is messy.',
-    with: 'Tasks, escrow, judging, settlement, and proof become a clear workflow.',
-    accent: '#c886ff',
-    accent2: '#78ecff',
+    id: 'speed-engine',
+    title: 'Speed Engine',
+    concept: 'Real World Speed / Reactivity',
+    summary: 'Real-world apps need fast reactions, not slow waiting screens.',
+    scene: 'A temple engine listens for events, fires a lightning rail, and activates an onchain action.',
+    points: ['Apps can react quickly', 'Automations can run when conditions happen', 'Less waiting for users'],
+    example: 'A payment, check-in, price update, or deadline can trigger an action automatically.',
+    why: 'Real-world apps need instant response.',
+    steps: [
+      { label: 'Event happens', detail: 'A payment, deadline, price, or status changes outside the app.' },
+      { label: 'Trigger fires', detail: 'The Speed Runner activates the temple engine.' },
+      { label: 'Action updates', detail: 'The onchain app reacts without making users wait.' },
+    ],
+    tone: 'coral',
+    icon: Gauge,
+    mascot: { name: 'Speed Runner', role: 'speed', accessory: 'bolt', mood: 'walk' },
+  },
+  {
+    id: 'rwa-vault',
+    title: 'RWA Vault',
+    concept: 'Real World Assets',
+    summary: 'Real-world assets should be more than static tokens. They should react to live data and real events.',
+    scene: 'Houses, invoices, bonds, gold, tickets, and documents become onchain asset cards that can update.',
+    points: ['Assets can come from the real world', 'Assets can update with live conditions', 'Apps and agents can use those assets'],
+    example: 'An invoice can update when payment status changes.',
+    why: 'Tokenized assets become useful, not just decorative tokens.',
+    steps: [
+      { label: 'Real asset', detail: 'A real object or document starts outside crypto.' },
+      { label: 'Tokenize', detail: 'The Vault Keeper turns it into an onchain asset card.' },
+      { label: 'Update status', detail: 'Live data changes the asset when real events happen.' },
+    ],
+    tone: 'cream',
+    icon: KeyRound,
+    mascot: { name: 'Vault Keeper', role: 'vault', accessory: 'key', mood: 'focus' },
+  },
+  {
+    id: 'agent-camp',
+    title: 'Agent Camp',
+    concept: 'Agent Economy',
+    summary: 'AI agents are useful when they can safely do tasks, coordinate, and get paid.',
+    scene: 'Agent characters move a task scroll through request, work, verify, and pay stations.',
+    points: ['Agents can coordinate work', 'Tasks need rules and deadlines', 'Payment should happen after verification'],
+    example: 'An image agent completes a task, a judge agent checks it, then payment is released.',
+    why: 'Agents need safe rails before they handle real value.',
+    steps: [
+      { label: 'Request', detail: 'A user gives an agent a clear job.' },
+      { label: 'Work', detail: 'The agent does the task and submits output.' },
+      { label: 'Verify and pay', detail: 'A judge checks the result before payment releases.' },
+    ],
+    tone: 'emerald',
+    icon: Bot,
+    mascot: { name: 'Agent Scout', role: 'agent', accessory: 'orb', mood: 'think' },
+  },
+  {
+    id: 'scale-lab',
+    title: 'SCALE Lab',
+    concept: 'Simple Contracts for Agent Labor Execution',
+    summary: 'SCALE helps define task terms for agents so work can be checked before payment.',
+    scene: 'A lab machine passes a task through task terms, deadline, quality check, and payment release stations.',
+    points: ['Define the task clearly', 'Enforce deadline and terms', 'Verify quality before payment'],
+    example: 'A user requests an output from an agent, and a judge checks whether it meets the terms before release.',
+    why: 'It reduces risk when paying agents to do work.',
+    steps: [
+      { label: 'Task terms', detail: 'The work and success conditions are written clearly.' },
+      { label: 'Deadline and check', detail: 'The lab checks time limits and quality rules.' },
+      { label: 'Release payment', detail: 'Payment moves only after the task passes verification.' },
+    ],
+    tone: 'sapphire',
     icon: Scale,
-  },
-  {
-    id: 'homes',
-    name: 'HOMES',
-    shortName: 'Identity',
-    role: 'Wallet identity',
-    simple: 'Your wallet is your home: it holds assets, history, reputation, and permissions.',
-    analogy: 'Like your home, bank account, and ID card combined, secured by cryptography.',
-    without: 'Accounts are scattered across apps and can be copied or faked.',
-    with: 'One wallet connects actions, proof, and reputation across Rialo.',
-    accent: '#57e39f',
-    accent2: '#f2c866',
-    icon: Home,
+    mascot: { name: 'SCALE Engineer', role: 'scale', accessory: 'gear', mood: 'focus' },
   },
 ]
 
-export const glossary = [
-  { term: 'Smart contract', icon: Zap, simple: 'A vending machine on the internet: put the right input in, get the promised result out, no human needed.' },
-  { term: 'Blockchain', icon: Gem, simple: 'A public notebook everyone can inspect, but nobody can secretly erase.' },
-  { term: 'Token', icon: Gem, simple: 'A digital certificate that says who owns something.' },
-  { term: 'Wallet', icon: Home, simple: 'Your home and bank account combined for the blockchain world.' },
-  { term: 'Gas fee', icon: Zap, simple: 'A postage stamp for sending an action to the blockchain.' },
-]
-
-export const workflows: Record<WorldBuildingId, WorkflowStep[]> = {
-  oracle: [
-    { key: 'task', title: 'Task', what: 'A scroll unrolls and the Agent reads your request.', why: 'The work starts from a clear instruction.', item: itemAssets.scroll },
-    { key: 'escrow', title: 'Escrow', what: 'Gold locks inside a sealed chest.', why: 'Payment is held safely until the work passes.', item: itemAssets.coin },
-    { key: 'work', title: 'Work', what: 'The Agent walks through the chamber and thinks.', why: 'AI processes the task and creates an output.', item: itemAssets.crystal },
-    { key: 'output', title: 'Output', what: 'A completed scroll floats from the altar.', why: 'The result is submitted for checking.', item: itemAssets.scroll },
-    { key: 'judge', title: 'Judge', what: 'The mask scans the result and gives a score.', why: 'Another AI checks quality before payment.', item: itemAssets.mask },
-    { key: 'settle', title: 'Settlement', what: 'Coins release and a proof tablet appears.', why: 'Approved work gets paid; bad work can refund.', item: itemAssets.proof },
-  ],
-  treasury: [
-    { key: 'deposit', title: 'Deposit', what: 'A real-world asset enters the vault slot.', why: 'The physical claim starts its digital journey.', item: itemAssets.deed },
-    { key: 'verify', title: 'Verify', what: 'Rune locks spin around the vault.', why: 'The asset is checked before becoming usable.', item: itemAssets.key },
-    { key: 'tokenize', title: 'Tokenize', what: 'The asset becomes a glowing token.', why: 'Ownership becomes digital and transferable.', item: itemAssets.token },
-    { key: 'ledger', title: 'Ledger', what: 'The token connects to a blockchain stone.', why: 'Anyone can verify the record later.', item: itemAssets.ledger },
-    { key: 'market', title: 'Market', what: 'A portal sends the token to the Bazaar.', why: 'Verified assets can trade more easily.', item: itemAssets.price },
-  ],
-  hub: [
-    { key: 'proposal', title: 'Proposal', what: 'Citizens send scrolls into the hall.', why: 'Ideas become clear choices.', item: itemAssets.proposal },
-    { key: 'vote', title: 'Vote', what: 'Vote tokens fly to yes and no sides.', why: 'The community decides together.', item: itemAssets.yes },
-    { key: 'record', title: 'Record', what: 'The spire changes color and stores the result.', why: 'The decision cannot be quietly rewritten.', item: itemAssets.proof },
-  ],
-  bazaar: [
-    { key: 'list', title: 'List', what: 'Sellers place token cards on floating stalls.', why: 'Everyone can see what is available.', item: itemAssets.price },
-    { key: 'match', title: 'Match', what: 'Buyer and seller lights connect.', why: 'Prices find balance through trades.', item: itemAssets.trade },
-    { key: 'settle', title: 'Settle', what: 'Tokens and payment swap paths.', why: 'The trade completes automatically.', item: itemAssets.token },
-  ],
-  spire: [
-    { key: 'mempool', title: 'Waiting', what: 'Transactions swirl in the mempool.', why: 'Actions wait their turn before confirmation.', item: itemAssets.spark },
-    { key: 'block', title: 'Block', what: 'Light beams fuse into a crystal block.', why: 'Many actions are confirmed as a batch.', item: itemAssets.block },
-    { key: 'proof', title: 'Proof', what: 'The block joins the tower forever.', why: 'Everyone can verify what happened.', item: itemAssets.proof },
-  ],
-  homes: [
-    { key: 'wallet', title: 'Wallet', what: 'Your home glows when you connect.', why: 'Your wallet is your identity anchor.', item: itemAssets.home },
-    { key: 'history', title: 'History', what: 'Memory orbs float around your home.', why: 'Actions become reputation and context.', item: itemAssets.memory },
-    { key: 'threads', title: 'Threads', what: 'Light paths connect to every building.', why: 'One identity ties together the Rialo world.', item: itemAssets.identity },
-  ],
-}
+export const worldZoneById = Object.fromEntries(worldZones.map((zone) => [zone.id, zone])) as Record<WorldZoneId, WorldZone>

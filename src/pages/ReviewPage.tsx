@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import { motion } from 'framer-motion'
-import { Clapperboard, ExternalLink, ImageIcon, Loader2, Send, Sparkles, Star, Utensils } from 'lucide-react'
+import { ChefHat, Clapperboard, ExternalLink, Film, Loader2, Popcorn, Send, Soup, Star, Utensils } from 'lucide-react'
 import { useReadContract, useWaitForTransactionReceipt, useWriteContract } from 'wagmi'
 import ProfileGate from '@/components/ProfileGate'
 import { ARC_CHAIN, RIALO_TEMPLE_ABI, RIALO_TEMPLE_ADDRESS } from '@/config/contracts'
@@ -9,6 +9,9 @@ import { ACTION_FEE, fmtAddress, parseReviews, REVIEW_PAGE_SIZE, type ReviewData
 
 type Tab = 'all' | 'food' | 'film'
 type WriteKind = 'food' | 'film'
+
+const foodTags = ['Flavor bomb', 'Cozy', 'Street gem', 'Worth the bite']
+const filmTags = ['Great story', 'Visual feast', 'Cozy watch', 'Big mood']
 
 export default function ReviewPage() {
   return (
@@ -26,17 +29,12 @@ function ReviewInner({ refetchProfile }: { refetchProfile: () => void }) {
   const [imageUrl, setImageUrl] = useState('')
   const [rating, setRating] = useState(0)
   const [reviewText, setReviewText] = useState('')
+  const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [message, setMessage] = useState('')
 
   const query = tab === 'all'
-    ? {
-        functionName: 'getReviews' as const,
-        args: [0n, REVIEW_PAGE_SIZE] as const,
-      }
-    : {
-        functionName: 'getReviewsByCategory' as const,
-        args: [tab === 'food' ? 0 : 1, 0n, REVIEW_PAGE_SIZE] as const,
-      }
+    ? { functionName: 'getReviews' as const, args: [0n, REVIEW_PAGE_SIZE] as const }
+    : { functionName: 'getReviewsByCategory' as const, args: [tab === 'food' ? 0 : 1, 0n, REVIEW_PAGE_SIZE] as const }
 
   const { data, isLoading, refetch } = useReadContract({
     address: RIALO_TEMPLE_ADDRESS,
@@ -48,6 +46,7 @@ function ReviewInner({ refetchProfile }: { refetchProfile: () => void }) {
   })
 
   const reviews = useMemo(() => parseReviews(data), [data])
+  const activeTags = kind === 'food' ? foodTags : filmTags
 
   const { data: reviewTxHash, writeContract, isPending, reset } = useWriteContract({
     mutation: {
@@ -57,10 +56,7 @@ function ReviewInner({ refetchProfile }: { refetchProfile: () => void }) {
 
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
     hash: reviewTxHash,
-    query: {
-      enabled: Boolean(reviewTxHash),
-      refetchOnWindowFocus: false,
-    },
+    query: { enabled: Boolean(reviewTxHash), refetchOnWindowFocus: false },
   })
 
   useEffect(() => {
@@ -70,24 +66,32 @@ function ReviewInner({ refetchProfile }: { refetchProfile: () => void }) {
 
   useEffect(() => {
     if (!isConfirmed) return
-    setMessage('Review submitted on-chain.')
+    setMessage('Review saved. The temple critics are taking notes.')
     setTitle('')
     setOriginOrImdb('')
     setImageUrl('')
     setRating(0)
     setReviewText('')
+    setSelectedTags([])
     void refetch()
     refetchProfile()
     reset()
-    const clear = window.setTimeout(() => setMessage(''), 1800)
+    const clear = window.setTimeout(() => setMessage(''), 2200)
     return () => window.clearTimeout(clear)
   }, [isConfirmed, refetch, refetchProfile, reset])
+
+  function toggleTag(tag: string) {
+    setSelectedTags((current) => current.includes(tag) ? current.filter((item) => item !== tag) : [...current, tag])
+  }
 
   function submitReview() {
     if (!title.trim() || rating < 1) {
       setMessage('Title/name and rating are required.')
       return
     }
+
+    const tagLine = selectedTags.length ? `\n\nMood: ${selectedTags.join(', ')}` : ''
+    const textForChain = `${reviewText.trim()}${tagLine}`.trim()
 
     setMessage('Open your wallet and confirm the review transaction.')
     if (kind === 'food') {
@@ -96,7 +100,7 @@ function ReviewInner({ refetchProfile }: { refetchProfile: () => void }) {
         abi: RIALO_TEMPLE_ABI,
         chainId: ARC_CHAIN.id,
         functionName: 'submitFoodReview',
-        args: [title.trim(), originOrImdb.trim(), imageUrl.trim(), rating, reviewText.trim()],
+        args: [title.trim(), originOrImdb.trim(), imageUrl.trim(), rating, textForChain],
         value: ACTION_FEE,
       })
       return
@@ -107,168 +111,194 @@ function ReviewInner({ refetchProfile }: { refetchProfile: () => void }) {
       abi: RIALO_TEMPLE_ABI,
       chainId: ARC_CHAIN.id,
       functionName: 'submitFilmReview',
-      args: [title.trim(), originOrImdb.trim(), rating, reviewText.trim()],
+      args: [title.trim(), originOrImdb.trim(), rating, textForChain],
       value: ACTION_FEE,
     })
   }
 
   return (
-    <div className="review-studio mx-auto max-w-7xl px-4 py-8 sm:px-6">
-      <section className="review-hero temple-card">
-        <div>
-          <p className="text-xs font-black uppercase tracking-[0.22em] text-[var(--temple-gold)]">Rialo Review Temple</p>
-          <h1 className="mt-3 text-5xl font-black leading-none text-[var(--temple-text)] sm:text-7xl">Submit reviews that feel collectible.</h1>
-          <p className="mt-4 max-w-2xl text-sm font-semibold leading-6 text-[var(--temple-muted)]">
-            Food and film live in two clean lanes. Pick a lane, craft a stamp, and publish a tiny cultural proof on Arc.
-          </p>
+    <main className="review2-page mx-auto max-w-[1480px] px-4 pb-14 pt-6 sm:px-6">
+      <section className="review2-hero">
+        <div className="review2-hero-copy">
+          <span className="review2-eyebrow">Rialo Taste & Reel Review Hub</span>
+          <h1>Review Food & Movies</h1>
+          <p>Share simple reviews and build your Rialo Temple taste profile. Rate the bite, the watch, and the memory.</p>
         </div>
-        <div className="review-hero-art" aria-hidden="true">
-          <img src="/rialo_logo.png" alt="" />
-          <span className="review-orbit-chip food"><Utensils className="h-5 w-5" /> Food</span>
-          <span className="review-orbit-chip film"><Clapperboard className="h-5 w-5" /> Film</span>
-          <span className="review-orbit-star"><Sparkles className="h-5 w-5" /></span>
+        <div className="review2-hero-cards">
+          <CategoryCard kind="food" active={kind === 'food'} onClick={() => setKind('food')} />
+          <CategoryCard kind="film" active={kind === 'film'} onClick={() => setKind('film')} />
         </div>
       </section>
 
-      <div className="mt-5 grid gap-5 lg:grid-cols-[1.05fr_0.95fr]">
-      <section className="review-booth temple-card spark-field rounded-lg p-5 sm:p-6">
-        <div className="mb-5 flex items-start justify-between gap-4">
-          <div>
-            <p className="text-xs font-black uppercase tracking-wider text-[var(--temple-cyan)]">Review studio</p>
-            <h2 className="mt-2 text-4xl font-black tracking-normal">Make a clean review stamp</h2>
-            <p className="mt-2 max-w-md text-sm leading-6 text-[var(--temple-muted)]">Separate lanes, cleaner form, richer preview. No more mixed-up wall.</p>
-          </div>
-          <div className="review-mascot machine-screen hidden h-16 w-16 items-center justify-center rounded-full border border-[var(--temple-border)] sm:flex">
-            {kind === 'food' ? <Utensils className="h-6 w-6 text-[var(--temple-emerald)]" /> : <Clapperboard className="h-6 w-6 text-[var(--temple-gold)]" />}
-          </div>
-        </div>
-
-        <div className="review-switch mb-5 grid grid-cols-2 gap-2 rounded-full p-1">
-          {[
-            { id: 'food' as const, label: 'Food', Icon: Utensils },
-            { id: 'film' as const, label: 'Film', Icon: Clapperboard },
-          ].map(({ id, label, Icon }) => (
-            <button key={id} onClick={() => setKind(id)} className={`inline-flex items-center justify-center gap-2 rounded-full px-3 py-2.5 text-sm font-black ${kind === id ? 'temple-button' : 'text-[var(--temple-muted)]'}`}>
-              <Icon className="h-4 w-4" /> {label}
-            </button>
-          ))}
-        </div>
-
-        <div className="grid gap-4 xl:grid-cols-[1fr_0.72fr]">
-          <div className="space-y-4">
-            <Field label={kind === 'food' ? 'Food name' : 'Film title'}>
-              <input className="temple-input w-full rounded-full px-4 py-3 text-sm" value={title} onChange={(event) => setTitle(event.target.value)} placeholder={kind === 'food' ? 'Nasi Goreng Kampung' : 'Dune: Part Two'} />
-            </Field>
-            <Field label={kind === 'food' ? 'Origin / region' : 'IMDb link'}>
-              <input className="temple-input w-full rounded-full px-4 py-3 text-sm" value={originOrImdb} onChange={(event) => setOriginOrImdb(event.target.value)} placeholder={kind === 'food' ? 'Jakarta, Indonesia' : 'https://www.imdb.com/title/...'} />
-            </Field>
-            {kind === 'food' && (
-              <Field label="Food image URL">
-                <div className="relative">
-                  <ImageIcon className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--temple-soft)]" />
-                  <input className="temple-input w-full rounded-full py-3 pl-11 pr-4 text-sm" value={imageUrl} onChange={(event) => setImageUrl(event.target.value)} placeholder="https://images.example/food.jpg" />
-                </div>
-              </Field>
-            )}
-            <Field label="Rating">
-              <div className="review-stars flex gap-1">
-                {[1, 2, 3, 4, 5].map((value) => (
-                  <button key={value} type="button" onClick={() => setRating(value)} className="rounded-full p-1.5">
-                    <Star className="h-7 w-7 transition hover:scale-110" fill={value <= rating ? '#ffe45e' : 'none'} style={{ color: value <= rating ? '#ffe45e' : 'var(--temple-border)' }} />
-                  </button>
-                ))}
-              </div>
-            </Field>
-            <Field label="Review">
-              <textarea className="temple-input h-28 w-full resize-none rounded-[22px] px-4 py-3 text-sm" value={reviewText} onChange={(event) => setReviewText(event.target.value)} placeholder="Write the part people should remember..." />
-            </Field>
-
-            {message && <p className="text-sm text-[var(--temple-gold)]">{message}</p>}
-            <button onClick={submitReview} disabled={isPending || isConfirming} className="temple-button inline-flex w-full items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-black disabled:cursor-not-allowed disabled:opacity-55">
-              {isPending || isConfirming ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-              {isConfirming ? 'Confirming on Arc' : isPending ? 'Waiting for wallet' : 'Mint review stamp / 1 USDC'}
-            </button>
-          </div>
-
-          <div className="review-preview-card">
-            <div className="review-preview-media">
-              {kind === 'food' && imageUrl ? <img src={imageUrl} alt="" onError={(event) => { event.currentTarget.style.display = 'none' }} /> : kind === 'food' ? <Utensils className="h-10 w-10" /> : <Clapperboard className="h-10 w-10" />}
+      <section className="review2-studio">
+        <div className="review2-composer">
+          <div className="review2-composer-head">
+            <ReviewMascot kind={kind} />
+            <div>
+              <span className="review2-eyebrow">{kind === 'food' ? 'Food review' : 'Movie review'}</span>
+              <h2>{kind === 'food' ? 'Was it worth the bite?' : 'Was it worth the watch?'}</h2>
+              <p>{kind === 'food' ? 'Rate the flavor, vibe, and memory.' : 'Rate the story, visuals, and mood.'}</p>
             </div>
-            <p className="mt-4 text-[10px] font-black uppercase tracking-wider text-[var(--temple-pink)]">{kind} stamp</p>
-            <h3 className="mt-1 line-clamp-2 text-xl font-black">{title || (kind === 'food' ? 'Your dish title' : 'Your film title')}</h3>
-            <p className="mt-1 truncate text-xs text-[var(--temple-muted)]">{originOrImdb || (kind === 'food' ? 'Origin, city, memory' : 'IMDb link or source')}</p>
-            <div className="mt-3 flex gap-0.5">{[1, 2, 3, 4, 5].map((value) => <Star key={value} className="h-4 w-4" fill={value <= rating ? '#ffe45e' : 'none'} style={{ color: value <= rating ? '#ffe45e' : 'var(--temple-border)' }} />)}</div>
           </div>
+
+          <div className="review2-form-grid">
+            <Field label={kind === 'food' ? 'Dish or place' : 'Movie title'}>
+              <input className="review2-input" value={title} onChange={(event) => setTitle(event.target.value)} placeholder={kind === 'food' ? 'Soto Betawi Pak Haji' : 'Everything Everywhere All at Once'} />
+            </Field>
+            <Field label={kind === 'food' ? 'City / memory' : 'IMDb or source link'}>
+              <input className="review2-input" value={originOrImdb} onChange={(event) => setOriginOrImdb(event.target.value)} placeholder={kind === 'food' ? 'Jakarta, late night bowl' : 'https://www.imdb.com/title/...'} />
+            </Field>
+            {kind === 'food' ? (
+              <Field label="Food image URL">
+                <input className="review2-input" value={imageUrl} onChange={(event) => setImageUrl(event.target.value)} placeholder="Optional image URL for the dish" />
+              </Field>
+            ) : null}
+          </div>
+
+          <Field label="Rating">
+            <div className="review2-rating" aria-label="Rating">
+              {[1, 2, 3, 4, 5].map((value) => (
+                <button key={value} type="button" onClick={() => setRating(value)} className={value <= rating ? 'is-active' : ''}>
+                  <Star className="h-7 w-7" fill="currentColor" />
+                </button>
+              ))}
+            </div>
+          </Field>
+
+          <Field label="Mood tags">
+            <div className="review2-tags">
+              {activeTags.map((tag) => (
+                <button key={tag} type="button" onClick={() => toggleTag(tag)} className={selectedTags.includes(tag) ? 'is-active' : ''}>{tag}</button>
+              ))}
+            </div>
+          </Field>
+
+          <Field label="Short review">
+            <textarea className="review2-input review2-textarea" value={reviewText} onChange={(event) => setReviewText(event.target.value)} placeholder={kind === 'food' ? 'The broth was warm, peppery, and worth remembering...' : 'The story stayed with me after the credits...'} />
+          </Field>
+
+          {message ? <p className="review2-message">{message}</p> : null}
+
+          <button onClick={submitReview} disabled={isPending || isConfirming} className="review2-submit">
+            {isPending || isConfirming ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+            {isConfirming ? 'Confirming on Arc' : isPending ? 'Waiting for wallet' : 'Publish review / 1 USDC'}
+          </button>
         </div>
+
+        <aside className={`review2-live-card ${kind}`}>
+          <div className="review2-live-media">
+            {kind === 'food' && imageUrl ? <img src={imageUrl} alt="" onError={(event) => { event.currentTarget.style.display = 'none' }} /> : kind === 'food' ? <Soup className="h-14 w-14" /> : <Film className="h-14 w-14" />}
+            {kind === 'food' ? <span className="review2-steam one" /> : <span className="review2-film-strip" />}
+            {kind === 'food' ? <span className="review2-steam two" /> : null}
+          </div>
+          <span>{kind === 'food' ? 'Taste preview' : 'Reel preview'}</span>
+          <h3>{title || (kind === 'food' ? 'Your next favorite bite' : 'Your next favorite watch')}</h3>
+          <p>{reviewText || (kind === 'food' ? 'A short note about flavor, vibe, and memory will appear here.' : 'A short note about story, visuals, and mood will appear here.')}</p>
+          <div className="review2-preview-stars">{[1, 2, 3, 4, 5].map((value) => <Star key={value} className="h-4 w-4" fill={value <= rating ? 'currentColor' : 'none'} />)}</div>
+        </aside>
       </section>
 
-      <section className="review-wall temple-card rounded-lg p-5 sm:p-6">
-        <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <section className="review2-gallery">
+        <div className="review2-gallery-head">
           <div>
-            <p className="text-xs font-black uppercase tracking-wider text-[var(--temple-soft)]">The stamp wall</p>
-            <h2 className="arcade-title text-3xl font-black">Latest taste drops</h2>
+            <span className="review2-eyebrow">Review gallery</span>
+            <h2>Latest temple notes</h2>
           </div>
-          <div className="review-filter grid grid-cols-3 rounded-full p-1 text-xs font-black">
+          <div className="review2-filter">
             {(['all', 'food', 'film'] as const).map((item) => (
-              <button key={item} onClick={() => setTab(item)} className={`rounded-full px-3 py-2 capitalize ${tab === item ? 'temple-button' : 'text-[var(--temple-muted)]'}`}>{item}</button>
+              <button key={item} type="button" onClick={() => setTab(item)} className={tab === item ? 'is-active' : ''}>{item}</button>
             ))}
           </div>
         </div>
 
         {isLoading ? (
-          <div className="flex items-center justify-center py-16 text-sm text-[var(--temple-muted)]"><Loader2 className="mr-2 h-4 w-4 animate-spin text-[var(--temple-emerald)]" /> Loading reviews</div>
+          <div className="review2-state"><Loader2 className="h-5 w-5 animate-spin" /> Loading reviews</div>
         ) : reviews.length === 0 ? (
-          <div className="review-empty pixel-panel rounded-lg border border-[var(--temple-border)] py-16 text-center">
-            <Star className="mx-auto mb-3 h-8 w-8 text-[var(--temple-soft)]" />
-            <p className="text-sm text-[var(--temple-muted)]">No reviews in this category yet.</p>
+          <div className="review2-state">
+            <ReviewMascot kind="food" />
+            <strong>No reviews yet.</strong>
+            <span>Drop the first taste or reel memory.</span>
           </div>
         ) : (
-          <div className="review-card-grid grid gap-4 sm:grid-cols-2">
+          <div className="review2-card-grid">
             {reviews.map((review, index) => <ReviewCard key={`${review.id}-${review.reviewer}`} review={review} index={index} />)}
           </div>
         )}
       </section>
+    </main>
+  )
+}
+
+function CategoryCard({ kind, active, onClick }: { kind: WriteKind; active: boolean; onClick: () => void }) {
+  const isFood = kind === 'food'
+  const Icon = isFood ? Utensils : Clapperboard
+  return (
+    <button type="button" onClick={onClick} className={`review2-category-card ${kind} ${active ? 'is-active' : ''}`}>
+      <ReviewMascot kind={kind} />
+      <div>
+        <span><Icon className="h-4 w-4" /> {isFood ? 'Food Review' : 'Movie Review'}</span>
+        <strong>{isFood ? 'Worth the bite?' : 'Worth the watch?'}</strong>
+        <p>{isFood ? 'Flavor, vibe, memory.' : 'Story, visuals, mood.'}</p>
       </div>
-    </div>
+    </button>
   )
 }
 
 function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <label className="block">
-      <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-[var(--temple-soft)]">{label}</span>
+    <label className="review2-field">
+      <span>{label}</span>
       {children}
     </label>
   )
 }
 
+function ReviewMascot({ kind }: { kind: WriteKind }) {
+  return (
+    <div className={`review2-mascot ${kind}`} aria-label={kind === 'food' ? 'Food critic mascot' : 'Movie critic mascot'} role="img">
+      <span className="review2-mascot-shadow" />
+      <div className="review2-mascot-body">
+        <span className="review2-mascot-ear left" />
+        <span className="review2-mascot-ear right" />
+        <div className="review2-mascot-face">
+          <span className="review2-mascot-eye left" />
+          <span className="review2-mascot-eye right" />
+          <span className="review2-mascot-mouth" />
+        </div>
+        <span className="review2-mascot-arm left" />
+        <span className="review2-mascot-arm right" />
+      </div>
+      <span className="review2-mascot-tool">{kind === 'food' ? <ChefHat className="h-4 w-4" /> : <Popcorn className="h-4 w-4" />}</span>
+    </div>
+  )
+}
+
 function ReviewCard({ review, index }: { review: ReviewData; index: number }) {
   const isFood = review.category === 0
-  const Icon = isFood ? Utensils : Clapperboard
+  const Icon = isFood ? Soup : Film
   return (
-    <motion.article initial={{ opacity: 0, y: 8, rotate: index % 2 === 0 ? -1.5 : 1.5 }} animate={{ opacity: 1, y: 0, rotate: index % 2 === 0 ? -0.8 : 0.8 }} transition={{ delay: index * 0.025 }} className="review-poster-card pixel-panel rounded-lg border border-[var(--temple-border)] p-4 transition hover:-translate-y-1 hover:rotate-0 hover:border-[rgba(255,122,217,0.38)]">
-      <div className="review-poster-media">
-        {isFood && review.imageUrl ? <img src={review.imageUrl} alt="" className="h-full w-full object-cover" onError={(event) => { event.currentTarget.style.display = 'none' }} /> : (
-          <div className="flex h-full w-full shrink-0 items-center justify-center bg-white/[0.035]">
-            <Icon className="h-7 w-7 text-[var(--temple-emerald)]" />
-          </div>
-        )}
+    <motion.article
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.025 }}
+      className={`review2-card ${isFood ? 'food' : 'film'}`}
+    >
+      <div className="review2-card-media">
+        {isFood && review.imageUrl ? <img src={review.imageUrl} alt="" onError={(event) => { event.currentTarget.style.display = 'none' }} /> : <Icon className="h-8 w-8" />}
       </div>
-      <div className="mt-4 min-w-0">
-        <div className="mb-2 flex items-center justify-between gap-3">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-white/[0.06] px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-[var(--temple-gold)]">
-            <Icon className="h-3 w-3" /> {isFood ? 'Food' : 'Film'}
-          </span>
-          <span className="flex gap-0.5">{[1, 2, 3, 4, 5].map((value) => <Star key={value} className="h-3.5 w-3.5" fill={value <= review.rating ? '#ffe45e' : 'none'} style={{ color: value <= review.rating ? '#ffe45e' : 'var(--temple-border)' }} />)}</span>
+      <div className="review2-card-body">
+        <div className="review2-card-meta">
+          <span>{isFood ? 'Food' : 'Movie'}</span>
+          <span>{[1, 2, 3, 4, 5].map((value) => <Star key={value} className="h-3.5 w-3.5" fill={value <= review.rating ? 'currentColor' : 'none'} />)}</span>
         </div>
-        <h3 className="line-clamp-2 text-lg font-black">{review.title}</h3>
-        {review.originOrImdb && (
-          <a href={review.originOrImdb.startsWith('http') ? review.originOrImdb : undefined} target="_blank" rel="noreferrer" className="mt-1 inline-flex max-w-full items-center gap-1 truncate text-xs text-[var(--temple-muted)]">
-            {review.originOrImdb} {review.originOrImdb.startsWith('http') && <ExternalLink className="h-3 w-3 shrink-0" />}
+        <h3>{review.title}</h3>
+        {review.originOrImdb ? (
+          <a href={review.originOrImdb.startsWith('http') ? review.originOrImdb : undefined} target="_blank" rel="noreferrer">
+            {review.originOrImdb} {review.originOrImdb.startsWith('http') ? <ExternalLink className="h-3 w-3" /> : null}
           </a>
-        )}
-        {review.reviewText && <p className="mt-3 line-clamp-4 text-sm leading-6 text-[var(--temple-muted)]">{review.reviewText}</p>}
-        <p className="mt-4 text-[10px] font-semibold uppercase tracking-wider text-[var(--temple-soft)]">by {fmtAddress(review.reviewer)}</p>
+        ) : null}
+        {review.reviewText ? <p>{review.reviewText}</p> : null}
+        <small>by {fmtAddress(review.reviewer)}</small>
       </div>
     </motion.article>
   )

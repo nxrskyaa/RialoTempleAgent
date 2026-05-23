@@ -1,7 +1,7 @@
 export type WorldCharacterTone = 'gold' | 'emerald' | 'coral' | 'sapphire' | 'violet' | 'cream'
-export type WorldCharacterRole = 'gate' | 'vault' | 'agent' | 'scale' | 'quest' | 'portal'
+export type WorldCharacterRole = 'guide' | 'data' | 'bridge' | 'privacy' | 'identity' | 'speed' | 'vault' | 'agent' | 'scale'
 export type WorldCharacterMood = 'wave' | 'think' | 'walk' | 'focus' | 'float'
-export type WorldCharacterAccessory = 'scroll' | 'orb' | 'coin' | 'key' | 'spark' | 'map'
+export type WorldCharacterAccessory = 'scroll' | 'orb' | 'key' | 'drop' | 'shield' | 'stamp' | 'bolt' | 'gear'
 
 type WorldCharacterProps = {
   name: string
@@ -15,7 +15,7 @@ type WorldCharacterProps = {
 export default function WorldCharacter({
   name,
   tone = 'gold',
-  role = 'gate',
+  role = 'guide',
   size = 'md',
   mood = 'wave',
   accessory = 'orb',
@@ -24,8 +24,6 @@ export default function WorldCharacter({
     <div className={`world-character tone-${tone} role-${role} size-${size} mood-${mood}`} aria-label={name} role="img">
       <span className="world-character-shadow" />
       <span className="world-character-accessory" data-accessory={accessory} />
-      <span className="world-character-spark one" />
-      <span className="world-character-spark two" />
       <div className="world-character-body">
         <span className="world-character-badge" />
         <div className="world-character-head">

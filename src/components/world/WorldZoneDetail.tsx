@@ -1,73 +1,85 @@
-import type { WorldZone } from './WorldZoneCard'
-import WorldCharacter from './WorldCharacter'
-import ExplanationPopup from './ExplanationPopup'
-import { glossary, type WorldBuilding } from './worldData'
+import { motion } from 'framer-motion'
+import { ArrowRight, CheckCircle2, Lightbulb } from 'lucide-react'
 import WorldFeatureScene from './WorldFeatureScene'
+import WorldCharacter from './WorldCharacter'
+import type { WorldZone } from './worldData'
 
 type WorldZoneDetailProps = {
-  zone: WorldZone | undefined
-  building: WorldBuilding
-  advanced: boolean
-  onToggleAdvanced: () => void
+  zone: WorldZone
+  onNext: () => void
 }
 
-const technicalNotes: Record<string, string> = {
-  oracle: 'Agents create work, judges score it, escrow settles it, and proof records the result.',
-  treasury: 'RWA maps a verified offchain claim to an onchain record that apps can inspect.',
-  hub: 'Governance turns proposals and votes into transparent state changes.',
-  bazaar: 'Markets coordinate listings, matching, settlement, and price discovery.',
-  spire: 'Transactions wait, batch into blocks, and become verifiable chain history.',
-  homes: 'Wallet identity carries permissions, assets, reputation, and history.',
-}
+export default function WorldZoneDetail({ zone, onNext }: WorldZoneDetailProps) {
+  const Icon = zone.icon
 
-export default function WorldZoneDetail({ zone, building, advanced, onToggleAdvanced }: WorldZoneDetailProps) {
   return (
-    <aside className={`world-feature-detail tone-${zone?.tone ?? 'gold'}`}>
-      <div className="world-detail-hero">
-        <WorldCharacter
-          name={zone?.mascot.name ?? building.shortName}
-          tone={zone?.tone ?? 'gold'}
-          size="md"
-          mood={zone?.mascot.mood ?? 'wave'}
-          accessory={zone?.mascot.accessory ?? 'orb'}
-          role={zone?.mascot.role ?? 'gate'}
-        />
-        <div>
-          <span>{zone?.concept ?? building.role}</span>
-          <h2>{zone?.label ?? building.shortName}</h2>
+    <motion.section
+      key={zone.id}
+      className={`world2-detail tone-${zone.tone}`}
+      initial={{ opacity: 0, y: 18 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.32, ease: 'easeOut' }}
+    >
+      <div className="world2-detail-main">
+        <div className="world2-detail-copy">
+          <span className="world2-eyebrow"><Icon className="h-4 w-4" /> {zone.concept}</span>
+          <h2>{zone.title}</h2>
+          <p>{zone.summary}</p>
+          <div className="world2-scene-brief">
+            <strong>Visual scene</strong>
+            <span>{zone.scene}</span>
+          </div>
         </div>
+        <WorldFeatureScene zone={zone} />
       </div>
 
-      <p>{zone?.simple ?? building.simple}</p>
+      <div className="world2-learning-grid">
+        <article className="world2-learning-card is-points">
+          <h3>What you should notice</h3>
+          {zone.points.map((point) => (
+            <span key={point}><CheckCircle2 className="h-4 w-4" /> {point}</span>
+          ))}
+        </article>
 
-      <WorldFeatureScene zone={zone} compact />
+        <article className="world2-learning-card">
+          <h3>Example</h3>
+          <p>{zone.example}</p>
+        </article>
 
-      {zone?.points?.length ? (
-        <div className="world-happening-card">
-          <strong>What is happening?</strong>
-          {zone.points.map((point) => <span key={point}>{point}</span>)}
-        </div>
-      ) : null}
+        <article className="world2-learning-card">
+          <h3>Why it matters</h3>
+          <p>{zone.why}</p>
+        </article>
 
-      <div className="world-compare-card">
-        <strong>Without Rialo</strong>
-        <span>{building.without}</span>
+        <article className="world2-learning-card world2-character-note">
+          <WorldCharacter
+            name={zone.mascot.name}
+            tone={zone.tone}
+            role={zone.mascot.role}
+            accessory={zone.mascot.accessory}
+            mood={zone.mascot.mood}
+            size="sm"
+          />
+          <div>
+            <h3>{zone.mascot.name}</h3>
+            <p>This guide acts out the process so the concept is easier to remember.</p>
+          </div>
+        </article>
       </div>
-      <div className="world-compare-card is-bright">
-        <strong>With Rialo</strong>
-        <span>{building.with}</span>
-      </div>
 
-      <button type="button" onClick={onToggleAdvanced} className="world-learn-toggle">
-        {advanced ? 'Hide tech note' : 'Learn more'}
-      </button>
-      {advanced ? <div className="world-tech-bubble">{technicalNotes[building.id]}</div> : null}
-
-      <div className="world-modal-row">
-        {glossary.slice(0, 3).map((item) => (
-          <ExplanationPopup key={item.term} title={item.term}>{item.simple}</ExplanationPopup>
+      <div className="world2-process-strip">
+        {zone.steps.map((step, index) => (
+          <div key={step.label} className="world2-process-step">
+            <small>{String(index + 1).padStart(2, '0')}</small>
+            <strong>{step.label}</strong>
+            <span>{step.detail}</span>
+          </div>
         ))}
       </div>
-    </aside>
+
+      <button type="button" onClick={onNext} className="world2-next-button">
+        <Lightbulb className="h-4 w-4" /> Explore next idea <ArrowRight className="h-4 w-4" />
+      </button>
+    </motion.section>
   )
 }
