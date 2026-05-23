@@ -50,21 +50,10 @@ export default function ProfileGate({ children, compact = false }: Props) {
   })
 
   useEffect(() => {
-    if (!profileTxHash) return
-    setMessage(isConfirming ? 'Transaction sent. Waiting for Arc confirmation...' : 'Transaction sent.')
-  }, [isConfirming, profileTxHash])
-
-  useEffect(() => {
     if (!isConfirmed) return
-    setMessage('Profile sealed on-chain.')
     void refetch()
     reset()
   }, [isConfirmed, refetch, reset])
-
-  useEffect(() => {
-    if (!receiptError) return
-    setMessage(receiptError.message.split('\n')[0] || 'Profile confirmation failed.')
-  }, [receiptError])
 
   function submitProfile() {
     const handle = normalizeXHandle(xInput)
@@ -86,9 +75,18 @@ export default function ProfileGate({ children, compact = false }: Props) {
   const previewHandle = normalizeXHandle(xInput)
   const previewAvatar = toXAvatarUrl(previewHandle)
   const isSaving = isPending || isConfirming
+  const transactionMessage = receiptError
+    ? receiptError.message.split('\n')[0] || 'Profile confirmation failed.'
+    : isConfirmed
+      ? 'Profile sealed on-chain.'
+      : profileTxHash
+        ? isConfirming
+          ? 'Transaction sent. Waiting for Arc confirmation...'
+          : 'Transaction sent.'
+        : ''
   const profileReadMessage = readError
     ? `Could not read the Grialo contract on Arc Testnet. Check that ${RIALO_TEMPLE_ADDRESS} is the deployed RialoTempleGrialo address.`
-    : message
+    : transactionMessage || message
 
   if (!isConnected) {
     return (

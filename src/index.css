@@ -3690,6 +3690,485 @@
 }
 
 @layer components {
+  .world2-step-heading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+  }
+
+  .world2-process-step .world2-step-heading small {
+    display: inline-grid;
+    min-width: 34px;
+    height: 28px;
+    place-items: center;
+    border: 1px solid color-mix(in srgb, var(--world-tone) 48%, rgba(245, 239, 218, .16));
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--world-tone) 18%, rgba(5, 8, 7, .72));
+    color: var(--world-tone);
+    line-height: 1;
+  }
+
+  .world2-process-step .world2-step-heading strong {
+    min-width: 0;
+    line-height: 1.15;
+  }
+
+  .world-story-scene.zone-rwa-vault,
+  .world-story-scene.zone-identity-passport {
+    display: grid;
+    min-height: 340px;
+    place-items: center;
+    padding: clamp(18px, 3vw, 30px);
+  }
+
+  .scene-rwa-flow,
+  .scene-identity-flow {
+    position: relative;
+    z-index: 3;
+    display: grid;
+    width: min(100%, 760px);
+    grid-template-columns: minmax(150px, .95fr) 44px minmax(150px, .9fr) 44px minmax(160px, .9fr);
+    gap: clamp(10px, 1.8vw, 18px);
+    align-items: center;
+    padding-right: 108px;
+  }
+
+  .scene-rwa-flow .scene-assets-stack,
+  .scene-identity-flow .scene-passport-stamps {
+    position: static;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .scene-rwa-flow .scene-assets-stack span,
+  .scene-identity-flow .scene-passport-stamps span {
+    position: static;
+    white-space: nowrap;
+    text-align: center;
+    animation-name: world2StationCheck;
+    animation-duration: 3.4s;
+  }
+
+  .scene-flow-arrow {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 10px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, transparent, var(--world-tone), var(--world-tone-2));
+    box-shadow: 0 0 20px color-mix(in srgb, var(--world-tone) 28%, transparent);
+    animation: world2Flow 2.4s ease-in-out infinite;
+  }
+
+  .scene-flow-arrow::after {
+    content: '';
+    position: absolute;
+    right: -2px;
+    top: 50%;
+    width: 14px;
+    height: 14px;
+    border-top: 4px solid var(--world-tone-2);
+    border-right: 4px solid var(--world-tone-2);
+    transform: translateY(-50%) rotate(45deg);
+  }
+
+  .scene-rwa-flow .scene-vault-core,
+  .scene-identity-flow .scene-passport-book,
+  .scene-identity-flow .scene-entry-door,
+  .scene-rwa-flow .scene-asset-card {
+    position: static;
+    display: grid;
+    min-height: 124px;
+    place-items: center;
+    text-align: center;
+  }
+
+  .scene-rwa-flow .scene-vault-core {
+    border: 2px solid #07100c;
+    border-radius: 22px 22px 28px 28px;
+    background:
+      linear-gradient(180deg, var(--temple-gold), #2c2214);
+    color: #07100c;
+    padding: 14px;
+    font-size: 12px;
+    font-weight: 950;
+    box-shadow: 0 8px 0 rgba(0,0,0,.16), 0 0 22px color-mix(in srgb, var(--world-tone) 22%, transparent);
+  }
+
+  .scene-rwa-flow .scene-vault-core small,
+  .scene-identity-flow .scene-passport-book small,
+  .scene-rwa-flow .scene-asset-card small,
+  .scene-rwa-flow .scene-asset-card em {
+    display: block;
+    margin-top: 4px;
+    font-size: 10px;
+    font-style: normal;
+    opacity: .74;
+  }
+
+  .scene-rwa-flow .scene-asset-card em {
+    margin-top: 10px;
+    border-radius: 999px;
+    background: rgba(87, 227, 159, .24);
+    padding: 6px 9px;
+    color: #07100c;
+    animation: world2Stamp 2.8s ease-in-out infinite;
+  }
+
+  .scene-identity-flow .scene-passport-book {
+    width: auto;
+    height: auto;
+    border-radius: 20px;
+    background:
+      linear-gradient(135deg, #f7f1df, var(--temple-gold));
+  }
+
+  .scene-identity-flow .scene-entry-door {
+    border-radius: 24px 24px 12px 12px;
+    background:
+      linear-gradient(180deg, rgba(87, 227, 159, .9), rgba(7, 16, 12, .9));
+    color: #f7f1df;
+  }
+
+  .zone-rwa-vault .world-scene-guide,
+  .zone-identity-passport .world-scene-guide {
+    right: 2%;
+    bottom: 3%;
+    transform: scale(.78);
+  }
+
+  .world-story-scene.is-compact .scene-rwa-flow,
+  .world-story-scene.is-compact .scene-identity-flow {
+    grid-template-columns: 1fr 24px 1fr 24px 1fr;
+    gap: 6px;
+    padding-right: 42px;
+  }
+
+  .world-story-scene.is-compact .scene-rwa-flow .scene-assets-stack span:nth-child(n+5) {
+    display: none;
+  }
+
+  .world-story-scene.is-compact .scene-rwa-flow .scene-assets-stack,
+  .world-story-scene.is-compact .scene-identity-flow .scene-passport-stamps {
+    grid-template-columns: 1fr;
+  }
+
+  .world-story-scene.is-compact .scene-rwa-flow .scene-vault-core,
+  .world-story-scene.is-compact .scene-identity-flow .scene-passport-book,
+  .world-story-scene.is-compact .scene-identity-flow .scene-entry-door,
+  .world-story-scene.is-compact .scene-rwa-flow .scene-asset-card {
+    min-height: 74px;
+    padding: 7px;
+    font-size: 8px;
+  }
+
+  .grialo-page {
+    position: relative;
+  }
+
+  .grialo-ritual-hero {
+    border-radius: 24px;
+    box-shadow: 0 30px 100px rgba(0, 0, 0, .32);
+  }
+
+  .grialo-command-panel {
+    position: relative;
+    z-index: 2;
+  }
+
+  .grialo-command-panel::after {
+    content: '';
+    display: block;
+    width: min(100%, 360px);
+    height: 1px;
+    margin-top: 24px;
+    background: linear-gradient(90deg, var(--temple-gold), rgba(87, 227, 159, .8), transparent);
+    opacity: .62;
+  }
+
+  .grialo-stage-shell {
+    min-height: 620px;
+    border-radius: 24px;
+    background:
+      radial-gradient(circle at 50% 27%, color-mix(in srgb, var(--grialo-rarity) 34%, transparent), transparent 17rem),
+      radial-gradient(circle at 50% 78%, rgba(242, 200, 102, .18), transparent 19rem),
+      linear-gradient(145deg, rgba(245, 239, 218, .09), rgba(5, 8, 7, .82));
+  }
+
+  .grialo-energy-ring {
+    position: absolute;
+    inset: 32px;
+    border: 1px solid color-mix(in srgb, var(--grialo-rarity) 36%, rgba(245, 239, 218, .13));
+    border-radius: 28px;
+    pointer-events: none;
+    box-shadow: inset 0 0 44px rgba(245, 239, 218, .035);
+  }
+
+  .grialo-energy-ring::before,
+  .grialo-energy-ring::after {
+    content: '';
+    position: absolute;
+    inset: 18px;
+    border-radius: inherit;
+    border: 1px dashed color-mix(in srgb, var(--grialo-rarity) 32%, rgba(245, 239, 218, .18));
+    opacity: .56;
+  }
+
+  .grialo-stage-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    border: 1px solid rgba(245, 239, 218, .13);
+    border-radius: 999px;
+    background: rgba(5, 8, 7, .62);
+    padding: 8px 12px;
+    backdrop-filter: blur(14px);
+  }
+
+  .grialo-stage-status span,
+  .grialo-stage-status b {
+    font-size: 10px;
+    font-weight: 950;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  .grialo-stage-status span {
+    color: var(--grialo-rarity);
+  }
+
+  .grialo-stage-status b {
+    color: rgba(247, 241, 223, .72);
+  }
+
+  .grialo-roulette {
+    width: min(390px, 88vw);
+    height: min(390px, 88vw);
+  }
+
+  .grialo-roulette-track {
+    position: absolute;
+    inset: -6px;
+    z-index: 1;
+    border-radius: 999px;
+    background:
+      repeating-conic-gradient(from 0deg, rgba(247, 241, 223, .28) 0 3deg, transparent 3deg 12deg);
+    opacity: .4;
+    mask-image: radial-gradient(circle, transparent 58%, black 59%, black 67%, transparent 68%);
+    animation: grialo-track-pulse 3.2s ease-in-out infinite;
+  }
+
+  .grialo-roulette-wheel {
+    inset: 28px;
+    z-index: 2;
+    background:
+      conic-gradient(from -22.5deg,
+        rgba(143, 144, 140, .9) 0deg 45deg,
+        rgba(87, 227, 159, .78) 45deg 90deg,
+        rgba(120, 236, 255, .78) 90deg 135deg,
+        rgba(200, 134, 255, .78) 135deg 180deg,
+        rgba(242, 200, 102, .86) 180deg 225deg,
+        rgba(255, 156, 226, .78) 225deg 270deg,
+        rgba(24, 24, 30, .92) 270deg 315deg,
+        rgba(245, 239, 218, .72) 315deg 360deg),
+      radial-gradient(circle at 50% 50%, rgba(11, 13, 11, .1), rgba(11, 13, 11, .9) 62%);
+  }
+
+  .grialo-roulette.is-spinning .grialo-roulette-wheel {
+    animation: grialo-wheel-spin 3.8s cubic-bezier(.12, .74, .12, 1) infinite;
+  }
+
+  .grialo-roulette.is-spinning .grialo-roulette-track {
+    animation: grialo-track-spin .9s linear infinite;
+    opacity: .74;
+  }
+
+  .grialo-roulette-core {
+    z-index: 6;
+    width: 126px;
+    height: 126px;
+    border: 2px solid rgba(242, 200, 102, .34);
+    background:
+      radial-gradient(circle at 50% 38%, rgba(247, 241, 223, .16), rgba(11, 13, 11, .9) 66%),
+      conic-gradient(from 180deg, rgba(242, 200, 102, .22), rgba(87, 227, 159, .18), rgba(255, 128, 102, .16), rgba(242, 200, 102, .22));
+  }
+
+  .grialo-roulette-pointer {
+    top: -8px;
+    z-index: 8;
+    border-left-width: 20px;
+    border-right-width: 20px;
+    border-bottom-width: 42px;
+  }
+
+  .grialo-roulette-streak {
+    position: absolute;
+    z-index: 7;
+    width: 120px;
+    height: 2px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--grialo-rarity) 74%, #f7f1df), transparent);
+    filter: blur(.2px);
+    opacity: 0;
+  }
+
+  .grialo-roulette.is-spinning .grialo-roulette-streak {
+    animation: grialo-wheel-streak .72s ease-in-out infinite;
+  }
+
+  .streak-a { --r: 24deg; transform: rotate(24deg) translateX(94px); }
+  .streak-b { --r: 154deg; transform: rotate(154deg) translateX(86px); animation-delay: -.32s; }
+
+  .grialo-box-card,
+  .grialo-reveal {
+    border-radius: 22px;
+  }
+
+  .grialo-reveal-burst {
+    position: absolute;
+    inset: 18px;
+    border-radius: inherit;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at 30% 25%, var(--temple-gold) 0 3px, transparent 4px),
+      radial-gradient(circle at 68% 22%, var(--temple-emerald) 0 3px, transparent 4px),
+      radial-gradient(circle at 76% 72%, color-mix(in srgb, var(--grialo-rarity) 80%, #f7f1df) 0 4px, transparent 5px),
+      radial-gradient(circle at 22% 76%, #78ecff 0 3px, transparent 4px);
+    opacity: .78;
+    animation: grialo-reveal-burst 1.8s ease-in-out infinite;
+  }
+
+  @keyframes grialo-track-pulse {
+    0%, 100% { transform: rotate(0deg) scale(.98); opacity: .32; }
+    50% { transform: rotate(12deg) scale(1.02); opacity: .62; }
+  }
+
+  @keyframes grialo-track-spin {
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes grialo-wheel-streak {
+    0% { opacity: 0; transform: rotate(var(--r, 0deg)) translateX(40px) scaleX(.4); }
+    45% { opacity: .86; }
+    100% { opacity: 0; transform: rotate(var(--r, 0deg)) translateX(150px) scaleX(1); }
+  }
+
+  @keyframes grialo-reveal-burst {
+    0%, 100% { transform: scale(.94); opacity: .36; filter: blur(0); }
+    45% { transform: scale(1.04); opacity: .9; filter: blur(.2px); }
+  }
+
+  @media (max-width: 980px) {
+    .scene-rwa-flow,
+    .scene-identity-flow {
+      grid-template-columns: 1fr;
+      padding-right: 0;
+    }
+
+    .scene-flow-arrow {
+      width: 10px;
+      height: 34px;
+      justify-self: center;
+      background: linear-gradient(180deg, transparent, var(--world-tone), var(--world-tone-2));
+    }
+
+    .scene-flow-arrow::after {
+      right: auto;
+      top: auto;
+      bottom: -2px;
+      left: 50%;
+      transform: translateX(-50%) rotate(135deg);
+    }
+
+    .zone-rwa-vault .world-scene-guide,
+    .zone-identity-passport .world-scene-guide {
+      right: -10px;
+      bottom: -18px;
+      transform: scale(.58);
+    }
+  }
+
+  @media (max-width: 720px) {
+    html,
+    body,
+    #root {
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+
+    .world2-page,
+    .grialo-page {
+      width: 100%;
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+
+    .world2-page :is(.world2-hero, .world2-map-section, .world2-detail),
+    .grialo-page :is(.grialo-ritual-hero, .grialo-stage-shell) {
+      max-width: 100%;
+      overflow: hidden;
+    }
+
+    .world2-hero h1 {
+      max-width: 100%;
+      font-size: clamp(3.2rem, 16vw, 4.4rem);
+      line-height: .9;
+      overflow-wrap: break-word;
+    }
+
+    .temple-card.spark-field {
+      max-width: calc(100vw - 28px);
+      overflow: hidden;
+      margin-inline: auto;
+    }
+
+    .temple-card.spark-field .arcade-title {
+      white-space: normal;
+      overflow-wrap: break-word;
+    }
+
+    .world-story-scene.zone-rwa-vault,
+    .world-story-scene.zone-identity-passport {
+      min-height: 560px;
+      padding: 16px;
+    }
+
+    .scene-rwa-flow .scene-assets-stack,
+    .scene-identity-flow .scene-passport-stamps {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grialo-stage-shell {
+      min-height: 590px;
+      border-radius: 20px;
+    }
+
+    .grialo-energy-ring {
+      inset: 16px;
+      border-radius: 20px;
+    }
+
+    .grialo-roulette {
+      width: min(320px, 82vw);
+      height: min(320px, 82vw);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .grialo-energy-ring,
+    .grialo-roulette-track,
+    .grialo-roulette-streak,
+    .grialo-reveal-burst {
+      animation: none !important;
+    }
+  }
+}
+
+@layer components {
   .world-page {
     position: relative;
     overflow: hidden;
@@ -4275,6 +4754,67 @@
     .scene-thread,
     .scene-memory-orbs span {
       animation: none !important;
+    }
+  }
+}
+
+@layer components {
+  @media (max-width: 720px) {
+    .world2-page,
+    .grialo-page {
+      box-sizing: border-box;
+      width: calc(100vw - 24px) !important;
+      max-width: calc(100vw - 24px) !important;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+      margin-left: auto;
+      margin-right: auto;
+      overflow-x: hidden;
+    }
+
+    .temple-card.spark-field {
+      box-sizing: border-box;
+      max-width: calc(100vw - 24px) !important;
+    }
+
+    .world2-hero h1 {
+      max-width: 7.2ch;
+      font-size: clamp(3rem, 15vw, 4rem);
+      line-height: .92;
+    }
+
+    .world2-zone-card,
+    .world2-learning-card,
+    .world2-process-step {
+      min-width: 0;
+      max-width: 100%;
+    }
+
+    .temple-card.spark-field .arcade-title {
+      max-width: 12ch;
+      margin-left: auto;
+      margin-right: auto;
+      white-space: normal;
+      overflow-wrap: break-word;
+      font-size: clamp(1.45rem, 7vw, 1.75rem);
+      line-height: 1.05;
+    }
+
+    .world2-hero-copy,
+    .world2-section-heading,
+    .temple-card.spark-field {
+      max-width: calc(100vw - 56px);
+    }
+
+    .world2-hero-copy p,
+    .world2-section-heading p,
+    .temple-card.spark-field p {
+      max-width: min(100%, 300px);
+      overflow-wrap: break-word;
+    }
+
+    .world2-logo-pool {
+      display: none;
     }
   }
 }

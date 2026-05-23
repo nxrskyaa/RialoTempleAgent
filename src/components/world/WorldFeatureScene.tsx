@@ -17,7 +17,7 @@ const scaleLabels = ['Task Terms', 'Deadline', 'Quality Check', 'Payment Release
 
 export default function WorldFeatureScene({ zone, compact = false }: WorldFeatureSceneProps) {
   return (
-    <div className={`world-story-scene scene-${zone.id} tone-${zone.tone} ${compact ? 'is-compact' : ''}`}>
+    <div className={`world-story-scene zone-${zone.id} tone-${zone.tone} ${compact ? 'is-compact' : ''}`}>
       {renderScene(zone)}
       <div className="world-scene-guide">
         <WorldCharacter
@@ -74,13 +74,18 @@ function renderScene(zone: WorldZone) {
 
   if (zone.id === 'identity-passport') {
     return (
-      <>
-        <div className="scene-passport-book">Temple Passport</div>
-        <div className="scene-passport-stamps">
+      <div className="scene-identity-flow">
+        <div className="scene-passport-stamps" aria-label="Familiar login options">
           {passportLabels.map((label, index) => <span key={label} style={{ '--i': index } as CSSProperties}>{label}</span>)}
         </div>
-        <div className="scene-entry-door">Enter app</div>
-      </>
+        <span className="scene-flow-arrow" />
+        <div className="scene-passport-book">
+          <strong>Temple Passport</strong>
+          <small>stamped identity</small>
+        </div>
+        <span className="scene-flow-arrow" />
+        <div className="scene-entry-door">Enter Web3</div>
+      </div>
     )
   }
 
@@ -97,14 +102,22 @@ function renderScene(zone: WorldZone) {
 
   if (zone.id === 'rwa-vault') {
     return (
-      <>
-        <div className="scene-assets-stack">
+      <div className="scene-rwa-flow">
+        <div className="scene-assets-stack" aria-label="Real-world assets">
           {assetLabels.map((label, index) => <span key={label} style={{ '--i': index } as CSSProperties}>{label}</span>)}
         </div>
-        <div className="scene-rwa-vault">RWA Vault</div>
-        <div className="scene-asset-card"><strong>Asset card</strong><small>Status updates</small></div>
-        <span className="scene-data-update">live data</span>
-      </>
+        <span className="scene-flow-arrow" />
+        <div className="scene-vault-core">
+          <strong>RWA Vault</strong>
+          <small>verify</small>
+        </div>
+        <span className="scene-flow-arrow" />
+        <div className="scene-asset-card">
+          <strong>Asset Card</strong>
+          <small>onchain record</small>
+          <em>Live status update</em>
+        </div>
+      </div>
     )
   }
 

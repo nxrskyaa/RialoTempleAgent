@@ -199,10 +199,10 @@ function GrialoInner({ profileName, fallbackStats, refetchProfile }: { profileNa
   }
 
   return (
-    <main className="mx-auto max-w-7xl px-4 pb-14 pt-8 sm:px-6">
-      <section className="grialo-hero temple-card overflow-hidden rounded-lg p-5 sm:p-7">
+    <main className="grialo-page mx-auto max-w-7xl px-4 pb-14 pt-8 sm:px-6">
+      <section className="grialo-hero grialo-ritual-hero temple-card overflow-hidden rounded-lg p-5 sm:p-7">
         <div className="grid gap-8 lg:grid-cols-[0.82fr_1.18fr] lg:items-center">
-          <div>
+          <div className="grialo-command-panel">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-[var(--temple-gold)]">Grialo daily surprise ritual</p>
             <h1 className="arcade-title mt-3 text-5xl font-black leading-none text-[var(--temple-text)] sm:text-7xl">Channel Grialo</h1>
             <p className="mt-4 max-w-2xl text-sm font-semibold leading-6 text-[var(--temple-muted)]">
@@ -334,6 +334,7 @@ function TempleStage({
   return (
     <div className={`grialo-stage-shell ${stage}`} style={{ '--grialo-rarity': rarity.color, '--grialo-accent': rarity.accent } as CSSProperties}>
       <div className="grialo-aurora" />
+      <div className="grialo-energy-ring" />
       <div className="grialo-rune-ring">
         {Array.from({ length: 12 }).map((_, index) => <span key={index} style={{ transform: `rotate(${index * 30}deg) translateY(-150px)` }} />)}
       </div>
@@ -341,7 +342,12 @@ function TempleStage({
       <AnimatePresence mode="wait">
         {!isMystery && !isReveal ? (
           <motion.div key="orb" initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 1.04 }} className="grialo-orb-panel">
+            <div className="grialo-stage-status">
+              <span>{stage === 'spinning' ? 'Channeling' : canSpin ? 'Ready' : 'Cooldown'}</span>
+              <b>{stage === 'spinning' ? 'Roulette is choosing a box' : canSpin ? 'One daily ritual available' : fmtCountdown(cooldown)}</b>
+            </div>
             <div className={`grialo-roulette ${stage === 'spinning' ? 'is-spinning' : ''}`}>
+              <div className="grialo-roulette-track" />
               <div className="grialo-roulette-pointer" />
               <div className="grialo-roulette-wheel">
                 {['Stone', 'Jade', 'Sapphire', 'Amethyst', 'Gold', 'Crown', 'Void', 'PTS'].map((label, index) => (
@@ -359,6 +365,8 @@ function TempleStage({
               <span className="grialo-roulette-spark spark-a" />
               <span className="grialo-roulette-spark spark-b" />
               <span className="grialo-roulette-spark spark-c" />
+              <span className="grialo-roulette-streak streak-a" />
+              <span className="grialo-roulette-streak streak-b" />
             </div>
             <p className="mt-5 text-xs font-black uppercase tracking-[0.18em] text-[var(--temple-gold)]">
               {canSpin ? 'Temple Energy Ready' : 'Energy regenerating'}
@@ -371,6 +379,7 @@ function TempleStage({
         ) : isReveal ? (
           <motion.div key="reveal" initial={{ opacity: 0, y: 24, scale: 0.9 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0 }} className={`grialo-reveal ${rarity.aura}`}>
             <div className="grialo-reveal-shine" />
+            <div className="grialo-reveal-burst" />
             <p className="text-xs font-black uppercase tracking-[0.18em]" style={{ color: rarity.color }}>{rarity.tier} / {rarity.boxName}</p>
             <h2 className="mt-3 text-5xl font-black sm:text-6xl">{rarity.text}</h2>
             <div className="mt-5 grid grid-cols-2 gap-3">

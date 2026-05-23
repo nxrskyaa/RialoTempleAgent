@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import type { CSSProperties } from 'react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 export type SignatureCardRecord = {
   id: bigint
@@ -38,13 +38,9 @@ export default function CardPreview({
   borderGradient,
   compact = false,
 }: CardPreviewProps) {
-  const [avatarFailed, setAvatarFailed] = useState(false)
-  const showImage = Boolean(profileImageUrl) && !avatarFailed
+  const [failedAvatarUrl, setFailedAvatarUrl] = useState('')
+  const showImage = Boolean(profileImageUrl) && failedAvatarUrl !== profileImageUrl
   const initial = (xUsername.replace('@', '').trim().charAt(0) || 'G').toUpperCase()
-
-  useEffect(() => {
-    setAvatarFailed(false)
-  }, [profileImageUrl])
 
   return (
     <motion.article
@@ -72,7 +68,7 @@ export default function CardPreview({
             <img
               src={profileImageUrl}
               alt={`${displayHandle(xUsername)} avatar`}
-              onError={() => setAvatarFailed(true)}
+              onError={() => setFailedAvatarUrl(profileImageUrl)}
             />
           ) : null}
           <div className="signature-card-avatar-fallback" aria-hidden="true">

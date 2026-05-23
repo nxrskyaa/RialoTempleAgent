@@ -69,11 +69,7 @@ export default function WorldZoneDetail({ zone, onNext }: WorldZoneDetailProps) 
 
       <div className="world2-process-strip">
         {zone.steps.map((step, index) => (
-          <div key={step.label} className="world2-process-step">
-            <small>{String(index + 1).padStart(2, '0')}</small>
-            <strong>{step.label}</strong>
-            <span>{step.detail}</span>
-          </div>
+          <StepCard key={step.label} index={index} label={step.label} detail={step.detail} />
         ))}
       </div>
 
@@ -81,5 +77,17 @@ export default function WorldZoneDetail({ zone, onNext }: WorldZoneDetailProps) 
         <Lightbulb className="h-4 w-4" /> Explore next idea <ArrowRight className="h-4 w-4" />
       </button>
     </motion.section>
+  )
+}
+
+function StepCard({ index, label, detail }: { index: number; label: string; detail: string }) {
+  return (
+    <div className="world2-process-step">
+      <div className="world2-step-heading">
+        <small>{String(index + 1).padStart(2, '0')}</small>
+        <strong>{label}</strong>
+      </div>
+      <span>{detail}</span>
+    </div>
   )
 }

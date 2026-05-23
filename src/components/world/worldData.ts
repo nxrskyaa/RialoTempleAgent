@@ -111,8 +111,8 @@ export const worldZones: WorldZone[] = [
     example: 'A user could verify with email or phone instead of only using a wallet.',
     why: 'Normal users can access Web3 without feeling lost.',
     steps: [
-      { label: 'Familiar login', detail: 'The user starts with email, phone, or social identity.' },
-      { label: 'Passport stamp', detail: 'The Passport Clerk links that proof to the app experience.' },
+      { label: 'Familiar Login', detail: 'The user starts with email, phone, or social identity.' },
+      { label: 'Passport Stamp', detail: 'The Passport Clerk links that proof to the app experience.' },
       { label: 'Enter Web3', detail: 'The user gets a smoother path into onchain activity.' },
     ],
     tone: 'gold',
@@ -147,9 +147,9 @@ export const worldZones: WorldZone[] = [
     example: 'An invoice can update when payment status changes.',
     why: 'Tokenized assets become useful, not just decorative tokens.',
     steps: [
-      { label: 'Real asset', detail: 'A real object or document starts outside crypto.' },
-      { label: 'Tokenize', detail: 'The Vault Keeper turns it into an onchain asset card.' },
-      { label: 'Update status', detail: 'Live data changes the asset when real events happen.' },
+      { label: 'Real Asset', detail: 'A real object or document starts outside crypto.' },
+      { label: 'Asset Card', detail: 'The Vault Keeper turns it into an onchain record.' },
+      { label: 'Update Status', detail: 'Live data changes the asset when real events happen.' },
     ],
     tone: 'cream',
     icon: KeyRound,
