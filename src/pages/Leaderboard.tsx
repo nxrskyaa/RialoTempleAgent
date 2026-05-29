@@ -1,11 +1,13 @@
 import { useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Crown, Flame, Loader2, Sparkles, Trophy, WalletCards, type LucideIcon } from 'lucide-react'
+import type { Address } from 'viem'
 import { useReadContract, useReadContracts } from 'wagmi'
 import { ARC_CHAIN, RIALO_TEMPLE_ABI, RIALO_TEMPLE_ADDRESS } from '@/config/contracts'
 import { buildLeaderboardRows, fmtAddress, getGrialoRarity, parseLeaderboardAddresses, type GrialoLeaderboardData } from '@/lib/rialo'
 
 const LIMIT = 30n
+const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000' as Address
 
 const TABS = [
   { id: 'pts', label: 'Top PTS', fn: 'getTopByPts', metric: 'Total PTS' },
@@ -36,26 +38,37 @@ export default function Leaderboard() {
   })
 
   const ranking = useMemo(() => parseLeaderboardAddresses(rankQuery.data), [rankQuery.data])
-  const userQueries = useReadContracts({
-    contracts: ranking.users.map((user) => ({
+  const hydrationContracts = useMemo(() => {
+    const users = ranking.users.length > 0 ? ranking.users : [ZERO_ADDRESS]
+
+    return users.map((user) => ({
       address: RIALO_TEMPLE_ADDRESS,
       abi: RIALO_TEMPLE_ABI,
       chainId: ARC_CHAIN.id,
-      functionName: 'getUser',
-      args: [user],
-    })),
+      functionName: 'getUser' as const,
+      args: [user] as const,
+    }))
+  }, [ranking.users])
+
+  const userQueries = useReadContracts({
+    contracts: hydrationContracts,
     query: {
       enabled: ranking.users.length > 0,
       refetchInterval: 10000,
       retry: 1,
     },
   })
+  const userResults = useMemo(
+    () => (ranking.users.length > 0 ? userQueries.data?.map((item) => (item.status === 'success' ? item.result : undefined)) ?? [] : []),
+    [ranking.users.length, userQueries.data],
+  )
   const rows = useMemo(
-    () => buildLeaderboardRows(ranking.users, ranking.values, userQueries.data?.map((item) => item.result) ?? []),
-    [ranking.users, ranking.values, userQueries.data],
+    () => buildLeaderboardRows(ranking.users, ranking.values, userResults),
+    [ranking.users, ranking.values, userResults],
   )
   const playerCount = typeof playerCountQuery.data === 'bigint' ? Number(playerCountQuery.data) : 0
-  const isLoading = rankQuery.isLoading || userQueries.isLoading
+  const isLoading = rankQuery.isLoading || (ranking.users.length > 0 && userQueries.isLoading)
+  const readError = rankQuery.error ?? (ranking.users.length > 0 ? userQueries.error : null)
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
@@ -86,7 +99,15 @@ export default function Leaderboard() {
         ))}
       </div>
 
-      {isLoading ? (
+      {readError ? (
+        <div className="temple-card spark-field rounded-lg py-16 text-center">
+          <Trophy className="mx-auto mb-3 h-9 w-9 text-[var(--temple-soft)]" />
+          <p className="text-sm font-black text-[var(--temple-text)]">Leaderboard read needs a retry.</p>
+          <p className="mx-auto mt-2 max-w-xl text-xs font-semibold text-[var(--temple-muted)]">
+            The V2Lite contract is reachable, but this leaderboard tab returned an unreadable response. Try switching tabs or refresh the page.
+          </p>
+        </div>
+      ) : isLoading ? (
         <div className="flex items-center justify-center py-20 text-sm text-[var(--temple-muted)]">
           <Loader2 className="mr-2 h-4 w-4 animate-spin text-[var(--temple-emerald)]" /> Loading V2Lite ranks
         </div>

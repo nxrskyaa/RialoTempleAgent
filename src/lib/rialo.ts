@@ -359,8 +359,8 @@ export function parseGrialoSpin(data: unknown): GrialoSpinData {
 export function parseLeaderboardAddresses(data: unknown): { users: Address[]; values: number[] } {
   const row = (data ?? {}) as Record<string, unknown>
   const arr = Array.isArray(data) ? data : []
-  const usersRaw = (row.topUsers ?? arr[0] ?? []) as unknown[]
-  const valuesRaw = (row.values ?? arr[1] ?? []) as unknown[]
+  const usersRaw = toArray(row.topUsers ?? arr[0])
+  const valuesRaw = toArray(row.values ?? arr[1])
 
   return {
     users: usersRaw.map((user) => String(user) as Address).filter((user) => /^0x[a-fA-F0-9]{40}$/.test(user)),
@@ -371,10 +371,11 @@ export function parseLeaderboardAddresses(data: unknown): { users: Address[]; va
 export function buildLeaderboardRows(users: Address[], values: number[], userResults: unknown[]): GrialoLeaderboardData[] {
   return users.map((user, index) => {
     const parsed = parseUnifiedUser(userResults[index])
+    const hasProfile = parsed.exists || Boolean(parsed.name || parsed.xHandle)
     return {
       user,
-      username: parsed.name,
-      xHandle: parsed.xHandle,
+      username: hasProfile ? parsed.name : 'Unsealed Explorer',
+      xHandle: hasProfile ? parsed.xHandle : '-',
       totalPts: parsed.totalPts,
       grialoPts: parsed.grialoPts,
       quizPts: parsed.quizPts,
@@ -457,6 +458,14 @@ function toNumber(value: unknown) {
   if (typeof value === 'number') return value
   if (typeof value === 'string') return Number(value || 0)
   return 0
+}
+
+function toArray(value: unknown): unknown[] {
+  if (Array.isArray(value)) return value
+  if (value && typeof value === 'object' && Symbol.iterator in value) {
+    return Array.from(value as Iterable<unknown>)
+  }
+  return []
 }
 
 function toBigInt(value: unknown) {
