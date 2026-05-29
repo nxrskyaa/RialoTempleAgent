@@ -263,10 +263,12 @@ function parseSpinFromReceipt(logs?: readonly Log[]): GrialoSpinData | null {
       const args = decoded.args as Record<string, unknown>
 
       return {
+        spinId: Number(args.spinId ?? 0),
         tier: Number(args.tier ?? 0),
         ptsGained: Number(args.pts ?? 0),
         streakAfter: Number(args.streakAfterSpin ?? 0),
         spunAt: Number(args.timestamp ?? 0),
+        exists: true,
       }
     } catch {
       // Ignore unrelated logs in the receipt.
@@ -281,14 +283,17 @@ function GrialoDashboard({ stats }: { stats: GrialoStatsData }) {
   const items = [
     ['Total spins', stats.totalSpins, '#57e39f'],
     ['Total PTS', stats.totalPts, '#f2c866'],
+    ['Grialo PTS', stats.grialoPts, '#57e39f'],
+    ['Quiz PTS', stats.quizPts, '#78ecff'],
     ['Current streak', `${stats.currentStreak}d`, '#57e39f'],
     ['Best streak', `${stats.bestStreak}d`, '#f2c866'],
     ['Best tier', bestRarity.tier, bestRarity.color],
+    ['Wishes', stats.totalWishes, '#ff7ad9'],
     ['Temple Energy', stats.spinReady ? 'Ready' : fmtCountdown(stats.waitTime), stats.spinReady ? '#57e39f' : '#f2c866'],
   ]
 
   return (
-    <section className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
+    <section className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-9">
       {items.map(([label, value, color]) => (
         <div key={label} className="temple-card rounded-lg p-4">
           <p className="text-2xl font-black" style={{ color: String(color) }}>{value}</p>

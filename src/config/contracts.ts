@@ -1,8 +1,44 @@
 import type { Address } from 'viem'
 
 export const RIALO_TEMPLE_ADDRESS = (
-  import.meta.env.VITE_RIALO_TEMPLE_ADDRESS || '0x0e5b996F56df97917289b2552A843620f9E88A60'
+  import.meta.env.VITE_RIALO_TEMPLE_ADDRESS || '0x568e94aAf7Daf29af6Ffc53C54b58E7d2DCc3BD5'
 ) as Address
+
+const PROFILE_COMPONENTS = [
+  { internalType: 'string', name: 'username', type: 'string' },
+  { internalType: 'string', name: 'xHandle', type: 'string' },
+  { internalType: 'uint256', name: 'sealedAt', type: 'uint256' },
+  { internalType: 'bool', name: 'isSealed', type: 'bool' },
+] as const
+
+const STATS_COMPONENTS = [
+  { internalType: 'uint256', name: 'totalPts', type: 'uint256' },
+  { internalType: 'uint256', name: 'grialoPts', type: 'uint256' },
+  { internalType: 'uint256', name: 'quizPts', type: 'uint256' },
+  { internalType: 'uint256', name: 'totalSpins', type: 'uint256' },
+  { internalType: 'uint256', name: 'currentStreak', type: 'uint256' },
+  { internalType: 'uint256', name: 'bestStreak', type: 'uint256' },
+  { internalType: 'uint256', name: 'lastSpinAt', type: 'uint256' },
+  { internalType: 'uint8', name: 'bestTier', type: 'uint8' },
+  { internalType: 'uint256', name: 'totalQuizzes', type: 'uint256' },
+  { internalType: 'uint256', name: 'totalWishes', type: 'uint256' },
+] as const
+
+const SPIN_COMPONENTS = [
+  { internalType: 'uint256', name: 'spinId', type: 'uint256' },
+  { internalType: 'uint8', name: 'tier', type: 'uint8' },
+  { internalType: 'uint256', name: 'pts', type: 'uint256' },
+  { internalType: 'uint256', name: 'streakAfterSpin', type: 'uint256' },
+  { internalType: 'uint256', name: 'timestamp', type: 'uint256' },
+  { internalType: 'bool', name: 'exists', type: 'bool' },
+] as const
+
+const WISH_COMPONENTS = [
+  { internalType: 'uint256', name: 'wishId', type: 'uint256' },
+  { internalType: 'address', name: 'author', type: 'address' },
+  { internalType: 'string', name: 'message', type: 'string' },
+  { internalType: 'uint256', name: 'createdAt', type: 'uint256' },
+] as const
 
 export const RIALO_TEMPLE_ABI = [
   {
@@ -25,19 +61,14 @@ export const RIALO_TEMPLE_ABI = [
   {
     inputs: [{ internalType: 'address', name: 'user', type: 'address' }],
     name: 'getProfile',
-    outputs: [
-      {
-        components: [
-          { internalType: 'string', name: 'username', type: 'string' },
-          { internalType: 'string', name: 'xHandle', type: 'string' },
-          { internalType: 'uint256', name: 'sealedAt', type: 'uint256' },
-          { internalType: 'bool', name: 'isSealed', type: 'bool' },
-        ],
-        internalType: 'struct RialoTempleGrialo.Profile',
-        name: '',
-        type: 'tuple',
-      },
-    ],
+    outputs: [{ components: PROFILE_COMPONENTS, internalType: 'struct RialoTempleV2Lite.Profile', name: '', type: 'tuple' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'address', name: 'user', type: 'address' }],
+    name: 'getStats',
+    outputs: [{ components: STATS_COMPONENTS, internalType: 'struct RialoTempleV2Lite.Stats', name: '', type: 'tuple' }],
     stateMutability: 'view',
     type: 'function',
   },
@@ -47,20 +78,12 @@ export const RIALO_TEMPLE_ABI = [
     outputs: [
       {
         components: [
-          { internalType: 'string', name: 'username', type: 'string' },
-          { internalType: 'string', name: 'xHandle', type: 'string' },
-          { internalType: 'bool', name: 'profileSealed', type: 'bool' },
-          { internalType: 'uint256', name: 'sealedAt', type: 'uint256' },
-          { internalType: 'uint256', name: 'totalSpins', type: 'uint256' },
-          { internalType: 'uint256', name: 'totalPts', type: 'uint256' },
-          { internalType: 'uint256', name: 'currentStreak', type: 'uint256' },
-          { internalType: 'uint256', name: 'bestStreak', type: 'uint256' },
-          { internalType: 'uint256', name: 'lastSpinAt', type: 'uint256' },
-          { internalType: 'uint8', name: 'bestTier', type: 'uint8' },
+          { components: PROFILE_COMPONENTS, internalType: 'struct RialoTempleV2Lite.Profile', name: 'profile', type: 'tuple' },
+          { components: STATS_COMPONENTS, internalType: 'struct RialoTempleV2Lite.Stats', name: 'stats', type: 'tuple' },
           { internalType: 'bool', name: 'spinReady', type: 'bool' },
           { internalType: 'uint256', name: 'waitTime', type: 'uint256' },
         ],
-        internalType: 'struct RialoTempleGrialo.UserView',
+        internalType: 'struct RialoTempleV2Lite.UserView',
         name: '',
         type: 'tuple',
       },
@@ -71,20 +94,7 @@ export const RIALO_TEMPLE_ABI = [
   {
     inputs: [],
     name: 'spinGrialo',
-    outputs: [
-      {
-        components: [
-          { internalType: 'uint256', name: 'spinId', type: 'uint256' },
-          { internalType: 'uint8', name: 'tier', type: 'uint8' },
-          { internalType: 'uint256', name: 'pts', type: 'uint256' },
-          { internalType: 'uint256', name: 'streakAfterSpin', type: 'uint256' },
-          { internalType: 'uint256', name: 'timestamp', type: 'uint256' },
-        ],
-        internalType: 'struct RialoTempleGrialo.SpinResult',
-        name: 'result',
-        type: 'tuple',
-      },
-    ],
+    outputs: [{ components: SPIN_COMPONENTS, internalType: 'struct RialoTempleV2Lite.SpinResult', name: 'result', type: 'tuple' }],
     stateMutability: 'nonpayable',
     type: 'function',
   },
@@ -111,62 +121,15 @@ export const RIALO_TEMPLE_ABI = [
   },
   {
     inputs: [{ internalType: 'address', name: 'user', type: 'address' }],
-    name: 'getStats',
-    outputs: [
-      {
-        components: [
-          { internalType: 'uint256', name: 'totalSpins', type: 'uint256' },
-          { internalType: 'uint256', name: 'totalPts', type: 'uint256' },
-          { internalType: 'uint256', name: 'currentStreak', type: 'uint256' },
-          { internalType: 'uint256', name: 'bestStreak', type: 'uint256' },
-          { internalType: 'uint256', name: 'lastSpinAt', type: 'uint256' },
-          { internalType: 'uint8', name: 'bestTier', type: 'uint8' },
-        ],
-        internalType: 'struct RialoTempleGrialo.Stats',
-        name: '',
-        type: 'tuple',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [{ internalType: 'address', name: 'user', type: 'address' }],
     name: 'getLatestSpin',
-    outputs: [
-      {
-        components: [
-          { internalType: 'uint256', name: 'spinId', type: 'uint256' },
-          { internalType: 'uint8', name: 'tier', type: 'uint8' },
-          { internalType: 'uint256', name: 'pts', type: 'uint256' },
-          { internalType: 'uint256', name: 'streakAfterSpin', type: 'uint256' },
-          { internalType: 'uint256', name: 'timestamp', type: 'uint256' },
-        ],
-        internalType: 'struct RialoTempleGrialo.SpinResult',
-        name: '',
-        type: 'tuple',
-      },
-    ],
+    outputs: [{ components: SPIN_COMPONENTS, internalType: 'struct RialoTempleV2Lite.SpinResult', name: '', type: 'tuple' }],
     stateMutability: 'view',
     type: 'function',
   },
   {
     inputs: [{ internalType: 'address', name: 'user', type: 'address' }],
     name: 'getSpinHistory',
-    outputs: [
-      {
-        components: [
-          { internalType: 'uint256', name: 'spinId', type: 'uint256' },
-          { internalType: 'uint8', name: 'tier', type: 'uint8' },
-          { internalType: 'uint256', name: 'pts', type: 'uint256' },
-          { internalType: 'uint256', name: 'streakAfterSpin', type: 'uint256' },
-          { internalType: 'uint256', name: 'timestamp', type: 'uint256' },
-        ],
-        internalType: 'struct RialoTempleGrialo.SpinResult[]',
-        name: '',
-        type: 'tuple[]',
-      },
-    ],
+    outputs: [{ components: SPIN_COMPONENTS, internalType: 'struct RialoTempleV2Lite.SpinResult[]', name: '', type: 'tuple[]' }],
     stateMutability: 'view',
     type: 'function',
   },
@@ -178,33 +141,78 @@ export const RIALO_TEMPLE_ABI = [
     type: 'function',
   },
   {
-    inputs: [{ internalType: 'uint8', name: 'tier', type: 'uint8' }],
-    name: 'tierName',
-    outputs: [{ internalType: 'string', name: '', type: 'string' }],
+    inputs: [{ internalType: 'uint16', name: 'quizId', type: 'uint16' }],
+    name: 'completeQuiz',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'address', name: 'user', type: 'address' },
+      { internalType: 'uint16', name: 'quizId', type: 'uint16' },
+    ],
+    name: 'isQuizCompleted',
+    outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
     stateMutability: 'view',
     type: 'function',
   },
   {
-    inputs: [{ internalType: 'uint8', name: 'tier', type: 'uint8' }],
-    name: 'boxName',
-    outputs: [{ internalType: 'string', name: '', type: 'string' }],
+    inputs: [{ internalType: 'uint16', name: 'quizId', type: 'uint16' }],
+    name: 'quizReward',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
     type: 'function',
   },
   {
-    inputs: [{ internalType: 'uint8', name: 'tier', type: 'uint8' }],
-    name: 'grialoText',
-    outputs: [{ internalType: 'string', name: '', type: 'string' }],
+    inputs: [{ internalType: 'uint16', name: 'quizId', type: 'uint16' }],
+    name: 'quizActive',
+    outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'string', name: 'message', type: 'string' }],
+    name: 'submitWish',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'uint256', name: 'wishId', type: 'uint256' }],
+    name: 'getWish',
+    outputs: [{ components: WISH_COMPONENTS, internalType: 'struct RialoTempleV2Lite.Wish', name: '', type: 'tuple' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'getWishCount',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
     type: 'function',
   },
   {
     inputs: [
-      { internalType: 'uint8', name: 'tier', type: 'uint8' },
-      { internalType: 'uint256', name: 'streak', type: 'uint256' },
+      { internalType: 'uint256', name: 'start', type: 'uint256' },
+      { internalType: 'uint256', name: 'limit', type: 'uint256' },
     ],
-    name: 'pointsPreview',
+    name: 'getWishes',
+    outputs: [{ components: WISH_COMPONENTS, internalType: 'struct RialoTempleV2Lite.Wish[]', name: '', type: 'tuple[]' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'address', name: 'user', type: 'address' }],
+    name: 'getUserWishCount',
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'address', name: 'user', type: 'address' }],
+    name: 'getUserWishIds',
+    outputs: [{ internalType: 'uint256[]', name: '', type: 'uint256[]' }],
     stateMutability: 'view',
     type: 'function',
   },
@@ -212,20 +220,8 @@ export const RIALO_TEMPLE_ABI = [
     inputs: [{ internalType: 'uint256', name: 'limit', type: 'uint256' }],
     name: 'getTopByPts',
     outputs: [
-      {
-        components: [
-          { internalType: 'address', name: 'user', type: 'address' },
-          { internalType: 'string', name: 'username', type: 'string' },
-          { internalType: 'string', name: 'xHandle', type: 'string' },
-          { internalType: 'uint256', name: 'totalPts', type: 'uint256' },
-          { internalType: 'uint256', name: 'totalSpins', type: 'uint256' },
-          { internalType: 'uint256', name: 'bestStreak', type: 'uint256' },
-          { internalType: 'uint8', name: 'bestTier', type: 'uint8' },
-        ],
-        internalType: 'struct RialoTempleGrialo.LeaderboardEntry[]',
-        name: '',
-        type: 'tuple[]',
-      },
+      { internalType: 'address[]', name: 'topUsers', type: 'address[]' },
+      { internalType: 'uint256[]', name: 'values', type: 'uint256[]' },
     ],
     stateMutability: 'view',
     type: 'function',
@@ -234,20 +230,28 @@ export const RIALO_TEMPLE_ABI = [
     inputs: [{ internalType: 'uint256', name: 'limit', type: 'uint256' }],
     name: 'getTopByStreak',
     outputs: [
-      {
-        components: [
-          { internalType: 'address', name: 'user', type: 'address' },
-          { internalType: 'string', name: 'username', type: 'string' },
-          { internalType: 'string', name: 'xHandle', type: 'string' },
-          { internalType: 'uint256', name: 'totalPts', type: 'uint256' },
-          { internalType: 'uint256', name: 'totalSpins', type: 'uint256' },
-          { internalType: 'uint256', name: 'bestStreak', type: 'uint256' },
-          { internalType: 'uint8', name: 'bestTier', type: 'uint8' },
-        ],
-        internalType: 'struct RialoTempleGrialo.LeaderboardEntry[]',
-        name: '',
-        type: 'tuple[]',
-      },
+      { internalType: 'address[]', name: 'topUsers', type: 'address[]' },
+      { internalType: 'uint256[]', name: 'values', type: 'uint256[]' },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'uint256', name: 'limit', type: 'uint256' }],
+    name: 'getTopByGrialoPts',
+    outputs: [
+      { internalType: 'address[]', name: 'topUsers', type: 'address[]' },
+      { internalType: 'uint256[]', name: 'values', type: 'uint256[]' },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'uint256', name: 'limit', type: 'uint256' }],
+    name: 'getTopByQuizPts',
+    outputs: [
+      { internalType: 'address[]', name: 'topUsers', type: 'address[]' },
+      { internalType: 'uint256[]', name: 'values', type: 'uint256[]' },
     ],
     stateMutability: 'view',
     type: 'function',
@@ -256,6 +260,13 @@ export const RIALO_TEMPLE_ABI = [
     inputs: [],
     name: 'getPlayerCount',
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'uint256', name: 'index', type: 'uint256' }],
+    name: 'getPlayerAt',
+    outputs: [{ internalType: 'address', name: '', type: 'address' }],
     stateMutability: 'view',
     type: 'function',
   },
@@ -275,8 +286,6 @@ export const RIALO_TEMPLE_ABI = [
       { indexed: true, internalType: 'address', name: 'user', type: 'address' },
       { indexed: true, internalType: 'uint256', name: 'spinId', type: 'uint256' },
       { indexed: false, internalType: 'uint8', name: 'tier', type: 'uint8' },
-      { indexed: false, internalType: 'string', name: 'tierName', type: 'string' },
-      { indexed: false, internalType: 'string', name: 'boxName', type: 'string' },
       { indexed: false, internalType: 'uint256', name: 'pts', type: 'uint256' },
       { indexed: false, internalType: 'uint256', name: 'streakAfterSpin', type: 'uint256' },
       { indexed: false, internalType: 'uint256', name: 'totalPts', type: 'uint256' },
@@ -286,95 +295,26 @@ export const RIALO_TEMPLE_ABI = [
     type: 'event',
   },
   {
+    anonymous: false,
     inputs: [
-      { internalType: 'string', name: 'name', type: 'string' },
-      { internalType: 'string', name: 'origin', type: 'string' },
-      { internalType: 'string', name: 'imageUrl', type: 'string' },
-      { internalType: 'uint8', name: 'rating', type: 'uint8' },
-      { internalType: 'string', name: 'reviewText', type: 'string' },
+      { indexed: true, internalType: 'address', name: 'user', type: 'address' },
+      { indexed: false, internalType: 'string', name: 'username', type: 'string' },
+      { indexed: false, internalType: 'string', name: 'xHandle', type: 'string' },
+      { indexed: false, internalType: 'uint256', name: 'timestamp', type: 'uint256' },
     ],
-    name: 'submitFoodReview',
-    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-    stateMutability: 'payable',
-    type: 'function',
+    name: 'ProfileSealed',
+    type: 'event',
   },
   {
+    anonymous: false,
     inputs: [
-      { internalType: 'string', name: 'title', type: 'string' },
-      { internalType: 'string', name: 'imdbUrl', type: 'string' },
-      { internalType: 'uint8', name: 'rating', type: 'uint8' },
-      { internalType: 'string', name: 'reviewText', type: 'string' },
+      { indexed: true, internalType: 'address', name: 'author', type: 'address' },
+      { indexed: true, internalType: 'uint256', name: 'wishId', type: 'uint256' },
+      { indexed: false, internalType: 'string', name: 'message', type: 'string' },
+      { indexed: false, internalType: 'uint256', name: 'createdAt', type: 'uint256' },
     ],
-    name: 'submitFilmReview',
-    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-    stateMutability: 'payable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      { internalType: 'uint256', name: 'offset', type: 'uint256' },
-      { internalType: 'uint256', name: 'limit', type: 'uint256' },
-    ],
-    name: 'getReviews',
-    outputs: [
-      {
-        components: [
-          { internalType: 'uint256', name: 'id', type: 'uint256' },
-          { internalType: 'enum RialoTemple.ReviewCategory', name: 'category', type: 'uint8' },
-          { internalType: 'address', name: 'reviewer', type: 'address' },
-          { internalType: 'string', name: 'title', type: 'string' },
-          { internalType: 'string', name: 'originOrImdb', type: 'string' },
-          { internalType: 'string', name: 'imageUrl', type: 'string' },
-          { internalType: 'uint8', name: 'rating', type: 'uint8' },
-          { internalType: 'string', name: 'reviewText', type: 'string' },
-          { internalType: 'uint256', name: 'timestamp', type: 'uint256' },
-        ],
-        internalType: 'struct RialoTemple.Review[]',
-        name: '',
-        type: 'tuple[]',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [
-      { internalType: 'enum RialoTemple.ReviewCategory', name: 'category', type: 'uint8' },
-      { internalType: 'uint256', name: 'offset', type: 'uint256' },
-      { internalType: 'uint256', name: 'limit', type: 'uint256' },
-    ],
-    name: 'getReviewsByCategory',
-    outputs: [
-      {
-        components: [
-          { internalType: 'uint256', name: 'id', type: 'uint256' },
-          { internalType: 'enum RialoTemple.ReviewCategory', name: 'category', type: 'uint8' },
-          { internalType: 'address', name: 'reviewer', type: 'address' },
-          { internalType: 'string', name: 'title', type: 'string' },
-          { internalType: 'string', name: 'originOrImdb', type: 'string' },
-          { internalType: 'string', name: 'imageUrl', type: 'string' },
-          { internalType: 'uint8', name: 'rating', type: 'uint8' },
-          { internalType: 'string', name: 'reviewText', type: 'string' },
-          { internalType: 'uint256', name: 'timestamp', type: 'uint256' },
-        ],
-        internalType: 'struct RialoTemple.Review[]',
-        name: '',
-        type: 'tuple[]',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'getTotals',
-    outputs: [
-      { internalType: 'uint256', name: 'totalUsers', type: 'uint256' },
-      { internalType: 'uint256', name: 'totalReviews', type: 'uint256' },
-      { internalType: 'uint256', name: 'balance', type: 'uint256' },
-    ],
-    stateMutability: 'view',
-    type: 'function',
+    name: 'WishSubmitted',
+    type: 'event',
   },
 ] as const
 
@@ -386,3 +326,6 @@ export const ARC_CHAIN = {
   blockExplorers: { default: { name: 'Arcscan', url: 'https://testnet.arcscan.app' } },
   testnet: true,
 } as const
+
+export const ARC_EXPLORER_TX_BASE =
+  import.meta.env.VITE_ARC_EXPLORER_TX_BASE || `${ARC_CHAIN.blockExplorers.default.url}/tx`

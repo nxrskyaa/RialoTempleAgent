@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Clock, Copy, ExternalLink, Flame, Sparkles, Star, Trophy, UserRound, Wallet, Zap, type LucideIcon } from 'lucide-react'
+import { Clock, Copy, ExternalLink, Flame, ScrollText, Sparkles, Star, Trophy, UserRound, Wallet, Wand2, Zap, type LucideIcon } from 'lucide-react'
 import { useAccount, useBalance, useReadContract } from 'wagmi'
 import ProfileGate from '@/components/ProfileGate'
 import { ARC_CHAIN, RIALO_TEMPLE_ABI, RIALO_TEMPLE_ADDRESS } from '@/config/contracts'
@@ -85,10 +85,15 @@ function ProfileInner({ profile, fallbackStats }: { profile: ProfileData; fallba
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <Metric icon={Trophy} label="Total PTS" value={grialoStats.totalPts} color="#f2c866" />
+            <Metric icon={Zap} label="Grialo PTS" value={grialoStats.grialoPts} color="#57e39f" />
+            <Metric icon={ScrollText} label="Quiz PTS" value={grialoStats.quizPts} color="#78ecff" />
             <Metric icon={Zap} label="Total spins" value={grialoStats.totalSpins} color="#57e39f" />
             <Metric icon={Flame} label="Current streak" value={`${grialoStats.currentStreak}d`} color="#57e39f" />
             <Metric icon={Trophy} label="Best streak" value={`${grialoStats.bestStreak}d`} color="#f2c866" />
             <Metric icon={Star} label="Best tier" value={bestRarity.tier} color={bestRarity.color} />
+            <Metric icon={Wand2} label="Quizzes" value={grialoStats.totalQuizzes} color="#f2c866" />
+            <Metric icon={Sparkles} label="Wishes" value={grialoStats.totalWishes} color="#ff7ad9" />
             <Metric icon={Clock} label="Next spin" value={grialoStats.spinReady || waitTime <= 0 ? 'Ready' : fmtCountdown(waitTime)} color={grialoStats.spinReady || waitTime <= 0 ? '#57e39f' : '#f2c866'} />
             <Metric icon={Sparkles} label="Temple Energy" value={grialoStats.spinReady || waitTime <= 0 ? 'Ready' : 'Restoring'} color="#78ecff" />
           </div>
@@ -97,7 +102,7 @@ function ProfileInner({ profile, fallbackStats }: { profile: ProfileData; fallba
             <p className="text-xs font-black uppercase tracking-wider text-[var(--temple-soft)]">Total PTS</p>
             <div className="mt-4 flex items-end gap-3">
               <p className="text-7xl font-black leading-none text-[var(--temple-emerald)]">{grialoStats.totalPts}</p>
-              <p className="pb-2 text-sm text-[var(--temple-muted)]">from Grialo mystery boxes</p>
+              <p className="pb-2 text-sm text-[var(--temple-muted)]">unified from Grialo, Quiz, and Wishes</p>
             </div>
           </div>
         </section>

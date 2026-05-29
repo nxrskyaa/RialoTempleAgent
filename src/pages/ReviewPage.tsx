@@ -4,8 +4,9 @@ import { motion } from 'framer-motion'
 import { ChefHat, Clapperboard, ExternalLink, Film, Loader2, Popcorn, Send, Soup, Star, Utensils } from 'lucide-react'
 import { useReadContract, useWaitForTransactionReceipt, useWriteContract } from 'wagmi'
 import ProfileGate from '@/components/ProfileGate'
-import { ARC_CHAIN, RIALO_TEMPLE_ABI, RIALO_TEMPLE_ADDRESS } from '@/config/contracts'
-import { ACTION_FEE, fmtAddress, parseReviews, REVIEW_PAGE_SIZE, type ReviewData } from '@/lib/rialo'
+import { ARC_CHAIN } from '@/config/contracts'
+import { ACTION_FEE, REVIEW_CONTRACT_ABI, REVIEW_CONTRACT_ADDRESS, REVIEW_PAGE_SIZE } from '@/config/reviewContract'
+import { fmtAddress, parseReviews, type ReviewData } from '@/lib/rialo'
 
 type Tab = 'all' | 'food' | 'film'
 type WriteKind = 'food' | 'film'
@@ -37,8 +38,8 @@ function ReviewInner({ refetchProfile }: { refetchProfile: () => void }) {
     : { functionName: 'getReviewsByCategory' as const, args: [tab === 'food' ? 0 : 1, 0n, REVIEW_PAGE_SIZE] as const }
 
   const { data, isLoading, refetch } = useReadContract({
-    address: RIALO_TEMPLE_ADDRESS,
-    abi: RIALO_TEMPLE_ABI,
+    address: REVIEW_CONTRACT_ADDRESS,
+    abi: REVIEW_CONTRACT_ABI,
     chainId: ARC_CHAIN.id,
     functionName: query.functionName,
     args: query.args,
@@ -96,8 +97,8 @@ function ReviewInner({ refetchProfile }: { refetchProfile: () => void }) {
     setMessage('Open your wallet and confirm the review transaction.')
     if (kind === 'food') {
       writeContract({
-        address: RIALO_TEMPLE_ADDRESS,
-        abi: RIALO_TEMPLE_ABI,
+        address: REVIEW_CONTRACT_ADDRESS,
+        abi: REVIEW_CONTRACT_ABI,
         chainId: ARC_CHAIN.id,
         functionName: 'submitFoodReview',
         args: [title.trim(), originOrImdb.trim(), imageUrl.trim(), rating, textForChain],
@@ -107,8 +108,8 @@ function ReviewInner({ refetchProfile }: { refetchProfile: () => void }) {
     }
 
     writeContract({
-      address: RIALO_TEMPLE_ADDRESS,
-      abi: RIALO_TEMPLE_ABI,
+      address: REVIEW_CONTRACT_ADDRESS,
+      abi: REVIEW_CONTRACT_ABI,
       chainId: ARC_CHAIN.id,
       functionName: 'submitFilmReview',
       args: [title.trim(), originOrImdb.trim(), rating, textForChain],

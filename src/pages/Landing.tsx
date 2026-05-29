@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion'
-import { ArrowRight, Clapperboard, Flame, Globe2, MessageSquareText, Star, Trophy, Utensils, type LucideIcon } from 'lucide-react'
+import { ArrowRight, Flame, Globe2, MessageSquareText, ScrollText, Star, Trophy, Wand2, type LucideIcon } from 'lucide-react'
 import { useReadContract } from 'wagmi'
 import { ARC_CHAIN, RIALO_TEMPLE_ABI, RIALO_TEMPLE_ADDRESS } from '@/config/contracts'
 import { GRIALO_RARITIES } from '@/lib/rialo'
 
-const AMBIENT_MOVES = ['Grialo', 'PTS', 'Food', 'Film']
+const AMBIENT_MOVES = ['Grialo', 'Quiz', 'Wish', 'PTS']
 
 export default function Landing() {
   const [activeMove, setActiveMove] = useState('Grialo')
@@ -55,7 +55,7 @@ export default function Landing() {
               Daily mystery boxes. Real on-chain proof.
             </h1>
             <p className="mt-6 max-w-lg text-base leading-7 text-[var(--temple-muted)]">
-              Channel Grialo, open temple boxes, drop food and film notes, and let your wallet carry the proof. Weirdly cozy, fully on-chain.
+              Channel Grialo, complete Rialo quizzes, send onchain wishes, and let your wallet carry the proof. Weirdly cozy, fully on-chain.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link to="/grialo" className="temple-button inline-flex items-center gap-2 rounded-lg px-5 py-3 text-sm font-bold">
@@ -66,6 +66,9 @@ export default function Landing() {
               </Link>
               <Link to="/world" className="temple-button-secondary inline-flex items-center gap-2 rounded-lg px-5 py-3 text-sm font-semibold">
                 <Globe2 className="h-4 w-4 text-[var(--temple-cyan)]" /> Explore World
+              </Link>
+              <Link to="/quiz" className="temple-button-secondary inline-flex items-center gap-2 rounded-lg px-5 py-3 text-sm font-semibold">
+                <Wand2 className="h-4 w-4 text-[var(--temple-gold)]" /> Take quiz
               </Link>
             </div>
           </div>
@@ -96,9 +99,9 @@ export default function Landing() {
               </div>
               <div className="toy-grid mt-8 grid grid-cols-2 gap-3">
                 <ActionTile icon={Flame} title="Grialo" text="Daily mystery box" to="/grialo" tone="mint" onPreview={setActiveMove} />
-                <ActionTile icon={Star} title="PTS" text="Rank fuel" to="/leaderboard" tone="gold" onPreview={setActiveMove} />
-                <ActionTile icon={Utensils} title="Food" text="Taste log" to="/review" tone="coral" onPreview={setActiveMove} />
-                <ActionTile icon={Clapperboard} title="Film" text="Scene notes" to="/review" tone="cyan" onPreview={setActiveMove} />
+                <ActionTile icon={Wand2} title="Quiz" text="Learn for PTS" to="/quiz" tone="gold" onPreview={setActiveMove} />
+                <ActionTile icon={ScrollText} title="Wish" text="Onchain note" to="/wish" tone="coral" onPreview={setActiveMove} />
+                <ActionTile icon={Star} title="PTS" text="Rank fuel" to="/leaderboard" tone="cyan" onPreview={setActiveMove} />
               </div>
             </div>
 
@@ -118,7 +121,7 @@ export default function Landing() {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   className="speech-pop absolute -right-5 top-7 rounded-lg px-3 py-2 text-xs font-black"
                 >
-                  {activeMove === 'Food' ? 'nom!' : activeMove === 'Film' ? 'roll!' : activeMove === 'PTS' ? '+pts!' : 'box!'}
+                  {activeMove === 'Quiz' ? 'smart!' : activeMove === 'Wish' ? 'sent!' : activeMove === 'PTS' ? '+pts!' : 'box!'}
                 </motion.div>
               </div>
               <div className="relative z-10 mt-64 grid grid-cols-3 gap-2 text-center">

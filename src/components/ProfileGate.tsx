@@ -85,7 +85,7 @@ export default function ProfileGate({ children, compact = false }: Props) {
           : 'Transaction sent.'
         : ''
   const profileReadMessage = readError
-    ? `Could not read the Grialo contract on Arc Testnet. Check that ${RIALO_TEMPLE_ADDRESS} is the deployed RialoTempleGrialo address.`
+    ? `Could not read the Rialo Temple V2Lite contract on Arc Testnet. Check ${RIALO_TEMPLE_ADDRESS}, then try again.`
     : transactionMessage || message
 
   if (!isConnected) {
@@ -93,7 +93,7 @@ export default function ProfileGate({ children, compact = false }: Props) {
       <div className="temple-card spark-field mx-auto flex max-w-xl flex-col items-center rounded-lg px-6 py-12 text-center">
         <div className="flame-buddy mb-5 h-20 w-16" />
         <h2 className="arcade-title text-2xl font-black">Connect wallet to wake the flame</h2>
-        <p className="mt-2 max-w-sm text-sm leading-6 text-[var(--temple-muted)]">Your profile, Grialo spins, reviews, and PTS all live behind your Arc Testnet wallet.</p>
+        <p className="mt-2 max-w-sm text-sm leading-6 text-[var(--temple-muted)]">Your Rialo Passport, Grialo, quiz PTS, wishes, and rank all live behind your Arc Testnet wallet.</p>
       </div>
     )
   }
@@ -120,7 +120,7 @@ export default function ProfileGate({ children, compact = false }: Props) {
           <div>
             <p className="text-xs font-black uppercase tracking-wider text-[var(--temple-cyan)]">Player card</p>
             <h1 className="text-2xl font-black">Seal Rialo Temple Profile</h1>
-            <p className="text-sm text-[var(--temple-muted)]">Choose a username and X handle for Grialo.</p>
+            <p className="text-sm text-[var(--temple-muted)]">Choose a username and X handle for your V2 Rialo Passport.</p>
           </div>
         </div>
 
@@ -167,14 +167,14 @@ export default function ProfileGate({ children, compact = false }: Props) {
               </div>
             </div>
             <div className="mt-5 grid grid-cols-3 gap-2 text-center">
-              {[['PTS', EMPTY_GRIALO_STATS.totalPts], ['Spins', EMPTY_GRIALO_STATS.totalSpins], ['Streak', EMPTY_GRIALO_STATS.currentStreak]].map(([label, value]) => (
+              {[['PTS', EMPTY_GRIALO_STATS.totalPts], ['Quiz', EMPTY_GRIALO_STATS.quizPts], ['Wishes', EMPTY_GRIALO_STATS.totalWishes]].map(([label, value]) => (
                 <div key={label} className="rounded-lg bg-white/[0.035] p-3">
                   <p className="text-lg font-semibold text-[var(--temple-emerald)]">{value}</p>
                   <p className="text-[10px] uppercase tracking-wider text-[var(--temple-soft)]">{label}</p>
                 </div>
               ))}
             </div>
-            <p className="mt-5 text-xs leading-relaxed text-[var(--temple-muted)]">This profile unlocks Grialo mystery boxes, food reviews, film reviews, and leaderboard identity.</p>
+            <p className="mt-5 text-xs leading-relaxed text-[var(--temple-muted)]">This profile unlocks Grialo mystery boxes, Rialo Quiz rewards, onchain wishes, and leaderboard identity.</p>
           </div>
         </div>
       )}

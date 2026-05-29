@@ -1,11 +1,13 @@
 import { Link, useLocation } from 'react-router-dom'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { motion } from 'framer-motion'
-import { Globe2, IdCard, MessageSquareText, Sparkles, Trophy, UserCircle } from 'lucide-react'
+import { Globe2, IdCard, MessageSquareText, ScrollText, Sparkles, Trophy, UserCircle, Wand2 } from 'lucide-react'
 
 const NAV = [
   { path: '/grialo', label: 'Grialo', icon: Sparkles },
   { path: '/world', label: 'World', icon: Globe2 },
+  { path: '/quiz', label: 'Quiz', icon: Wand2 },
+  { path: '/wish', label: 'Wish', icon: ScrollText },
   { path: '/review', label: 'Reviews', icon: MessageSquareText },
   { path: '/signature-card', label: 'Signature Card', icon: IdCard },
   { path: '/leaderboard', label: 'Rank', icon: Trophy },

@@ -1,7 +1,4 @@
-import { parseEther, type Address } from 'viem'
-
-export const ACTION_FEE = parseEther('1')
-export const REVIEW_PAGE_SIZE = 24n
+import type { Address } from 'viem'
 
 export type ProfileData = {
   name: string
@@ -47,12 +44,16 @@ export type LeaderboardData = {
 }
 
 export type GrialoStatsData = {
-  totalSpins: number
   totalPts: number
+  grialoPts: number
+  quizPts: number
+  totalSpins: number
   currentStreak: number
   bestStreak: number
   lastSpinAt: number
   bestTier: number
+  totalQuizzes: number
+  totalWishes: number
   spinReady: boolean
   waitTime: number
 }
@@ -62,10 +63,12 @@ export type GrialoUserData = ProfileData & GrialoStatsData & {
 }
 
 export type GrialoSpinData = {
+  spinId: number
   tier: number
   ptsGained: number
   streakAfter: number
   spunAt: number
+  exists: boolean
 }
 
 export type GrialoLeaderboardData = {
@@ -73,9 +76,21 @@ export type GrialoLeaderboardData = {
   username: string
   xHandle: string
   totalPts: number
+  grialoPts: number
+  quizPts: number
   totalSpins: number
   bestStreak: number
   bestTier: number
+  totalQuizzes: number
+  totalWishes: number
+  rankingValue: number
+}
+
+export type WishData = {
+  wishId: number
+  author: Address
+  message: string
+  createdAt: number
 }
 
 export type TotalsData = {
@@ -104,12 +119,16 @@ export const EMPTY_STATS: UserStatsData = {
 }
 
 export const EMPTY_GRIALO_STATS: GrialoStatsData = {
-  totalSpins: 0,
   totalPts: 0,
+  grialoPts: 0,
+  quizPts: 0,
+  totalSpins: 0,
   currentStreak: 0,
   bestStreak: 0,
   lastSpinAt: 0,
   bestTier: 0,
+  totalQuizzes: 0,
+  totalWishes: 0,
   spinReady: false,
   waitTime: 0,
 }
@@ -121,10 +140,12 @@ export const EMPTY_GRIALO_USER: GrialoUserData = {
 }
 
 export const EMPTY_GRIALO_SPIN: GrialoSpinData = {
+  spinId: 0,
   tier: 0,
   ptsGained: 0,
   streakAfter: 0,
   spunAt: 0,
+  exists: false,
 }
 
 export const TIERS = [
@@ -205,6 +226,29 @@ export function parseProfileResult(data: unknown): { profile: ProfileData; stats
 export function parseUnifiedUser(data: unknown): GrialoUserData {
   const row = (data ?? {}) as Record<string, unknown>
   const arr = Array.isArray(data) ? data : []
+  const nestedProfile = row.profile ?? arr[0]
+  const nestedStats = row.stats ?? arr[1]
+
+  if (nestedProfile || nestedStats) {
+    const profile = parseV2Profile(nestedProfile)
+    const stats = {
+      ...parseGrialoStats(nestedStats),
+      spinReady: Boolean(row.spinReady ?? arr[2] ?? false),
+      waitTime: toNumber(row.waitTime ?? arr[3]),
+    }
+
+    return {
+      ...EMPTY_GRIALO_USER,
+      ...stats,
+      name: profile.name,
+      xUrl: profile.xUrl,
+      xHandle: profile.xHandle,
+      avatarUrl: profile.avatarUrl,
+      exists: profile.exists,
+      sealedAt: profile.sealedAt,
+    }
+  }
+
   const username = String(row.username ?? row.name ?? arr[0] ?? '')
   const xHandle = normalizeXHandle(String(row.xHandle ?? arr[1] ?? ''))
   const profileSealed = Boolean(row.profileSealed ?? row.exists ?? arr[2] ?? false)
@@ -284,14 +328,18 @@ export function parseGrialoStats(data: unknown): GrialoStatsData {
   const row = (data ?? {}) as Record<string, unknown>
   const arr = Array.isArray(data) ? data : []
   return {
-    totalSpins: toNumber(row.totalSpins ?? arr[0]),
-    totalPts: toNumber(row.totalPts ?? arr[1]),
-    currentStreak: toNumber(row.currentStreak ?? arr[2]),
-    bestStreak: toNumber(row.bestStreak ?? arr[3]),
-    lastSpinAt: toNumber(row.lastSpinAt ?? arr[4]),
-    bestTier: toNumber(row.bestTier ?? arr[5]),
-    spinReady: Boolean(row.spinReady ?? arr[6] ?? false),
-    waitTime: toNumber(row.waitTime ?? arr[7]),
+    totalPts: toNumber(row.totalPts ?? arr[0]),
+    grialoPts: toNumber(row.grialoPts ?? arr[1]),
+    quizPts: toNumber(row.quizPts ?? arr[2]),
+    totalSpins: toNumber(row.totalSpins ?? arr[3] ?? row.totalCheckIns),
+    currentStreak: toNumber(row.currentStreak ?? arr[4]),
+    bestStreak: toNumber(row.bestStreak ?? arr[5]),
+    lastSpinAt: toNumber(row.lastSpinAt ?? arr[6]),
+    bestTier: toNumber(row.bestTier ?? arr[7]),
+    totalQuizzes: toNumber(row.totalQuizzes ?? arr[8]),
+    totalWishes: toNumber(row.totalWishes ?? arr[9]),
+    spinReady: Boolean(row.spinReady ?? arr[10] ?? false),
+    waitTime: toNumber(row.waitTime ?? arr[11]),
   }
 }
 
@@ -299,26 +347,57 @@ export function parseGrialoSpin(data: unknown): GrialoSpinData {
   const row = (data ?? {}) as Record<string, unknown>
   const arr = Array.isArray(data) ? data : []
   return {
+    spinId: toNumber(row.spinId ?? arr[0]),
     tier: toNumber(row.tier ?? arr[1]),
     ptsGained: toNumber(row.pts ?? row.ptsGained ?? arr[2]),
     streakAfter: toNumber(row.streakAfterSpin ?? row.streakAfter ?? arr[3]),
     spunAt: toNumber(row.timestamp ?? row.spunAt ?? arr[4]),
+    exists: Boolean(row.exists ?? arr[5] ?? toNumber(row.timestamp ?? arr[4]) > 0),
   }
 }
 
-export function parseGrialoLeaderboard(data: unknown): GrialoLeaderboardData[] {
+export function parseLeaderboardAddresses(data: unknown): { users: Address[]; values: number[] } {
+  const row = (data ?? {}) as Record<string, unknown>
+  const arr = Array.isArray(data) ? data : []
+  const usersRaw = (row.topUsers ?? arr[0] ?? []) as unknown[]
+  const valuesRaw = (row.values ?? arr[1] ?? []) as unknown[]
+
+  return {
+    users: usersRaw.map((user) => String(user) as Address).filter((user) => /^0x[a-fA-F0-9]{40}$/.test(user)),
+    values: valuesRaw.map(toNumber),
+  }
+}
+
+export function buildLeaderboardRows(users: Address[], values: number[], userResults: unknown[]): GrialoLeaderboardData[] {
+  return users.map((user, index) => {
+    const parsed = parseUnifiedUser(userResults[index])
+    return {
+      user,
+      username: parsed.name,
+      xHandle: parsed.xHandle,
+      totalPts: parsed.totalPts,
+      grialoPts: parsed.grialoPts,
+      quizPts: parsed.quizPts,
+      totalSpins: parsed.totalSpins,
+      bestStreak: parsed.bestStreak,
+      bestTier: parsed.bestTier,
+      totalQuizzes: parsed.totalQuizzes,
+      totalWishes: parsed.totalWishes,
+      rankingValue: values[index] ?? 0,
+    }
+  })
+}
+
+export function parseWishes(data: unknown): WishData[] {
   if (!Array.isArray(data)) return []
   return data.map((item) => {
     const row = item as Record<string, unknown>
     const arr = Array.isArray(item) ? item : []
     return {
-      user: String(row.user ?? arr[0] ?? '0x0000000000000000000000000000000000000000') as Address,
-      username: String(row.username ?? row.name ?? arr[1] ?? ''),
-      xHandle: normalizeXHandle(String(row.xHandle ?? arr[2] ?? '')),
-      totalPts: toNumber(row.totalPts ?? arr[3]),
-      totalSpins: toNumber(row.totalSpins ?? arr[4]),
-      bestStreak: toNumber(row.bestStreak ?? arr[5]),
-      bestTier: toNumber(row.bestTier ?? arr[6]),
+      wishId: toNumber(row.wishId ?? row.id ?? arr[0]),
+      author: String(row.author ?? arr[1] ?? '0x0000000000000000000000000000000000000000') as Address,
+      message: String(row.message ?? arr[2] ?? ''),
+      createdAt: toNumber(row.createdAt ?? row.timestamp ?? arr[3]),
     }
   })
 }
@@ -334,6 +413,24 @@ function parseProfile(data: unknown): ProfileData {
     followers: toNumber(row.followers ?? arr[4]),
     following: toNumber(row.following ?? arr[5]),
     exists: Boolean(row.exists ?? arr[6] ?? false),
+  }
+}
+
+function parseV2Profile(data: unknown): ProfileData & { sealedAt: number } {
+  const row = (data ?? {}) as Record<string, unknown>
+  const arr = Array.isArray(data) ? data : []
+  const username = String(row.username ?? row.name ?? arr[0] ?? '')
+  const xHandle = normalizeXHandle(String(row.xHandle ?? arr[1] ?? ''))
+
+  return {
+    name: username,
+    xUrl: toXUrl(xHandle),
+    xHandle,
+    avatarUrl: toXAvatarUrl(xHandle),
+    followers: 0,
+    following: 0,
+    exists: Boolean(row.isSealed ?? row.profileSealed ?? row.exists ?? arr[3] ?? false),
+    sealedAt: toNumber(row.sealedAt ?? arr[2]),
   }
 }
 

@@ -7,6 +7,8 @@ import Grialo from './pages/Grialo'
 import Leaderboard from './pages/Leaderboard'
 import SignatureCardPage from './pages/SignatureCardPage'
 import World from './pages/World'
+import RialoQuiz from './pages/RialoQuiz'
+import RialoWish from './pages/RialoWish'
 
 export default function App() {
   return (
@@ -17,6 +19,8 @@ export default function App() {
         <Route path="/grialo" element={<Grialo />} />
         <Route path="/world" element={<World />} />
         <Route path="/world-map" element={<Navigate to="/world" replace />} />
+        <Route path="/quiz" element={<RialoQuiz />} />
+        <Route path="/wish" element={<RialoWish />} />
         <Route path="/signature-card" element={<SignatureCardPage />} />
         <Route path="/leaderboard" element={<Leaderboard />} />
         <Route path="/profile" element={<Profile />} />
