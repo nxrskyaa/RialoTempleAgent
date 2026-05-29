@@ -243,7 +243,7 @@ function GrialoInner({ profileName, fallbackStats, refetchProfile }: { profileNa
       )}
 
       <GrialoDashboard stats={stats} />
-      <SpinHistory address={address} />
+      <LatestOpening address={address} />
     </main>
   )
 }
@@ -458,33 +458,27 @@ function RevealStat({ label, value }: { label: string; value: string }) {
   )
 }
 
-function SpinHistory({ address }: { address?: `0x${string}` }) {
-  const historyQuery = useReadContract({
+function LatestOpening({ address }: { address?: `0x${string}` }) {
+  const latestQuery = useReadContract({
     address: RIALO_TEMPLE_ADDRESS,
     abi: RIALO_TEMPLE_ABI,
     chainId: ARC_CHAIN.id,
-    functionName: 'getSpinHistory',
+    functionName: 'getLatestSpin',
     args: address ? [address] : undefined,
     query: { enabled: Boolean(address), refetchInterval: 12000, retry: 1 },
   })
-  const history = Array.isArray(historyQuery.data) ? historyQuery.data.map(parseGrialoSpin).slice(-6).reverse() : []
+  const latest = parseGrialoSpin(latestQuery.data)
 
-  if (!address || history.length === 0) return null
+  if (!address || !latest.exists) return null
+  const rarity = getGrialoRarity(latest.tier)
 
   return (
     <section className="mt-6 temple-card rounded-lg p-5">
-      <p className="mb-4 text-xs font-black uppercase tracking-wider text-[var(--temple-soft)]">Recent Grialo openings</p>
-      <div className="grid gap-3 md:grid-cols-3">
-        {history.map((spin, index) => {
-          const rarity = getGrialoRarity(spin.tier)
-          return (
-            <div key={`${spin.spunAt}-${index}`} className="pixel-panel rounded-lg border border-[var(--temple-border)] p-4">
-              <p className="text-sm font-black" style={{ color: rarity.color }}>{rarity.tier} / {rarity.boxName}</p>
-              <p className="mt-2 text-2xl font-black">{rarity.text}</p>
-              <p className="mt-1 text-xs font-semibold text-[var(--temple-muted)]">+{spin.ptsGained} PTS / {spin.streakAfter}d streak</p>
-            </div>
-          )
-        })}
+      <p className="mb-4 text-xs font-black uppercase tracking-wider text-[var(--temple-soft)]">Latest Grialo opening</p>
+      <div className="pixel-panel rounded-lg border border-[var(--temple-border)] p-4">
+        <p className="text-sm font-black" style={{ color: rarity.color }}>{rarity.tier} / {rarity.boxName}</p>
+        <p className="mt-2 text-2xl font-black">{rarity.text}</p>
+        <p className="mt-1 text-xs font-semibold text-[var(--temple-muted)]">+{latest.ptsGained} PTS / {latest.streakAfter}d streak</p>
       </div>
     </section>
   )

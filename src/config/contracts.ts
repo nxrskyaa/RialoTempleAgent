@@ -42,6 +42,20 @@ const WISH_COMPONENTS = [
 
 export const RIALO_TEMPLE_ABI = [
   {
+    inputs: [],
+    name: 'owner',
+    outputs: [{ internalType: 'address', name: '', type: 'address' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'paused',
+    outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
     inputs: [
       { internalType: 'string', name: 'username', type: 'string' },
       { internalType: 'string', name: 'xHandle', type: 'string' },
@@ -76,17 +90,10 @@ export const RIALO_TEMPLE_ABI = [
     inputs: [{ internalType: 'address', name: 'user', type: 'address' }],
     name: 'getUser',
     outputs: [
-      {
-        components: [
-          { components: PROFILE_COMPONENTS, internalType: 'struct RialoTempleV2Lite.Profile', name: 'profile', type: 'tuple' },
-          { components: STATS_COMPONENTS, internalType: 'struct RialoTempleV2Lite.Stats', name: 'stats', type: 'tuple' },
-          { internalType: 'bool', name: 'spinReady', type: 'bool' },
-          { internalType: 'uint256', name: 'waitTime', type: 'uint256' },
-        ],
-        internalType: 'struct RialoTempleV2Lite.UserView',
-        name: '',
-        type: 'tuple',
-      },
+      { components: PROFILE_COMPONENTS, internalType: 'struct RialoTempleV2Lite.Profile', name: 'profile', type: 'tuple' },
+      { components: STATS_COMPONENTS, internalType: 'struct RialoTempleV2Lite.Stats', name: 'stats', type: 'tuple' },
+      { internalType: 'bool', name: 'spinReady', type: 'bool' },
+      { internalType: 'uint256', name: 'waitTime', type: 'uint256' },
     ],
     stateMutability: 'view',
     type: 'function',
@@ -123,20 +130,6 @@ export const RIALO_TEMPLE_ABI = [
     inputs: [{ internalType: 'address', name: 'user', type: 'address' }],
     name: 'getLatestSpin',
     outputs: [{ components: SPIN_COMPONENTS, internalType: 'struct RialoTempleV2Lite.SpinResult', name: '', type: 'tuple' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [{ internalType: 'address', name: 'user', type: 'address' }],
-    name: 'getSpinHistory',
-    outputs: [{ components: SPIN_COMPONENTS, internalType: 'struct RialoTempleV2Lite.SpinResult[]', name: '', type: 'tuple[]' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [{ internalType: 'address', name: 'user', type: 'address' }],
-    name: 'getSpinHistoryLength',
-    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
     type: 'function',
   },

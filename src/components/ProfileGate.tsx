@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import { motion } from 'framer-motion'
 import { AlertCircle, CheckCircle2, Loader2, Sparkles, UserRound } from 'lucide-react'
-import { useAccount, useReadContract, useWaitForTransactionReceipt, useWriteContract } from 'wagmi'
+import { useAccount, useChainId, usePublicClient, useReadContract, useSwitchChain, useWaitForTransactionReceipt, useWriteContract } from 'wagmi'
 import { ARC_CHAIN, RIALO_TEMPLE_ABI, RIALO_TEMPLE_ADDRESS } from '@/config/contracts'
 import { EMPTY_GRIALO_STATS, EMPTY_PROFILE, normalizeXHandle, parseUnifiedUser, toXAvatarUrl, type GrialoStatsData, type ProfileData } from '@/lib/rialo'
 
@@ -13,9 +13,50 @@ type Props = {
 
 export default function ProfileGate({ children, compact = false }: Props) {
   const { address, isConnected } = useAccount()
+  const chainId = useChainId()
+  const publicClient = usePublicClient({ chainId: ARC_CHAIN.id })
+  const { switchChain, isPending: isSwitching } = useSwitchChain()
   const [name, setName] = useState('')
   const [xInput, setXInput] = useState('')
   const [message, setMessage] = useState('')
+  const isWrongNetwork = isConnected && chainId !== ARC_CHAIN.id
+
+  const ownerQuery = useReadContract({
+    address: RIALO_TEMPLE_ADDRESS,
+    abi: RIALO_TEMPLE_ABI,
+    chainId: ARC_CHAIN.id,
+    functionName: 'owner',
+    query: {
+      enabled: isConnected && !isWrongNetwork,
+      staleTime: 60_000,
+      retry: 1,
+    },
+  })
+
+  const pausedQuery = useReadContract({
+    address: RIALO_TEMPLE_ADDRESS,
+    abi: RIALO_TEMPLE_ABI,
+    chainId: ARC_CHAIN.id,
+    functionName: 'paused',
+    query: {
+      enabled: isConnected && !isWrongNetwork && !ownerQuery.isError,
+      staleTime: 30_000,
+      retry: 1,
+    },
+  })
+
+  const hasProfileQuery = useReadContract({
+    address: RIALO_TEMPLE_ADDRESS,
+    abi: RIALO_TEMPLE_ABI,
+    chainId: ARC_CHAIN.id,
+    functionName: 'hasProfile',
+    args: address ? [address] : undefined,
+    query: {
+      enabled: Boolean(address) && !isWrongNetwork && !ownerQuery.isError,
+      staleTime: 15_000,
+      retry: 1,
+    },
+  })
 
   const { data, error: readError, isLoading, refetch } = useReadContract({
     address: RIALO_TEMPLE_ADDRESS,
@@ -24,7 +65,7 @@ export default function ProfileGate({ children, compact = false }: Props) {
     functionName: 'getUser',
     args: address ? [address] : undefined,
     query: {
-      enabled: Boolean(address),
+      enabled: Boolean(address) && !isWrongNetwork && !ownerQuery.isError,
       staleTime: 5 * 60_000,
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
@@ -52,8 +93,9 @@ export default function ProfileGate({ children, compact = false }: Props) {
   useEffect(() => {
     if (!isConfirmed) return
     void refetch()
+    void hasProfileQuery.refetch()
     reset()
-  }, [isConfirmed, refetch, reset])
+  }, [hasProfileQuery, isConfirmed, refetch, reset])
 
   function submitProfile() {
     const handle = normalizeXHandle(xInput)
@@ -84,9 +126,26 @@ export default function ProfileGate({ children, compact = false }: Props) {
           ? 'Transaction sent. Waiting for Arc confirmation...'
           : 'Transaction sent.'
         : ''
-  const profileReadMessage = readError
-    ? `Could not read the Rialo Temple V2Lite contract on Arc Testnet. Check ${RIALO_TEMPLE_ADDRESS}, then try again.`
-    : transactionMessage || message
+  const profileReadMessage = isWrongNetwork
+    ? 'Switch to Arc Testnet to use Rialo Temple.'
+    : ownerQuery.error
+      ? 'Could not reach the Rialo Temple V2Lite contract on Arc Testnet. Please check network or contract address.'
+      : readError
+        ? 'Contract is reachable, but getUser decoding failed. ABI or parser mismatch.'
+        : transactionMessage || message
+
+  const diagnostics = {
+    connectedChainId: isConnected ? chainId : 'not connected',
+    expectedChainId: ARC_CHAIN.id,
+    contractAddress: RIALO_TEMPLE_ADDRESS,
+    publicClientChainName: publicClient?.chain?.name ?? ARC_CHAIN.name,
+    owner: ownerQuery.data ?? null,
+    paused: pausedQuery.data ?? null,
+    hasProfile: hasProfileQuery.data ?? null,
+    rawGetUser: data ?? null,
+    ownerError: ownerQuery.error?.message ?? null,
+    getUserError: readError?.message ?? null,
+  }
 
   if (!isConnected) {
     return (
@@ -94,6 +153,23 @@ export default function ProfileGate({ children, compact = false }: Props) {
         <div className="flame-buddy mb-5 h-20 w-16" />
         <h2 className="arcade-title text-2xl font-black">Connect wallet to wake the flame</h2>
         <p className="mt-2 max-w-sm text-sm leading-6 text-[var(--temple-muted)]">Your Rialo Passport, Grialo, quiz PTS, wishes, and rank all live behind your Arc Testnet wallet.</p>
+      </div>
+    )
+  }
+
+  if (isWrongNetwork) {
+    return (
+      <div className="mx-auto max-w-3xl px-4 py-8">
+        <div className="temple-card spark-field rounded-lg p-6 text-center">
+          <AlertCircle className="mx-auto mb-4 h-8 w-8 text-[var(--temple-gold)]" />
+          <h2 className="arcade-title text-3xl font-black">Switch to Arc Testnet</h2>
+          <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[var(--temple-muted)]">Rialo Temple V2Lite lives on Arc Testnet chain ID {ARC_CHAIN.id}. Switch networks before reading or writing contract state.</p>
+          <button type="button" onClick={() => switchChain({ chainId: ARC_CHAIN.id })} disabled={isSwitching} className="temple-button mt-5 inline-flex items-center gap-2 rounded-lg px-5 py-3 text-sm font-black disabled:opacity-60">
+            {isSwitching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+            {isSwitching ? 'Switching...' : 'Switch to Arc Testnet'}
+          </button>
+        </div>
+        <ContractDiagnostics diagnostics={diagnostics} />
       </div>
     )
   }
@@ -143,10 +219,12 @@ export default function ProfileGate({ children, compact = false }: Props) {
 
           {profileReadMessage && (
             <div className="flex items-start gap-2 rounded-lg border border-[var(--temple-border)] bg-white/[0.04] px-3 py-2 text-sm text-[var(--temple-text)]">
-              {readError ? <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-[var(--temple-red)]" /> : isConfirmed ? <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[var(--temple-emerald)]" /> : <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-[var(--temple-gold)]" />}
+              {ownerQuery.error || readError ? <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-[var(--temple-red)]" /> : isConfirmed ? <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[var(--temple-emerald)]" /> : <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-[var(--temple-gold)]" />}
               <span>{profileReadMessage}</span>
             </div>
           )}
+
+          {(ownerQuery.error || readError || import.meta.env.DEV) && <ContractDiagnostics diagnostics={diagnostics} />}
 
           <button type="button" onClick={submitProfile} disabled={isSaving} className="temple-button inline-flex w-full items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-black disabled:cursor-not-allowed disabled:opacity-60">
             {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
@@ -179,6 +257,29 @@ export default function ProfileGate({ children, compact = false }: Props) {
         </div>
       )}
     </div>
+  )
+}
+
+function ContractDiagnostics({ diagnostics }: { diagnostics: Record<string, unknown> }) {
+  return (
+    <details className="mt-4 rounded-lg border border-[var(--temple-border)] bg-black/20 p-3 text-left">
+      <summary className="cursor-pointer text-xs font-black uppercase tracking-wider text-[var(--temple-gold)]">Contract diagnostics</summary>
+      <pre className="mt-3 max-h-72 overflow-auto whitespace-pre-wrap break-words text-[11px] leading-5 text-[var(--temple-muted)]">
+        {safeDebug(diagnostics)}
+      </pre>
+    </details>
+  )
+}
+
+function safeDebug(value: unknown) {
+  return JSON.stringify(
+    value,
+    (_key, item) => {
+      if (typeof item === 'bigint') return item.toString()
+      if (item instanceof Error) return item.message
+      return item
+    },
+    2,
   )
 }
 
