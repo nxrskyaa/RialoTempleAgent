@@ -38,6 +38,29 @@ type AmbientNpc = {
   color: string
   accent: string
   line: string
+  activity: AmbientActivity
+}
+
+type AmbientActivity =
+  | 'garden'
+  | 'guide'
+  | 'inspect'
+  | 'deliver'
+  | 'chant'
+  | 'privacy'
+  | 'signal'
+  | 'build'
+  | 'dance'
+  | 'scribe'
+  | 'portal'
+  | 'greet'
+
+type NpcMotion = {
+  x: number
+  y: number
+  moving: boolean
+  direction: PlayerState['dir']
+  activityPulse: number
 }
 
 type PlayerState = {
@@ -328,18 +351,26 @@ const QUESTS: QuestNpc[] = [
 ]
 
 const AMBIENT_NPCS: AmbientNpc[] = [
-  { name: 'Boba Byte', sprite: 'npcSage', x: 300, y: 1040, color: '#ff7ad9', accent: '#f2c866', line: 'Rain makes the data spring louder.' },
-  { name: 'Mossy Dex', sprite: 'npcForestGuide', x: 690, y: 700, color: '#57e39f', accent: '#78ecff', line: 'Follow the gold arrow, then tap the quest guide.' },
-  { name: 'Peeko Bond', sprite: 'npcHerbalist', x: 1160, y: 430, color: '#f2c866', accent: '#ffad72', line: 'RWA vaults like clean verification stamps.' },
-  { name: 'Firo Mail', sprite: 'npcCaptain', x: 1560, y: 650, color: '#78ecff', accent: '#ff7ad9', line: 'Bridge Gate scrolls carry API messages out and back.' },
-  { name: 'Jade Numi', sprite: 'npcAlchemist', x: 2490, y: 620, color: '#b9ff66', accent: '#57e39f', line: 'Temple Energy returns when the daily ritual cools down.' },
-  { name: 'Pixel Kora', sprite: 'npcOracle', x: 360, y: 1700, color: '#c886ff', accent: '#f2c866', line: 'Privacy chambers turn plain scrolls into protected ones.' },
-  { name: 'Tama Tick', sprite: 'npcNavigator', x: 1640, y: 1360, color: '#ffad72', accent: '#78ecff', line: 'Signals are tiny real-world updates with big consequences.' },
-  { name: 'Orb Nalo', sprite: 'npcBuilder', x: 2460, y: 1600, color: '#57e39f', accent: '#c886ff', line: 'Every badge is better when the ledger can verify it.' },
-  { name: 'Rune Pika', sprite: 'npcShadowAgent', x: 920, y: 1270, color: '#ffe36e', accent: '#57e39f', line: 'Quest boards like brave learners.' },
-  { name: 'Minty Mox', sprite: 'npcSage', x: 1900, y: 1690, color: '#67ffc0', accent: '#f2c866', line: 'The map gets brighter when badges are claimed.' },
-  { name: 'Sera API', sprite: 'npcCaptain', x: 2470, y: 280, color: '#88d7ff', accent: '#ff8066', line: 'A response scroll always comes back through Bridge Gate.' },
-  { name: 'Candi Dot', sprite: 'npcForestGuide', x: 1500, y: 290, color: '#b9ff66', accent: '#f2c866', line: 'The temple is friendlier when every system can talk.' },
+  { name: 'Boba Byte', sprite: 'npcSage', x: 300, y: 1040, color: '#ff7ad9', accent: '#f2c866', line: 'Rain makes the data spring louder.', activity: 'garden' },
+  { name: 'Mossy Dex', sprite: 'npcForestGuide', x: 690, y: 700, color: '#57e39f', accent: '#78ecff', line: 'Follow the gold arrow, then tap the quest guide.', activity: 'guide' },
+  { name: 'Peeko Bond', sprite: 'npcHerbalist', x: 1160, y: 430, color: '#f2c866', accent: '#ffad72', line: 'RWA vaults like clean verification stamps.', activity: 'inspect' },
+  { name: 'Firo Mail', sprite: 'npcCaptain', x: 1560, y: 650, color: '#78ecff', accent: '#ff7ad9', line: 'Bridge Gate scrolls carry API messages out and back.', activity: 'deliver' },
+  { name: 'Jade Numi', sprite: 'npcAlchemist', x: 2490, y: 620, color: '#b9ff66', accent: '#57e39f', line: 'Temple Energy returns when the daily ritual cools down.', activity: 'chant' },
+  { name: 'Pixel Kora', sprite: 'npcOracle', x: 360, y: 1700, color: '#c886ff', accent: '#f2c866', line: 'Privacy chambers turn plain scrolls into protected ones.', activity: 'privacy' },
+  { name: 'Tama Tick', sprite: 'npcNavigator', x: 1640, y: 1360, color: '#ffad72', accent: '#78ecff', line: 'Signals are tiny real-world updates with big consequences.', activity: 'signal' },
+  { name: 'Orb Nalo', sprite: 'npcBuilder', x: 2460, y: 1600, color: '#57e39f', accent: '#c886ff', line: 'Every badge is better when the ledger can verify it.', activity: 'build' },
+  { name: 'Rune Pika', sprite: 'npcShadowAgent', x: 920, y: 1270, color: '#ffe36e', accent: '#57e39f', line: 'Quest boards like brave learners.', activity: 'dance' },
+  { name: 'Minty Mox', sprite: 'npcSage', x: 1900, y: 1690, color: '#67ffc0', accent: '#f2c866', line: 'The map gets brighter when badges are claimed.', activity: 'scribe' },
+  { name: 'Sera API', sprite: 'npcCaptain', x: 2470, y: 280, color: '#88d7ff', accent: '#ff8066', line: 'A response scroll always comes back through Bridge Gate.', activity: 'portal' },
+  { name: 'Candi Dot', sprite: 'npcForestGuide', x: 1500, y: 290, color: '#b9ff66', accent: '#f2c866', line: 'The temple is friendlier when every system can talk.', activity: 'greet' },
+]
+
+const NPC_INTERACTIONS = [
+  { from: 2, to: 11, label: 'verify', color: '#f2c866' },
+  { from: 3, to: 10, label: 'api', color: '#78ecff' },
+  { from: 6, to: 9, label: 'signal', color: '#ffad72' },
+  { from: 7, to: 4, label: 'energy', color: '#57e39f' },
+  { from: 0, to: 5, label: 'garden', color: '#ff7ad9' },
 ]
 
 const BUILDING_COLLIDERS = [
@@ -1507,24 +1538,31 @@ function drawActors(
   assets: TemplePlayAssets,
 ) {
   const actors: Array<{ y: number; draw: () => void }> = []
+  const ambientMotions = AMBIENT_NPCS.map((npc, index) => ambientNpcMotion(npc, index, time))
+
+  drawAmbientInteractions(ctx, time, ambientMotions)
 
   AMBIENT_NPCS.forEach((npc, index) => {
-    const motion = ambientNpcMotion(npc, index, time)
+    const motion = ambientMotions[index]
     actors.push({
       y: motion.y,
-      draw: () => drawSpriteActor(ctx, assets, {
-        sprite: npc.sprite,
-        x: motion.x,
-        y: motion.y,
-        name: npc.name,
-        tone: npc.color,
-        accent: npc.accent,
-        time,
-        seed: index * 0.73,
-        compact: true,
-        moving: motion.moving,
-        direction: motion.direction,
-      }),
+      draw: () => {
+        drawNpcActivity(ctx, npc, motion, index, time, 'behind')
+        drawSpriteActor(ctx, assets, {
+          sprite: npc.sprite,
+          x: motion.x,
+          y: motion.y,
+          name: npc.name,
+          tone: npc.color,
+          accent: npc.accent,
+          time,
+          seed: index * 0.73,
+          compact: true,
+          moving: motion.moving,
+          direction: motion.direction,
+        })
+        drawNpcActivity(ctx, npc, motion, index, time, 'front')
+      },
     })
   })
 
@@ -1533,20 +1571,24 @@ function drawActors(
     const action = questNpcMotion(quest, time)
     actors.push({
       y: action.y,
-      draw: () => drawSpriteActor(ctx, assets, {
-        sprite: quest.sprite,
-        x: action.x,
-        y: action.y,
-        name: completed ? `${quest.npc} OK` : quest.npc,
-        tone: quest.color,
-        accent: quest.accent,
-        time,
-        seed: quest.id * 0.48,
-        near: nearNpcId === quest.id,
-        completed,
-        moving: action.moving,
-        direction: action.direction,
-      }),
+      draw: () => {
+        drawQuestStationActivity(ctx, quest, action, time, 'behind')
+        drawSpriteActor(ctx, assets, {
+          sprite: quest.sprite,
+          x: action.x,
+          y: action.y,
+          name: completed ? `${quest.npc} OK` : quest.npc,
+          tone: quest.color,
+          accent: quest.accent,
+          time,
+          seed: quest.id * 0.48,
+          near: nearNpcId === quest.id,
+          completed,
+          moving: action.moving,
+          direction: action.direction,
+        })
+        drawQuestStationActivity(ctx, quest, action, time, 'front')
+      },
     })
   })
 
@@ -1570,33 +1612,373 @@ function drawActors(
   actors.sort((a, b) => a.y - b.y).forEach((actor) => actor.draw())
 }
 
-function ambientNpcMotion(npc: AmbientNpc, index: number, time: number) {
+function ambientNpcMotion(npc: AmbientNpc, index: number, time: number): NpcMotion {
   const mode = index % 4
+  const activityPulse = (Math.sin(time * 1.8 + index * 0.77) + 1) / 2
   if (mode === 0) {
     const phase = time * 0.62 + index
     const x = npc.x + Math.sin(phase) * 62
     const y = npc.y + Math.cos(phase * 0.65) * 18
     const direction: PlayerState['dir'] = Math.cos(phase) > 0 ? 'right' : 'left'
-    return { x, y, moving: true, direction }
+    return { x, y, moving: true, direction, activityPulse }
   }
   if (mode === 1) {
     const step = Math.floor(time * 1.8 + index) % 4
     const direction: PlayerState['dir'] = step === 0 ? 'down' : step === 1 ? 'right' : step === 2 ? 'up' : 'left'
-    return { x: npc.x, y: npc.y + Math.sin(time * 3.2 + index) * 3, moving: false, direction }
+    return { x: npc.x, y: npc.y + Math.sin(time * 3.2 + index) * 3, moving: false, direction, activityPulse }
   }
   if (mode === 2) {
     const phase = time * 0.42 + index * 1.7
     const x = npc.x + Math.sin(phase) * 24
     const y = npc.y + Math.sin(phase * 1.5) * 38
     const direction: PlayerState['dir'] = Math.sin(phase * 1.5) > 0 ? 'down' : 'up'
-    return { x, y, moving: true, direction }
+    return { x, y, moving: true, direction, activityPulse }
   }
   return {
     x: npc.x + Math.sin(time * 1.5 + index) * 5,
     y: npc.y + Math.sin(time * 2.4 + index) * 4,
     moving: false,
     direction: 'down' as PlayerState['dir'],
+    activityPulse,
   }
+}
+
+function drawAmbientInteractions(ctx: CanvasRenderingContext2D, time: number, motions: NpcMotion[]) {
+  NPC_INTERACTIONS.forEach((link, index) => {
+    const from = motions[link.from]
+    const to = motions[link.to]
+    if (!from || !to) return
+    const phase = (time * (0.22 + index * 0.025)) % 1
+    const sx = from.x
+    const sy = from.y - 86
+    const ex = to.x
+    const ey = to.y - 86
+    const cx = sx + (ex - sx) * phase
+    const cy = sy + (ey - sy) * phase + Math.sin(phase * Math.PI) * -38
+
+    ctx.save()
+    ctx.globalAlpha = 0.42
+    ctx.strokeStyle = link.color
+    ctx.lineWidth = 3
+    ctx.setLineDash([8, 18])
+    ctx.lineDashOffset = -time * 14
+    ctx.beginPath()
+    ctx.moveTo(sx, sy)
+    ctx.quadraticCurveTo((sx + ex) / 2, Math.min(sy, ey) - 52, ex, ey)
+    ctx.stroke()
+    ctx.setLineDash([])
+
+    ctx.globalAlpha = 0.96
+    drawTinyScroll(ctx, cx, cy, link.color, time + index)
+    if (Math.sin(time * 0.8 + index) > 0.72) {
+      drawMiniBubble(ctx, (sx + ex) / 2, Math.min(sy, ey) - 70, link.label, link.color)
+    }
+    ctx.restore()
+  })
+}
+
+function drawNpcActivity(
+  ctx: CanvasRenderingContext2D,
+  npc: AmbientNpc,
+  motion: NpcMotion,
+  index: number,
+  time: number,
+  layer: 'behind' | 'front',
+) {
+  const x = motion.x
+  const y = motion.y
+  const pulse = motion.activityPulse
+
+  if (layer === 'behind') {
+    if (npc.activity === 'chant' || npc.activity === 'privacy' || npc.activity === 'portal') {
+      drawRuneCircle(ctx, x, y - 4, npc.accent, time + index)
+    }
+    if (npc.activity === 'build') {
+      drawWorkBench(ctx, x - 52, y - 24, npc.accent, time)
+    }
+    if (npc.activity === 'garden') {
+      drawWateringTrail(ctx, x, y, npc.accent, time + index)
+    }
+    if (npc.activity === 'guide' || npc.activity === 'greet') {
+      drawGuidePing(ctx, x, y - 70, npc.accent, time + index)
+    }
+    return
+  }
+
+  switch (npc.activity) {
+    case 'garden':
+      drawTinyTool(ctx, x + 30, y - 48, 'watering', npc.accent, time)
+      if (pulse > 0.72) drawMiniBubble(ctx, x, y - 136, 'grow', npc.accent)
+      break
+    case 'guide':
+      drawTinySign(ctx, x + 34, y - 58, 'GO', npc.accent)
+      if (pulse > 0.78) drawMiniBubble(ctx, x, y - 136, 'this way', npc.accent)
+      break
+    case 'inspect':
+      drawTinyTool(ctx, x - 34, y - 54, 'stamp', npc.accent, time)
+      if (pulse > 0.68) drawMiniBubble(ctx, x, y - 136, 'checked', npc.accent)
+      break
+    case 'deliver':
+      drawTinyScroll(ctx, x + 34 + Math.sin(time * 4) * 4, y - 68, npc.accent, time)
+      if (pulse > 0.75) drawMiniBubble(ctx, x, y - 136, 'sent', npc.accent)
+      break
+    case 'chant':
+      drawFloatingOrb(ctx, x + 28, y - 94, npc.accent, time)
+      break
+    case 'privacy':
+      drawShieldSpark(ctx, x + 34, y - 78, npc.accent, time)
+      break
+    case 'signal':
+      drawSignalTicks(ctx, x + 34, y - 90, npc.accent, time)
+      if (pulse > 0.78) drawMiniBubble(ctx, x, y - 136, 'ping', npc.accent)
+      break
+    case 'build':
+      drawHammerSwing(ctx, x + 30, y - 58, npc.accent, time)
+      break
+    case 'dance':
+      drawDanceNotes(ctx, x, y - 112, npc.accent, time)
+      break
+    case 'scribe':
+      drawTinyScroll(ctx, x - 32, y - 62, npc.accent, time)
+      if (pulse > 0.74) drawMiniBubble(ctx, x, y - 136, 'logged', npc.accent)
+      break
+    case 'portal':
+      drawPortalGlyph(ctx, x + 36, y - 76, npc.accent, time)
+      break
+    case 'greet':
+      drawWaveMarks(ctx, x + 34, y - 96, npc.accent, time)
+      break
+  }
+}
+
+function drawTinyScroll(ctx: CanvasRenderingContext2D, x: number, y: number, color: string, time: number) {
+  ctx.save()
+  ctx.translate(Math.round(x), Math.round(y + Math.sin(time * 4) * 2))
+  ctx.rotate(Math.sin(time * 2.2) * 0.08)
+  ctx.fillStyle = '#f7f1df'
+  ctx.strokeStyle = '#07100c'
+  ctx.lineWidth = 2
+  ctx.fillRect(-13, -8, 26, 16)
+  ctx.strokeRect(-13, -8, 26, 16)
+  ctx.fillStyle = color
+  ctx.fillRect(-8, -3, 16, 3)
+  ctx.fillRect(-8, 3, 10, 3)
+  ctx.restore()
+}
+
+function drawMiniBubble(ctx: CanvasRenderingContext2D, x: number, y: number, text: string, color: string) {
+  ctx.save()
+  ctx.font = '900 11px monospace'
+  const width = Math.ceil(ctx.measureText(text).width) + 16
+  ctx.fillStyle = 'rgba(7, 16, 12, .88)'
+  ctx.fillRect(Math.round(x - width / 2), Math.round(y), width, 22)
+  ctx.strokeStyle = color
+  ctx.lineWidth = 2
+  ctx.strokeRect(Math.round(x - width / 2) + 0.5, Math.round(y) + 0.5, width - 1, 21)
+  ctx.fillStyle = '#f7f1df'
+  ctx.fillText(text, Math.round(x - width / 2 + 8), Math.round(y + 15))
+  ctx.fillStyle = color
+  ctx.fillRect(Math.round(x - 4), Math.round(y + 21), 8, 5)
+  ctx.restore()
+}
+
+function drawRuneCircle(ctx: CanvasRenderingContext2D, x: number, y: number, color: string, time: number) {
+  const radius = 28 + Math.sin(time * 2) * 3
+  ctx.save()
+  ctx.translate(x, y)
+  ctx.rotate(time * 0.35)
+  ctx.strokeStyle = color
+  ctx.globalAlpha = 0.56
+  ctx.lineWidth = 3
+  ctx.beginPath()
+  ctx.ellipse(0, 0, radius, 13, 0, 0, Math.PI * 2)
+  ctx.stroke()
+  ctx.globalAlpha = 0.78
+  for (let i = 0; i < 6; i++) {
+    const angle = (Math.PI * 2 * i) / 6
+    ctx.fillStyle = i % 2 === 0 ? color : '#f2c866'
+    ctx.fillRect(Math.cos(angle) * radius - 3, Math.sin(angle) * 13 - 3, 6, 6)
+  }
+  ctx.restore()
+}
+
+function drawWorkBench(ctx: CanvasRenderingContext2D, x: number, y: number, color: string, time: number) {
+  ctx.save()
+  ctx.fillStyle = 'rgba(7, 16, 12, .36)'
+  ctx.fillRect(x - 4, y + 22, 80, 10)
+  ctx.fillStyle = '#7b4a2b'
+  ctx.fillRect(x, y, 70, 20)
+  ctx.fillStyle = '#3d2619'
+  ctx.fillRect(x + 8, y + 20, 8, 22)
+  ctx.fillRect(x + 54, y + 20, 8, 22)
+  ctx.fillStyle = color
+  ctx.fillRect(x + 20 + Math.sin(time * 4) * 4, y - 8, 12, 10)
+  ctx.restore()
+}
+
+function drawWateringTrail(ctx: CanvasRenderingContext2D, x: number, y: number, color: string, time: number) {
+  ctx.save()
+  for (let i = 0; i < 7; i++) {
+    const dx = 24 + i * 8
+    const dy = -44 + ((time * 42 + i * 13) % 42)
+    ctx.fillStyle = i % 2 === 0 ? color : '#78ecff'
+    ctx.globalAlpha = 0.62
+    ctx.fillRect(x + dx, y + dy, 4, 7)
+  }
+  ctx.restore()
+}
+
+function drawGuidePing(ctx: CanvasRenderingContext2D, x: number, y: number, color: string, time: number) {
+  ctx.save()
+  ctx.translate(x, y)
+  const pulse = 1 + ((time * 1.8) % 1) * 0.6
+  ctx.strokeStyle = color
+  ctx.globalAlpha = 0.5 * (2 - pulse)
+  ctx.lineWidth = 3
+  ctx.beginPath()
+  ctx.ellipse(0, 0, 22 * pulse, 10 * pulse, 0, 0, Math.PI * 2)
+  ctx.stroke()
+  ctx.restore()
+}
+
+function drawTinyTool(ctx: CanvasRenderingContext2D, x: number, y: number, kind: 'watering' | 'stamp', color: string, time: number) {
+  ctx.save()
+  ctx.translate(x, y)
+  ctx.rotate(kind === 'stamp' ? Math.sin(time * 4) * 0.18 : -0.25)
+  ctx.fillStyle = '#7b4a2b'
+  ctx.fillRect(-3, -17, 6, 28)
+  ctx.fillStyle = color
+  if (kind === 'stamp') {
+    const stampY = 8 + Math.sin(time * 5) * 3
+    ctx.fillRect(-12, stampY, 24, 10)
+    ctx.strokeStyle = '#07100c'
+    ctx.lineWidth = 2
+    ctx.strokeRect(-12, stampY, 24, 10)
+  } else {
+    ctx.fillRect(-14, -3, 25, 16)
+    ctx.fillRect(8, -8, 14, 6)
+    ctx.strokeStyle = '#07100c'
+    ctx.lineWidth = 2
+    ctx.strokeRect(-14, -3, 25, 16)
+  }
+  ctx.restore()
+}
+
+function drawTinySign(ctx: CanvasRenderingContext2D, x: number, y: number, text: string, color: string) {
+  ctx.save()
+  ctx.fillStyle = '#4b3427'
+  ctx.fillRect(x - 3, y + 14, 6, 24)
+  ctx.fillStyle = color
+  ctx.strokeStyle = '#07100c'
+  ctx.lineWidth = 2
+  ctx.fillRect(x - 18, y, 36, 18)
+  ctx.strokeRect(x - 18, y, 36, 18)
+  ctx.fillStyle = '#07100c'
+  ctx.font = '900 10px monospace'
+  ctx.fillText(text, x - 9, y + 13)
+  ctx.restore()
+}
+
+function drawFloatingOrb(ctx: CanvasRenderingContext2D, x: number, y: number, color: string, time: number) {
+  ctx.save()
+  ctx.translate(x, y + Math.sin(time * 2.4) * 5)
+  ctx.fillStyle = color
+  ctx.globalAlpha = 0.82
+  ctx.fillRect(-9, -9, 18, 18)
+  ctx.fillStyle = '#f7f1df'
+  ctx.fillRect(-3, -3, 6, 6)
+  ctx.restore()
+}
+
+function drawShieldSpark(ctx: CanvasRenderingContext2D, x: number, y: number, color: string, time: number) {
+  ctx.save()
+  ctx.translate(x, y)
+  ctx.strokeStyle = color
+  ctx.fillStyle = 'rgba(7, 16, 12, .38)'
+  ctx.lineWidth = 3
+  ctx.beginPath()
+  ctx.moveTo(0, -18)
+  ctx.lineTo(17, -7)
+  ctx.lineTo(11, 16)
+  ctx.lineTo(0, 24)
+  ctx.lineTo(-11, 16)
+  ctx.lineTo(-17, -7)
+  ctx.closePath()
+  ctx.fill()
+  ctx.stroke()
+  for (let i = 0; i < 4; i++) {
+    const a = time * 2 + i * 1.57
+    ctx.fillStyle = color
+    ctx.fillRect(Math.cos(a) * 27, Math.sin(a) * 18, 5, 5)
+  }
+  ctx.restore()
+}
+
+function drawSignalTicks(ctx: CanvasRenderingContext2D, x: number, y: number, color: string, time: number) {
+  ctx.save()
+  ctx.strokeStyle = color
+  ctx.lineWidth = 3
+  for (let i = 0; i < 3; i++) {
+    const radius = 10 + i * 12 + Math.sin(time * 4 + i) * 2
+    ctx.globalAlpha = 0.35 + i * 0.16
+    ctx.beginPath()
+    ctx.arc(x, y, radius, -0.9, 0.9)
+    ctx.stroke()
+  }
+  ctx.restore()
+}
+
+function drawHammerSwing(ctx: CanvasRenderingContext2D, x: number, y: number, color: string, time: number) {
+  ctx.save()
+  ctx.translate(x, y)
+  ctx.rotate(-0.55 + Math.sin(time * 5) * 0.25)
+  ctx.fillStyle = '#7b4a2b'
+  ctx.fillRect(-3, -18, 6, 36)
+  ctx.fillStyle = color
+  ctx.fillRect(-15, -24, 30, 12)
+  ctx.strokeStyle = '#07100c'
+  ctx.lineWidth = 2
+  ctx.strokeRect(-15, -24, 30, 12)
+  ctx.restore()
+}
+
+function drawDanceNotes(ctx: CanvasRenderingContext2D, x: number, y: number, color: string, time: number) {
+  ctx.save()
+  for (let i = 0; i < 3; i++) {
+    const px = x - 24 + i * 22 + Math.sin(time * 3 + i) * 5
+    const py = y - ((time * 26 + i * 19) % 44)
+    ctx.fillStyle = i % 2 === 0 ? color : '#f2c866'
+    ctx.fillRect(px, py, 7, 18)
+    ctx.fillRect(px + 7, py + 12, 10, 7)
+  }
+  ctx.restore()
+}
+
+function drawPortalGlyph(ctx: CanvasRenderingContext2D, x: number, y: number, color: string, time: number) {
+  ctx.save()
+  ctx.translate(x, y)
+  ctx.rotate(time * 0.8)
+  ctx.strokeStyle = color
+  ctx.lineWidth = 3
+  ctx.strokeRect(-15, -15, 30, 30)
+  ctx.rotate(-time * 1.6)
+  ctx.strokeStyle = '#f2c866'
+  ctx.strokeRect(-9, -9, 18, 18)
+  ctx.restore()
+}
+
+function drawWaveMarks(ctx: CanvasRenderingContext2D, x: number, y: number, color: string, time: number) {
+  ctx.save()
+  ctx.strokeStyle = color
+  ctx.lineWidth = 3
+  for (let i = 0; i < 3; i++) {
+    const offset = i * 9 + Math.sin(time * 3 + i) * 2
+    ctx.beginPath()
+    ctx.moveTo(x + offset, y - 10)
+    ctx.quadraticCurveTo(x + offset + 9, y - 18, x + offset + 18, y - 10)
+    ctx.stroke()
+  }
+  ctx.restore()
 }
 
 function questNpcMotion(quest: QuestNpc, time: number) {
@@ -1622,6 +2004,37 @@ function questNpcMotion(quest: QuestNpc, time: number) {
     y: quest.y + Math.sin(phase * 2.2) * 4,
     moving: false,
     direction: 'down' as const,
+  }
+}
+
+function drawQuestStationActivity(
+  ctx: CanvasRenderingContext2D,
+  quest: QuestNpc,
+  motion: { x: number; y: number; moving: boolean; direction: PlayerState['dir'] },
+  time: number,
+  layer: 'behind' | 'front',
+) {
+  const x = motion.x
+  const y = motion.y
+  if (layer === 'behind') {
+    if (quest.zone === 'Temple Gate') drawGuidePing(ctx, x, y - 66, quest.accent, time + quest.id)
+    if (quest.zone === 'RWA Vault') drawRuneCircle(ctx, x, y - 8, quest.accent, time + quest.id)
+    if (quest.zone === 'Agent Camp') drawWorkBench(ctx, x - 48, y - 22, quest.accent, time + quest.id)
+    if (quest.zone === 'Signal Tower') drawSignalTicks(ctx, x, y - 92, quest.accent, time + quest.id)
+    if (quest.zone === 'SCALE Lab') drawPortalGlyph(ctx, x + 36, y - 72, quest.accent, time + quest.id)
+    return
+  }
+
+  if (quest.zone === 'Temple Gate') {
+    drawTinySign(ctx, x + 36, y - 56, 'START', quest.accent)
+  } else if (quest.zone === 'RWA Vault') {
+    drawTinyTool(ctx, x - 34, y - 54, 'stamp', quest.accent, time + quest.id)
+  } else if (quest.zone === 'Agent Camp') {
+    drawTinyScroll(ctx, x + 36, y - 70, quest.accent, time + quest.id)
+  } else if (quest.zone === 'Signal Tower') {
+    drawFloatingOrb(ctx, x + 32, y - 94, quest.accent, time + quest.id)
+  } else if (quest.zone === 'SCALE Lab') {
+    drawHammerSwing(ctx, x + 32, y - 58, quest.accent, time + quest.id)
   }
 }
 
