@@ -60,11 +60,11 @@ type SpriteKey =
   | 'npcAlchemist'
 
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000' as const
-const WORLD = { width: 2360, height: 1680 }
+const WORLD = { width: 2850, height: 2050 }
 const PLAYER_SPEED = 245
-const DESKTOP_CAMERA_ZOOM = 0.62
-const TABLET_CAMERA_ZOOM = 0.66
-const MOBILE_CAMERA_ZOOM = 0.72
+const DESKTOP_CAMERA_ZOOM = 0.48
+const TABLET_CAMERA_ZOOM = 0.5
+const MOBILE_CAMERA_ZOOM = 0.48
 
 type SpriteSheet = {
   src: string
@@ -168,8 +168,8 @@ const QUESTS: QuestNpc[] = [
     npc: 'Vault Keeper Mino',
     role: 'Asset Guardian',
     sprite: 'npcHerbalist',
-    x: 1450,
-    y: 360,
+    x: 2130,
+    y: 410,
     color: '#ffad72',
     accent: '#f2c866',
     reward: 75,
@@ -203,8 +203,8 @@ const QUESTS: QuestNpc[] = [
     npc: 'Scout Luma',
     role: 'Agent Coordinator',
     sprite: 'npcShadowAgent',
-    x: 1050,
-    y: 790,
+    x: 1320,
+    y: 920,
     color: '#78ecff',
     accent: '#c886ff',
     reward: 75,
@@ -238,8 +238,8 @@ const QUESTS: QuestNpc[] = [
     npc: 'Zap Tiko',
     role: 'Signal Runner',
     sprite: 'npcNavigator',
-    x: 1650,
-    y: 980,
+    x: 2290,
+    y: 1340,
     color: '#b9ff66',
     accent: '#78ecff',
     reward: 80,
@@ -273,8 +273,8 @@ const QUESTS: QuestNpc[] = [
     npc: 'Professor Rune',
     role: 'SCALE Engineer',
     sprite: 'npcAlchemist',
-    x: 720,
-    y: 1080,
+    x: 650,
+    y: 1480,
     color: '#c886ff',
     accent: '#57e39f',
     reward: 100,
@@ -310,18 +310,18 @@ const QUESTS: QuestNpc[] = [
 ]
 
 const AMBIENT_NPCS: AmbientNpc[] = [
-  { name: 'Boba Byte', sprite: 'npcSage', x: 310, y: 880, color: '#ff7ad9', accent: '#f2c866', line: 'Rain makes the data spring louder.' },
-  { name: 'Mossy Dex', sprite: 'npcForestGuide', x: 640, y: 630, color: '#57e39f', accent: '#78ecff', line: 'Try walking near a glowing NPC and press E.' },
-  { name: 'Peeko Bond', sprite: 'npcHerbalist', x: 870, y: 300, color: '#f2c866', accent: '#ffad72', line: 'RWA vaults like clean verification stamps.' },
-  { name: 'Firo Mail', sprite: 'npcCaptain', x: 1260, y: 610, color: '#78ecff', accent: '#ff7ad9', line: 'Bridge Gate scrolls carry API messages out and back.' },
-  { name: 'Jade Numi', sprite: 'npcAlchemist', x: 1800, y: 570, color: '#b9ff66', accent: '#57e39f', line: 'Temple Energy returns when the daily ritual cools down.' },
-  { name: 'Pixel Kora', sprite: 'npcOracle', x: 360, y: 1230, color: '#c886ff', accent: '#f2c866', line: 'Privacy chambers turn plain scrolls into protected ones.' },
-  { name: 'Tama Tick', sprite: 'npcNavigator', x: 1340, y: 1180, color: '#ffad72', accent: '#78ecff', line: 'Signals are tiny real-world updates with big consequences.' },
-  { name: 'Orb Nalo', sprite: 'npcBuilder', x: 1880, y: 1120, color: '#57e39f', accent: '#c886ff', line: 'Every badge is better when the ledger can verify it.' },
-  { name: 'Rune Pika', sprite: 'npcShadowAgent', x: 520, y: 1010, color: '#ffe36e', accent: '#57e39f', line: 'Quest boards like brave learners.' },
-  { name: 'Minty Mox', sprite: 'npcSage', x: 1510, y: 1260, color: '#67ffc0', accent: '#f2c866', line: 'The map gets brighter when badges are claimed.' },
-  { name: 'Sera API', sprite: 'npcCaptain', x: 1930, y: 290, color: '#88d7ff', accent: '#ff8066', line: 'A response scroll always comes back through Bridge Gate.' },
-  { name: 'Candi Dot', sprite: 'npcForestGuide', x: 1130, y: 260, color: '#b9ff66', accent: '#f2c866', line: 'The temple is friendlier when every system can talk.' },
+  { name: 'Boba Byte', sprite: 'npcSage', x: 300, y: 1040, color: '#ff7ad9', accent: '#f2c866', line: 'Rain makes the data spring louder.' },
+  { name: 'Mossy Dex', sprite: 'npcForestGuide', x: 690, y: 700, color: '#57e39f', accent: '#78ecff', line: 'Try walking near a glowing NPC and press E.' },
+  { name: 'Peeko Bond', sprite: 'npcHerbalist', x: 1160, y: 430, color: '#f2c866', accent: '#ffad72', line: 'RWA vaults like clean verification stamps.' },
+  { name: 'Firo Mail', sprite: 'npcCaptain', x: 1560, y: 650, color: '#78ecff', accent: '#ff7ad9', line: 'Bridge Gate scrolls carry API messages out and back.' },
+  { name: 'Jade Numi', sprite: 'npcAlchemist', x: 2490, y: 620, color: '#b9ff66', accent: '#57e39f', line: 'Temple Energy returns when the daily ritual cools down.' },
+  { name: 'Pixel Kora', sprite: 'npcOracle', x: 360, y: 1700, color: '#c886ff', accent: '#f2c866', line: 'Privacy chambers turn plain scrolls into protected ones.' },
+  { name: 'Tama Tick', sprite: 'npcNavigator', x: 1640, y: 1360, color: '#ffad72', accent: '#78ecff', line: 'Signals are tiny real-world updates with big consequences.' },
+  { name: 'Orb Nalo', sprite: 'npcBuilder', x: 2460, y: 1600, color: '#57e39f', accent: '#c886ff', line: 'Every badge is better when the ledger can verify it.' },
+  { name: 'Rune Pika', sprite: 'npcShadowAgent', x: 920, y: 1270, color: '#ffe36e', accent: '#57e39f', line: 'Quest boards like brave learners.' },
+  { name: 'Minty Mox', sprite: 'npcSage', x: 1900, y: 1690, color: '#67ffc0', accent: '#f2c866', line: 'The map gets brighter when badges are claimed.' },
+  { name: 'Sera API', sprite: 'npcCaptain', x: 2470, y: 280, color: '#88d7ff', accent: '#ff8066', line: 'A response scroll always comes back through Bridge Gate.' },
+  { name: 'Candi Dot', sprite: 'npcForestGuide', x: 1500, y: 290, color: '#b9ff66', accent: '#f2c866', line: 'The temple is friendlier when every system can talk.' },
 ]
 
 export default function TemplePlay() {
@@ -993,15 +993,21 @@ function drawGround(ctx: CanvasRenderingContext2D, time: number, assets: TempleP
   ctx.fillRect(0, 0, WORLD.width, WORLD.height)
   for (let y = 0; y < WORLD.height; y += 64) {
     for (let x = 0; x < WORLD.width; x += 64) {
-      const plaza = (x > 550 && x < 1660 && y > 180 && y < 620) || (x > 700 && x < 1700 && y > 560 && y < 1180)
-      const grove = x > 1300 && y > 820
-      const spring = x < 680 && y > 850
-      const garden = x > 120 && x < 540 && y > 780 && y < 1220
+      const gatePlaza = x > 220 && x < 650 && y > 240 && y < 620
+      const bridgePlaza = x > 1230 && x < 1640 && y > 420 && y < 760
+      const campPlaza = x > 1070 && x < 1530 && y > 700 && y < 1080
+      const vaultPlaza = x > 1900 && x < 2360 && y > 190 && y < 620
+      const towerPlaza = x > 2080 && x < 2460 && y > 1100 && y < 1540
+      const labPlaza = x > 450 && x < 920 && y > 1260 && y < 1660
+      const plaza = gatePlaza || bridgePlaza || campPlaza || vaultPlaza || towerPlaza || labPlaza
+      const grove = x > 1880 && y > 980
+      const spring = x < 720 && y > 940
+      const garden = x > 110 && x < 540 && y > 900 && y < 1400
       const tone = (x / 64 + y / 64) % 4
       ctx.fillStyle = plaza
-        ? tone % 2 === 0 ? '#a98357' : '#ba9362'
+        ? tone % 2 === 0 ? '#9c7951' : '#b1885d'
         : grove
-          ? tone % 2 === 0 ? '#604b86' : '#6c5595'
+          ? tone % 2 === 0 ? '#4f4674' : '#5b4e82'
           : spring
             ? tone % 2 === 0 ? '#2f8c78' : '#327f73'
             : garden
@@ -1025,7 +1031,7 @@ function drawGround(ctx: CanvasRenderingContext2D, time: number, assets: TempleP
     }
   }
 
-  for (let y = 790; y <= 1130; y += 110) {
+  for (let y = 960; y <= 1320; y += 110) {
     for (let x = 145; x <= 470; x += 112) {
       drawProp(ctx, assets, 'soilTile', x, y, 82, 82)
       const plant: PropKey = (x + y) % 3 === 0 ? 'pepperCluster' : (x + y) % 3 === 1 ? 'pepperPlant' : 'leafPlant'
@@ -1035,44 +1041,54 @@ function drawGround(ctx: CanvasRenderingContext2D, time: number, assets: TempleP
 }
 
 function drawPaths(ctx: CanvasRenderingContext2D, time: number) {
-  ctx.fillStyle = '#705746'
-  drawPixelPath(ctx, [[270, 510], [520, 510], [780, 780], [1090, 790], [1450, 360], [1710, 980]])
-  drawPixelPath(ctx, [[780, 780], [720, 1080], [360, 1230]])
-  drawPixelPath(ctx, [[420, 420], [870, 300], [1260, 610], [1800, 570]])
-  ctx.strokeStyle = `rgba(242, 200, 102, ${0.24 + Math.sin(time * 2) * 0.08})`
-  ctx.lineWidth = 5
-  ctx.setLineDash([18, 20])
-  ctx.beginPath()
-  ctx.moveTo(420, 420)
-  ctx.lineTo(1450, 360)
-  ctx.lineTo(1650, 980)
-  ctx.lineTo(720, 1080)
-  ctx.stroke()
+  drawPixelPath(ctx, [[420, 500], [420, 690], [760, 690], [760, 920], [1320, 920]])
+  drawPixelPath(ctx, [[1320, 920], [1320, 720], [1650, 720], [1650, 500], [2130, 500]])
+  drawPixelPath(ctx, [[1320, 920], [1680, 920], [1680, 1130], [2290, 1130], [2290, 1340]])
+  drawPixelPath(ctx, [[1320, 920], [1030, 920], [1030, 1160], [650, 1160], [650, 1480]])
+  drawPixelPath(ctx, [[1320, 920], [1320, 640], [1440, 640], [1440, 560]])
+
+  ctx.strokeStyle = `rgba(242, 200, 102, ${0.16 + Math.sin(time * 1.4) * 0.04})`
+  ctx.lineWidth = 3
+  ctx.setLineDash([10, 38])
+  for (const route of [
+    [[420, 500], [760, 690], [1320, 920], [1650, 500], [2130, 500]],
+    [[1320, 920], [1680, 1130], [2290, 1340]],
+    [[1320, 920], [1030, 1160], [650, 1480]],
+  ] as Array<Array<[number, number]>>) {
+    ctx.beginPath()
+    route.forEach(([x, y], index) => (index === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)))
+    ctx.stroke()
+  }
   ctx.setLineDash([])
 }
 
 function drawPixelPath(ctx: CanvasRenderingContext2D, points: Array<[number, number]>) {
-  ctx.lineWidth = 58
+  ctx.lineWidth = 72
   ctx.lineCap = 'square'
   ctx.lineJoin = 'round'
-  ctx.strokeStyle = '#80624b'
+  ctx.strokeStyle = '#654836'
   ctx.beginPath()
   points.forEach(([x, y], index) => (index === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)))
   ctx.stroke()
-  ctx.lineWidth = 40
-  ctx.strokeStyle = '#997455'
+  ctx.lineWidth = 50
+  ctx.strokeStyle = '#9b7352'
   ctx.stroke()
+  ctx.lineWidth = 2
+  ctx.strokeStyle = 'rgba(247, 241, 223, .14)'
+  ctx.setLineDash([16, 24])
+  ctx.stroke()
+  ctx.setLineDash([])
 }
 
 function drawWater(ctx: CanvasRenderingContext2D, time: number) {
   ctx.fillStyle = '#263d68'
-  ctx.fillRect(1120, 750, 360, 245)
+  ctx.fillRect(1580, 850, 390, 260)
   ctx.strokeStyle = '#7aa0c9'
   ctx.lineWidth = 8
-  ctx.strokeRect(1120, 750, 360, 245)
+  ctx.strokeRect(1580, 850, 390, 260)
   for (let i = 0; i < 12; i++) {
-    const x = 1150 + (i * 47) % 310
-    const y = 790 + (i * 31) % 170
+    const x = 1610 + (i * 51) % 330
+    const y = 892 + (i * 31) % 174
     ctx.fillStyle = i % 3 === 0 ? '#b985d8' : '#4c6d55'
     ctx.fillRect(x + Math.sin(time * 1.3 + i) * 5, y, 34, 10)
     ctx.fillStyle = '#f2c866'
@@ -1081,13 +1097,13 @@ function drawWater(ctx: CanvasRenderingContext2D, time: number) {
 }
 
 function drawBuildings(ctx: CanvasRenderingContext2D, time: number, completedIds: Set<number>, assets: TemplePlayAssets) {
-  drawProp(ctx, assets, 'balineseTemple', 254, 120, 250, 316)
-  drawTempleBuilding(ctx, 1260, 170, 330, 238, '#685149', '#f2c866', 'RWA Vault', time, 'vault')
-  drawTempleBuilding(ctx, 865, 635, 330, 228, '#3f5d68', '#78ecff', 'Agent Camp', time, 'camp')
-  drawTempleBuilding(ctx, 1510, 790, 282, 286, '#493b64', '#b9ff66', 'Signal Tower', time, 'tower')
-  drawTempleBuilding(ctx, 560, 910, 316, 238, '#4b3d65', '#c886ff', 'SCALE Lab', time, 'lab')
-  drawTempleBuilding(ctx, 1130, 465, 280, 174, '#3e605a', '#57e39f', 'Bridge Gate', time, 'gate')
-  drawTempleBuilding(ctx, 138, 1020, 258, 188, '#455d45', '#ff7ad9', 'Privacy Grove', time, 'grove')
+  drawProp(ctx, assets, 'balineseTemple', 255, 120, 240, 304)
+  drawTempleBuilding(ctx, 1930, 210, 390, 260, '#604a3e', '#f2c866', 'RWA Vault', time, 'vault')
+  drawTempleBuilding(ctx, 1090, 710, 430, 250, '#385e5d', '#78ecff', 'Agent Camp', time, 'camp')
+  drawTempleBuilding(ctx, 2115, 1080, 330, 340, '#45375f', '#b9ff66', 'Signal Tower', time, 'tower')
+  drawTempleBuilding(ctx, 465, 1245, 385, 270, '#4b3d65', '#c886ff', 'SCALE Lab', time, 'lab')
+  drawTempleBuilding(ctx, 1258, 440, 340, 210, '#3e605a', '#57e39f', 'Bridge Gate', time, 'gate')
+  drawTempleBuilding(ctx, 170, 1500, 330, 220, '#455d45', '#ff7ad9', 'Privacy Grove', time, 'grove')
 
   QUESTS.forEach((quest) => {
     if (!completedIds.has(quest.quizId)) return
@@ -1123,84 +1139,137 @@ function drawTempleBuilding(
   time: number,
   shape: 'vault' | 'camp' | 'tower' | 'lab' | 'gate' | 'grove',
 ) {
-  ctx.fillStyle = 'rgba(0,0,0,.25)'
-  ctx.fillRect(x + 18, y + h - 16, w, 34)
-  ctx.fillStyle = wall
-  ctx.fillRect(x, y + 52, w, h - 52)
-  ctx.fillStyle = glow
-  ctx.beginPath()
-  ctx.moveTo(x + w / 2, y)
-  ctx.lineTo(x + w + 18, y + 64)
-  ctx.lineTo(x - 18, y + 64)
-  ctx.closePath()
-  ctx.fill()
-  ctx.strokeStyle = '#07100c'
-  ctx.lineWidth = 6
-  ctx.stroke()
-  ctx.fillStyle = 'rgba(255,255,255,.12)'
-  ctx.fillRect(x + 16, y + 68, w - 32, 8)
-  ctx.fillStyle = '#161611'
-  ctx.fillRect(x + w / 2 - 30, y + h - 74, 60, 74)
-  ctx.fillStyle = glow
-  ctx.fillRect(x + w / 2 - 18, y + h - 58, 36, 10)
-  ctx.fillStyle = 'rgba(247,241,223,.82)'
-  const windows = Math.max(3, Math.floor(w / 72))
-  for (let i = 0; i < windows; i++) {
-    const wx = x + 28 + i * ((w - 56) / Math.max(1, windows - 1))
-    const pulse = 0.65 + Math.sin(time * 2 + i) * 0.2
-    ctx.globalAlpha = pulse
-    ctx.fillRect(wx, y + 94, 18, 28)
-    ctx.globalAlpha = 1
-  }
+  const pulse = 0.72 + Math.sin(time * 1.7 + x * 0.01) * 0.16
+  ctx.fillStyle = 'rgba(0,0,0,.28)'
+  ctx.fillRect(x + 18, y + h - 10, w - 14, 30)
+
   if (shape === 'vault') {
-    ctx.strokeStyle = '#f2c866'
-    ctx.lineWidth = 5
-    ctx.strokeRect(x + w / 2 - 50, y + h - 92, 100, 92)
-    ctx.fillStyle = '#07100c'
-    ctx.fillRect(x + w / 2 - 10, y + h - 52, 20, 18)
+    drawPixelRect(ctx, x + 28, y + 74, w - 56, h - 74, wall, '#07100c', 6)
+    drawPixelRoof(ctx, x + 2, y + 24, w - 4, 82, glow)
+    drawPixelRect(ctx, x + w / 2 - 62, y + h - 112, 124, 112, '#1a1711', glow, 5)
+    drawPixelRect(ctx, x + w / 2 - 42, y + h - 92, 84, 76, '#2d2519', '#07100c', 3)
+    ctx.strokeStyle = glow
+    ctx.lineWidth = 4
+    ctx.beginPath()
+    ctx.arc(x + w / 2, y + h - 54, 18 + pulse * 3, 0, Math.PI * 2)
+    ctx.stroke()
+    drawPixelRect(ctx, x + 64, y + 120, 42, 34, '#f4d27b', '#07100c', 3)
+    drawPixelRect(ctx, x + w - 110, y + 122, 46, 32, '#57e39f', '#07100c', 3)
   } else if (shape === 'tower') {
-    ctx.fillStyle = '#07100c'
-    ctx.fillRect(x + w / 2 - 18, y + 20, 36, h - 18)
-    ctx.fillStyle = glow
-    ctx.fillRect(x + w / 2 - 9, y + 2, 18, h - 32)
+    drawPixelRect(ctx, x + w / 2 - 70, y + 108, 140, h - 108, wall, '#07100c', 6)
+    drawPixelRoof(ctx, x + w / 2 - 110, y + 54, 220, 78, glow)
+    drawPixelRect(ctx, x + w / 2 - 26, y + 8, 52, 100, '#24322c', '#07100c', 5)
+    drawPixelRect(ctx, x + w / 2 - 10, y + 20, 20, h - 70, glow, '#07100c', 3)
+    ctx.globalAlpha = pulse
+    drawPixelRect(ctx, x + w / 2 - 50, y + 168, 28, 44, '#f7f1df', '#07100c', 3)
+    drawPixelRect(ctx, x + w / 2 + 22, y + 168, 28, 44, '#f7f1df', '#07100c', 3)
+    ctx.globalAlpha = 1
   } else if (shape === 'lab') {
-    ctx.fillStyle = '#57e39f'
-    ctx.fillRect(x + 40, y + 124, 48, 20)
-    ctx.fillStyle = '#78ecff'
-    ctx.fillRect(x + w - 92, y + 120, 42, 26)
+    drawPixelRect(ctx, x + 38, y + 76, w - 76, h - 76, wall, '#07100c', 6)
+    drawPixelRoof(ctx, x + 10, y + 20, w - 20, 74, glow)
+    drawPixelRect(ctx, x + 74, y + 132, 72, 42, '#57e39f', '#07100c', 3)
+    drawPixelRect(ctx, x + w - 146, y + 126, 70, 48, '#78ecff', '#07100c', 3)
+    drawPixelRect(ctx, x + w / 2 - 34, y + h - 82, 68, 82, '#151c22', '#07100c', 4)
   } else if (shape === 'camp') {
-    ctx.fillStyle = '#f2c866'
-    ctx.fillRect(x + 54, y + h - 108, 52, 46)
-    ctx.fillStyle = '#78ecff'
-    ctx.fillRect(x + w - 110, y + h - 108, 52, 46)
-  } else if (shape === 'gate') {
-    ctx.fillStyle = '#07100c'
-    ctx.fillRect(x + 44, y + h - 104, 30, 104)
-    ctx.fillRect(x + w - 74, y + h - 104, 30, 104)
+    drawPixelRect(ctx, x + 28, y + 126, w - 56, h - 126, '#4b3a2b', '#07100c', 5)
+    drawTent(ctx, x + 48, y + 64, 138, 120, '#f2c866', '#473227')
+    drawTent(ctx, x + w - 188, y + 74, 138, 112, '#78ecff', '#294253')
+    drawPixelRect(ctx, x + w / 2 - 44, y + 136, 88, 48, wall, '#07100c', 4)
     ctx.fillStyle = glow
-    ctx.fillRect(x + 74, y + h - 102, w - 148, 14)
+    ctx.fillRect(x + w / 2 - 16, y + 151, 32, 12)
+  } else if (shape === 'gate') {
+    drawPixelRect(ctx, x + 28, y + 70, 58, h - 70, wall, '#07100c', 5)
+    drawPixelRect(ctx, x + w - 86, y + 70, 58, h - 70, wall, '#07100c', 5)
+    drawPixelRoof(ctx, x + 8, y + 18, w - 16, 72, glow)
+    drawPixelRect(ctx, x + 88, y + 98, w - 176, 36, '#1d2e28', glow, 4)
+    ctx.fillStyle = 'rgba(87,227,159,.24)'
+    ctx.fillRect(x + 118, y + 136, w - 236, h - 136)
+  } else if (shape === 'grove') {
+    drawPixelRect(ctx, x + 58, y + 78, w - 116, h - 78, wall, '#07100c', 5)
+    drawPixelRoof(ctx, x + 28, y + 32, w - 56, 70, glow)
+    for (let i = 0; i < 4; i++) {
+      const tx = x + 18 + i * 84
+      drawPixelRect(ctx, tx + 14, y + h - 76, 18, 58, '#4b3427', '#07100c', 2)
+      ctx.fillStyle = i % 2 ? '#4c8452' : '#57a663'
+      ctx.fillRect(tx, y + h - 126 + Math.sin(time * 1.2 + i) * 2, 48, 48)
+      ctx.fillStyle = '#315f43'
+      ctx.fillRect(tx + 8, y + h - 146, 34, 32)
+    }
   }
+
   ctx.fillStyle = '#07100c'
-  ctx.fillRect(x + 18, y + h + 14, Math.max(116, label.length * 12), 34)
+  ctx.fillRect(x + 18, y + h + 14, Math.max(118, label.length * 12), 34)
   ctx.fillStyle = glow
   ctx.font = '900 18px monospace'
   ctx.fillText(label, x + 30, y + h + 38)
 }
 
-function drawEnvironmentProps(ctx: CanvasRenderingContext2D, time: number, assets: TemplePlayAssets) {
-  drawProp(ctx, assets, 'sunflower', 96, 790 + Math.sin(time * 1.4) * 2, 50, 58)
-  drawProp(ctx, assets, 'pepperCluster', 510, 1040 + Math.sin(time * 1.2) * 2, 58, 62)
-  drawProp(ctx, assets, 'guardianStatue', 1135, 350, 82, 104)
-  drawProp(ctx, assets, 'guardianStatue', 1550, 350, 82, 104)
-  drawProp(ctx, assets, 'vineCornerA', 1660, 1180, 88, 88)
-  drawProp(ctx, assets, 'vineCornerB', 1840, 970, 88, 88)
-  drawProp(ctx, assets, 'vineCornerC', 90, 1180, 88, 88)
+function drawPixelRect(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  fill: string,
+  stroke = '#07100c',
+  line = 4,
+) {
+  ctx.fillStyle = fill
+  ctx.fillRect(x, y, w, h)
+  ctx.strokeStyle = stroke
+  ctx.lineWidth = line
+  ctx.strokeRect(x, y, w, h)
+}
 
-  for (let i = 0; i < 52; i++) {
+function drawPixelRoof(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, fill: string) {
+  ctx.fillStyle = fill
+  ctx.beginPath()
+  ctx.moveTo(x + w / 2, y)
+  ctx.lineTo(x + w, y + h)
+  ctx.lineTo(x, y + h)
+  ctx.closePath()
+  ctx.fill()
+  ctx.strokeStyle = '#07100c'
+  ctx.lineWidth = 6
+  ctx.stroke()
+  ctx.fillStyle = 'rgba(247,241,223,.22)'
+  ctx.fillRect(x + 34, y + h - 18, w - 68, 9)
+}
+
+function drawTent(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, cloth: string, shade: string) {
+  ctx.fillStyle = cloth
+  ctx.beginPath()
+  ctx.moveTo(x + w / 2, y)
+  ctx.lineTo(x + w, y + h)
+  ctx.lineTo(x, y + h)
+  ctx.closePath()
+  ctx.fill()
+  ctx.strokeStyle = '#07100c'
+  ctx.lineWidth = 5
+  ctx.stroke()
+  ctx.fillStyle = shade
+  ctx.beginPath()
+  ctx.moveTo(x + w / 2, y + 18)
+  ctx.lineTo(x + w / 2 + 32, y + h)
+  ctx.lineTo(x + w / 2 - 32, y + h)
+  ctx.closePath()
+  ctx.fill()
+}
+
+function drawEnvironmentProps(ctx: CanvasRenderingContext2D, time: number, assets: TemplePlayAssets) {
+  drawProp(ctx, assets, 'sunflower', 116, 850 + Math.sin(time * 1.4) * 2, 50, 58)
+  drawProp(ctx, assets, 'pepperCluster', 528, 1090 + Math.sin(time * 1.2) * 2, 58, 62)
+  drawProp(ctx, assets, 'guardianStatue', 1180, 386, 82, 104)
+  drawProp(ctx, assets, 'guardianStatue', 1608, 386, 82, 104)
+  drawProp(ctx, assets, 'vineCornerA', 2050, 1540, 88, 88)
+  drawProp(ctx, assets, 'vineCornerB', 2580, 960, 88, 88)
+  drawProp(ctx, assets, 'vineCornerC', 88, 1770, 88, 88)
+
+  for (let i = 0; i < 76; i++) {
     const x = 90 + ((i * 257) % (WORLD.width - 180))
     const y = 120 + ((i * 181) % (WORLD.height - 240))
-    if (x > 1050 && x < 1540 && y > 700 && y < 1040) continue
-    const sway = Math.sin(time * 1.4 + i) * 3
+    if (isNearMainPlaySpace(x, y)) continue
+    const sway = Math.sin(time * 1.1 + i) * 1.8
     ctx.fillStyle = '#4b3427'
     ctx.fillRect(x + 10, y + 28, 16, 32)
     ctx.fillStyle = i % 4 === 0 ? '#57e39f' : '#3d724b'
@@ -1209,6 +1278,19 @@ function drawEnvironmentProps(ctx: CanvasRenderingContext2D, time: number, asset
     ctx.fillStyle = '#2b4f35'
     ctx.fillRect(x + 4 + sway, y + 23, 28, 14)
   }
+}
+
+function isNearMainPlaySpace(x: number, y: number) {
+  const blockedRects = [
+    [180, 100, 690, 690],
+    [1010, 360, 1700, 1040],
+    [1830, 120, 2380, 690],
+    [2050, 1030, 2510, 1510],
+    [420, 1200, 950, 1650],
+    [1500, 810, 2030, 1130],
+    [100, 880, 590, 1390],
+  ]
+  return blockedRects.some(([left, top, right, bottom]) => x > left && x < right && y > top && y < bottom)
 }
 
 function drawProp(
@@ -1236,24 +1318,22 @@ function drawActors(
   const actors: Array<{ y: number; draw: () => void }> = []
 
   AMBIENT_NPCS.forEach((npc, index) => {
-    const walkX = Math.sin(time * 0.42 + index * 1.8) * 18
-    const walkY = Math.cos(time * 0.36 + index * 1.2) * 9
-    const direction = Math.abs(walkX) > Math.abs(walkY)
-      ? walkX > 0 ? 'right' : 'left'
-      : walkY > 0 ? 'down' : 'up'
+    const idleY = Math.sin(time * 1.15 + index * 0.91) * 0.9
+    const directionCycle: Array<PlayerState['dir']> = ['down', 'right', 'down', 'left']
+    const direction = directionCycle[Math.floor(time / 5 + index) % directionCycle.length]
     actors.push({
-      y: npc.y + walkY,
+      y: npc.y + idleY,
       draw: () => drawSpriteActor(ctx, assets, {
         sprite: npc.sprite,
-        x: npc.x + walkX,
-        y: npc.y + walkY,
+        x: npc.x,
+        y: npc.y + idleY,
         name: npc.name,
         tone: npc.color,
         accent: npc.accent,
         time,
         seed: index * 0.73,
         compact: true,
-        moving: Math.abs(walkX) > 8,
+        moving: false,
         direction,
       }),
     })
@@ -1337,7 +1417,7 @@ function drawSpriteActor(
   const sheet = SPRITES[sprite]
   const image = assets.sprites[sprite]
   const frame = chooseSpriteFrame(sprite, sheet.frames, time, seed, moving, near, completed, player, direction)
-  const breathe = moving ? 0 : Math.sin(time * 2 + seed) * 1.4
+  const breathe = moving ? 0 : Math.sin(time * 1.8 + seed) * 0.75
   const drawW = player ? sheet.drawW * 1.04 : sheet.drawW
   const drawH = player ? sheet.drawH * 1.04 : sheet.drawH
   const dx = Math.round(x - drawW / 2)
@@ -1401,7 +1481,7 @@ function chooseSpriteFrame(
   if (frameCount <= 1) return 0
   if (frameCount === 4) return frameForDirection(direction)
   if (sprite === 'nxr') {
-    if (moving) return 1 + (Math.floor(time * 7 + seed) % 4)
+    if (moving) return 1 + (Math.floor(time * 5.2 + seed) % 4)
     if (near && frameCount > 6) return 6
     if (completed && frameCount > 7) return 7
     if (player && Math.sin(time * 1.1) > 0.9 && frameCount > 6) return 6
