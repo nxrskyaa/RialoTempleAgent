@@ -2363,6 +2363,598 @@
 }
 
 @layer components {
+  .temple-play-page {
+    overflow-x: hidden;
+  }
+
+  .temple-play-shell {
+    position: relative;
+    background:
+      radial-gradient(circle at 18% 8%, rgba(87, 227, 159, 0.18), transparent 22rem),
+      radial-gradient(circle at 80% 18%, rgba(242, 200, 102, 0.14), transparent 24rem),
+      linear-gradient(180deg, rgba(247, 241, 223, 0.07), transparent 42%),
+      rgba(5, 8, 7, 0.78);
+  }
+
+  .temple-play-topbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 16px;
+    align-items: end;
+    padding: clamp(16px, 3vw, 28px);
+  }
+
+  .temple-play-passport {
+    display: grid;
+    min-width: 190px;
+    gap: 4px;
+    border: 1px solid rgba(245, 239, 218, 0.14);
+    border-radius: 14px;
+    background: rgba(5, 12, 10, 0.72);
+    padding: 14px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  }
+
+  .temple-play-passport span,
+  .temple-play-passport small {
+    color: var(--temple-muted);
+    font-size: 11px;
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+
+  .temple-play-passport strong {
+    color: var(--temple-gold);
+    font-size: 28px;
+    font-weight: 950;
+    line-height: 1;
+  }
+
+  .temple-play-stage {
+    position: relative;
+    min-height: 680px;
+    overflow: hidden;
+    border-top: 1px solid rgba(245, 239, 218, 0.12);
+    background: #101711;
+  }
+
+  .temple-play-canvas-wrap,
+  .temple-play-canvas-wrap canvas {
+    display: block;
+    width: 100%;
+    height: 680px;
+  }
+
+  .temple-play-canvas-wrap canvas {
+    image-rendering: pixelated;
+    cursor: crosshair;
+  }
+
+  .temple-play-hud,
+  .temple-play-miniquest,
+  .temple-play-toast {
+    border: 1px solid rgba(245, 239, 218, 0.14);
+    background: rgba(5, 8, 7, 0.78);
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(14px);
+  }
+
+  .temple-play-hud {
+    position: absolute;
+    left: 16px;
+    top: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    max-width: calc(100% - 32px);
+    border-radius: 999px;
+    padding: 8px;
+  }
+
+  .temple-play-hud span {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    border-radius: 999px;
+    background: rgba(245, 239, 218, 0.06);
+    padding: 8px 11px;
+    color: var(--temple-text);
+    font-size: 11px;
+    font-weight: 950;
+  }
+
+  .temple-play-miniquest {
+    position: absolute;
+    right: 16px;
+    top: 16px;
+    width: min(320px, calc(100% - 32px));
+    border-radius: 16px;
+    padding: 14px;
+  }
+
+  .temple-play-miniquest p {
+    margin: 0;
+    color: var(--temple-soft);
+    font-size: 10px;
+    font-weight: 950;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .temple-play-miniquest strong {
+    display: block;
+    margin-top: 5px;
+    color: var(--temple-text);
+    font-size: 16px;
+    font-weight: 950;
+  }
+
+  .temple-play-miniquest button {
+    margin-top: 11px;
+    width: 100%;
+    border: 1px solid rgba(242, 200, 102, 0.42);
+    border-radius: 11px;
+    background: linear-gradient(135deg, var(--temple-gold), var(--temple-emerald));
+    color: #07100c;
+    padding: 10px 12px;
+    font-size: 12px;
+    font-weight: 950;
+    transition: transform 160ms ease, opacity 160ms ease;
+  }
+
+  .temple-play-miniquest button:not(:disabled):hover {
+    transform: translateY(-2px);
+  }
+
+  .temple-play-miniquest button:disabled {
+    opacity: 0.5;
+  }
+
+  .temple-play-joystick {
+    position: absolute;
+    left: 18px;
+    bottom: 18px;
+    display: none;
+    width: 128px;
+    height: 128px;
+    touch-action: none;
+    border: 2px solid rgba(245, 239, 218, 0.16);
+    border-radius: 999px;
+    background:
+      radial-gradient(circle, rgba(87, 227, 159, 0.18), transparent 52%),
+      rgba(5, 8, 7, 0.64);
+    box-shadow: 0 22px 52px rgba(0, 0, 0, 0.38), inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(12px);
+  }
+
+  .temple-play-joystick span {
+    position: absolute;
+    left: 39px;
+    top: 39px;
+    width: 50px;
+    height: 50px;
+    border: 2px solid #07100c;
+    border-radius: 18px;
+    background: linear-gradient(135deg, var(--temple-gold), var(--temple-pink));
+    box-shadow: 0 8px 0 rgba(0, 0, 0, 0.24), 0 0 24px rgba(242, 200, 102, 0.22);
+  }
+
+  .temple-play-questbar {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  .temple-play-zone-pill {
+    --quest-color: var(--temple-gold);
+    min-height: 76px;
+    border: 1px solid color-mix(in srgb, var(--quest-color) 32%, rgba(245, 239, 218, 0.14));
+    border-radius: 14px;
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--quest-color) 12%, transparent), transparent),
+      rgba(245, 239, 218, 0.052);
+    padding: 13px;
+    text-align: left;
+    transition: transform 160ms ease, border-color 160ms ease;
+  }
+
+  .temple-play-zone-pill:hover {
+    transform: translateY(-3px);
+    border-color: color-mix(in srgb, var(--quest-color) 64%, rgba(245, 239, 218, 0.14));
+  }
+
+  .temple-play-zone-pill span,
+  .temple-play-zone-pill strong {
+    display: block;
+  }
+
+  .temple-play-zone-pill span {
+    color: var(--temple-text);
+    font-size: 13px;
+    font-weight: 950;
+  }
+
+  .temple-play-zone-pill strong {
+    margin-top: 7px;
+    color: var(--quest-color);
+    font-size: 11px;
+    font-weight: 950;
+    text-transform: uppercase;
+  }
+
+  .temple-play-zone-pill.is-complete {
+    background:
+      radial-gradient(circle at 20% 10%, rgba(87, 227, 159, 0.24), transparent 55%),
+      rgba(87, 227, 159, 0.08);
+  }
+
+  .temple-play-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    display: grid;
+    place-items: center;
+    padding: 16px;
+    background:
+      radial-gradient(circle at 50% 30%, rgba(87, 227, 159, 0.16), transparent 26rem),
+      rgba(1, 4, 3, 0.78);
+    backdrop-filter: blur(12px);
+  }
+
+  .temple-play-quiz-card {
+    width: min(1040px, 100%);
+    max-height: min(88vh, 920px);
+    overflow: auto;
+    border: 1px solid rgba(245, 239, 218, 0.16);
+    border-radius: 18px;
+    background:
+      linear-gradient(180deg, rgba(247, 241, 223, 0.09), transparent 42%),
+      rgba(8, 12, 9, 0.96);
+    box-shadow: 0 32px 100px rgba(0, 0, 0, 0.56), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    padding: clamp(16px, 3vw, 26px);
+  }
+
+  .temple-play-quiz-header {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 15px;
+    align-items: center;
+  }
+
+  .temple-play-npc-portrait {
+    --npc: var(--temple-gold);
+    --npc-accent: var(--temple-emerald);
+    position: relative;
+    width: 86px;
+    height: 92px;
+    flex: 0 0 auto;
+    border: 4px solid #07100c;
+    border-radius: 24px 24px 18px 18px;
+    background: var(--npc);
+    box-shadow: 0 12px 0 rgba(0, 0, 0, 0.2), 0 0 28px color-mix(in srgb, var(--npc) 28%, transparent);
+    animation: templePlayNpcBreathe 2.8s ease-in-out infinite;
+  }
+
+  .temple-play-npc-portrait i,
+  .temple-play-npc-portrait b,
+  .temple-play-npc-portrait span {
+    position: absolute;
+    display: block;
+  }
+
+  .temple-play-npc-portrait i {
+    left: 17px;
+    top: 34px;
+    width: 12px;
+    height: 13px;
+    border-radius: 4px;
+    background: #f7f1df;
+    box-shadow: 37px 0 0 #f7f1df;
+    animation: templePlayBlink 4.2s infinite;
+  }
+
+  .temple-play-npc-portrait b {
+    left: 33px;
+    top: 59px;
+    width: 20px;
+    height: 6px;
+    border-radius: 999px;
+    background: #07100c;
+  }
+
+  .temple-play-npc-portrait span {
+    left: 21px;
+    top: -16px;
+    width: 44px;
+    height: 22px;
+    border: 4px solid #07100c;
+    border-radius: 12px 12px 4px 4px;
+    background: var(--npc-accent);
+  }
+
+  .temple-play-quiz-header p,
+  .temple-play-quiz-header span {
+    color: var(--temple-muted);
+    font-size: 12px;
+    font-weight: 900;
+  }
+
+  .temple-play-quiz-header h2 {
+    margin: 4px 0;
+    color: var(--temple-text);
+    font-size: clamp(2rem, 5vw, 4rem);
+    font-weight: 950;
+    line-height: 0.95;
+  }
+
+  .temple-play-quiz-header > button {
+    border: 1px solid rgba(245, 239, 218, 0.16);
+    border-radius: 999px;
+    background: rgba(245, 239, 218, 0.07);
+    color: var(--temple-text);
+    padding: 10px 13px;
+    font-size: 12px;
+    font-weight: 950;
+  }
+
+  .temple-play-quiz-progress,
+  .temple-play-quiz-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 18px;
+    border: 1px solid rgba(245, 239, 218, 0.12);
+    border-radius: 14px;
+    background: rgba(245, 239, 218, 0.05);
+    padding: 12px;
+  }
+
+  .temple-play-quiz-progress span,
+  .temple-play-quiz-actions span {
+    color: var(--temple-muted);
+    font-size: 11px;
+    font-weight: 950;
+    text-transform: uppercase;
+  }
+
+  .temple-play-quiz-progress strong,
+  .temple-play-quiz-actions strong {
+    color: var(--temple-gold);
+    font-size: 18px;
+    font-weight: 950;
+  }
+
+  .temple-play-question-list {
+    display: grid;
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .temple-play-question-card {
+    border: 1px solid rgba(245, 239, 218, 0.12);
+    border-radius: 14px;
+    background: rgba(0, 0, 0, 0.18);
+    padding: 14px;
+  }
+
+  .temple-play-question-card > p {
+    margin: 0 0 12px;
+    color: var(--temple-text);
+    font-size: 15px;
+    font-weight: 950;
+  }
+
+  .temple-play-question-card > div {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .temple-play-question-card button {
+    display: flex;
+    min-height: 62px;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid rgba(245, 239, 218, 0.12);
+    border-radius: 12px;
+    background: rgba(245, 239, 218, 0.055);
+    color: var(--temple-muted);
+    padding: 10px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 950;
+    transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+  }
+
+  .temple-play-question-card button:hover {
+    transform: translateY(-2px);
+    color: var(--temple-text);
+  }
+
+  .temple-play-question-card button span {
+    width: 14px;
+    height: 14px;
+    flex: 0 0 auto;
+    border: 2px solid rgba(245, 239, 218, 0.18);
+    border-radius: 5px;
+  }
+
+  .temple-play-question-card button.is-correct {
+    border-color: rgba(87, 227, 159, 0.56);
+    background: rgba(87, 227, 159, 0.12);
+    color: var(--temple-text);
+  }
+
+  .temple-play-question-card button.is-wrong {
+    border-color: rgba(255, 95, 145, 0.56);
+    background: rgba(255, 95, 145, 0.12);
+    color: var(--temple-text);
+  }
+
+  .temple-play-question-card small {
+    display: block;
+    margin-top: 10px;
+    color: var(--temple-muted);
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.5;
+  }
+
+  .temple-play-quiz-actions button {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 1px solid rgba(242, 200, 102, 0.48);
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--temple-gold), var(--temple-emerald));
+    color: #07100c;
+    padding: 0 18px;
+    font-size: 13px;
+    font-weight: 950;
+  }
+
+  .temple-play-quiz-actions button:disabled {
+    cursor: not-allowed;
+    opacity: 0.58;
+  }
+
+  .temple-play-quiz-actions button.is-complete {
+    background: rgba(87, 227, 159, 0.18);
+    color: var(--temple-emerald);
+  }
+
+  .temple-play-toast {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    z-index: 90;
+    display: flex;
+    max-width: min(520px, calc(100vw - 36px));
+    align-items: center;
+    gap: 10px;
+    border-radius: 15px;
+    padding: 13px;
+  }
+
+  .temple-play-toast span {
+    color: var(--temple-text);
+    font-size: 13px;
+    font-weight: 850;
+  }
+
+  .temple-play-toast button {
+    border-radius: 999px;
+    background: rgba(245, 239, 218, 0.08);
+    color: var(--temple-text);
+    padding: 7px 10px;
+    font-size: 11px;
+    font-weight: 950;
+  }
+
+  @keyframes templePlayNpcBreathe {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-6px) scale(1.02); }
+  }
+
+  @keyframes templePlayBlink {
+    0%, 92%, 100% { transform: scaleY(1); }
+    95% { transform: scaleY(0.1); }
+  }
+
+  @media (max-width: 960px) {
+    .temple-play-topbar {
+      grid-template-columns: 1fr;
+    }
+
+    .temple-play-passport {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      align-items: center;
+    }
+
+    .temple-play-stage,
+    .temple-play-canvas-wrap,
+    .temple-play-canvas-wrap canvas {
+      height: 620px;
+      min-height: 620px;
+    }
+
+    .temple-play-questbar {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .temple-play-joystick {
+      display: block;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .temple-play-page {
+      width: calc(100vw - 24px);
+      max-width: calc(100vw - 24px);
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    .temple-play-topbar {
+      padding: 16px;
+    }
+
+    .temple-play-passport {
+      grid-template-columns: 1fr;
+    }
+
+    .temple-play-hud {
+      right: 12px;
+      left: 12px;
+      border-radius: 14px;
+    }
+
+    .temple-play-miniquest {
+      top: auto;
+      right: 12px;
+      bottom: 12px;
+      left: 158px;
+      width: auto;
+      padding: 12px;
+    }
+
+    .temple-play-stage,
+    .temple-play-canvas-wrap,
+    .temple-play-canvas-wrap canvas {
+      height: 600px;
+      min-height: 600px;
+    }
+
+    .temple-play-questbar {
+      grid-template-columns: 1fr;
+    }
+
+    .temple-play-quiz-header,
+    .temple-play-quiz-actions,
+    .temple-play-quiz-progress {
+      align-items: stretch;
+      grid-template-columns: 1fr;
+      flex-direction: column;
+    }
+
+    .temple-play-question-card > div {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .temple-play-npc-portrait,
+    .temple-play-npc-portrait i {
+      animation: none !important;
+    }
+  }
+}
+
+@layer components {
   .world2-page,
   .review2-page {
     position: relative;
