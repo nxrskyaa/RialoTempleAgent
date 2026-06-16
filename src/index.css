@@ -2591,67 +2591,7 @@
     box-shadow: 0 8px 0 rgba(0, 0, 0, 0.24), 0 0 24px rgba(242, 200, 102, 0.22);
   }
 
-  .temple-play-questbar {
-    position: absolute;
-    right: 18px;
-    top: auto;
-    left: 340px;
-    bottom: 16px;
-    z-index: 5;
-    display: grid;
-    width: auto;
-    grid-template-columns: repeat(5, minmax(112px, 1fr));
-    gap: 8px;
-    margin-top: 0;
-    transition: opacity 180ms ease, transform 180ms ease;
-  }
-
-  .temple-play-zone-pill {
-    --quest-color: var(--temple-gold);
-    min-height: 42px;
-    border: 3px solid #171009;
-    border-radius: 6px;
-    background:
-      linear-gradient(90deg, color-mix(in srgb, var(--quest-color) 20%, transparent), transparent),
-      rgba(5, 8, 7, 0.78);
-    padding: 8px 10px;
-    text-align: left;
-    transition: transform 160ms ease, border-color 160ms ease;
-    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.24);
-  }
-
-  .temple-play-zone-pill:hover {
-    transform: translateY(-3px);
-    border-color: color-mix(in srgb, var(--quest-color) 64%, rgba(245, 239, 218, 0.14));
-  }
-
-  .temple-play-zone-pill span,
-  .temple-play-zone-pill strong {
-    display: block;
-  }
-
-  .temple-play-zone-pill span {
-    color: var(--temple-text);
-    font-size: 10px;
-    font-weight: 950;
-  }
-
-  .temple-play-zone-pill strong {
-    margin-top: 4px;
-    color: var(--quest-color);
-    font-size: 9px;
-    font-weight: 950;
-    text-transform: uppercase;
-  }
-
-  .temple-play-zone-pill.is-complete {
-    background:
-      radial-gradient(circle at 20% 10%, rgba(87, 227, 159, 0.24), transparent 55%),
-      rgba(87, 227, 159, 0.08);
-  }
-
-  .temple-play-shell.is-dialog-open .temple-play-miniquest,
-  .temple-play-shell.is-dialog-open .temple-play-questbar {
+  .temple-play-shell.is-dialog-open .temple-play-miniquest {
     opacity: 0;
     pointer-events: none;
     transform: translateY(8px);
@@ -2937,23 +2877,6 @@
       align-items: center;
     }
 
-    .temple-play-questbar {
-      top: auto;
-      right: 14px;
-      bottom: 14px;
-      left: 170px;
-      width: auto;
-      display: flex;
-      overflow-x: auto;
-      padding-bottom: 4px;
-      scroll-snap-type: x mandatory;
-    }
-
-    .temple-play-zone-pill {
-      min-width: 150px;
-      scroll-snap-align: start;
-    }
-
     .temple-play-joystick {
       display: block;
     }
@@ -3019,22 +2942,6 @@
       left: 148px;
       width: auto;
       padding: 9px;
-    }
-
-    .temple-play-questbar {
-      right: 12px;
-      bottom: 8px;
-      left: 154px;
-      display: flex;
-      overflow-x: auto;
-      padding-bottom: 3px;
-      scroll-snap-type: x mandatory;
-    }
-
-    .temple-play-zone-pill {
-      min-width: 142px;
-      min-height: 42px;
-      scroll-snap-align: start;
     }
 
     .temple-play-overlay {

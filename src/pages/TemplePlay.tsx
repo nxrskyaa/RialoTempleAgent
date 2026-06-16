@@ -60,11 +60,11 @@ type SpriteKey =
   | 'npcAlchemist'
 
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000' as const
-const WORLD = { width: 2850, height: 2050 }
+const WORLD = { width: 3400, height: 2050 }
 const PLAYER_SPEED = 245
-const DESKTOP_CAMERA_ZOOM = 0.48
-const TABLET_CAMERA_ZOOM = 0.5
-const MOBILE_CAMERA_ZOOM = 0.48
+const DESKTOP_CAMERA_ZOOM = 0.42
+const TABLET_CAMERA_ZOOM = 0.44
+const MOBILE_CAMERA_ZOOM = 0.38
 
 type SpriteSheet = {
   src: string
@@ -95,15 +95,18 @@ type PropKey =
   | 'pepperCluster'
   | 'sunflower'
   | 'smallPepper'
-  | 'buildingTempleGate'
-  | 'buildingRwaVault'
-  | 'buildingAgentCamp'
-  | 'buildingSignalTower'
-  | 'buildingScaleLab'
-  | 'buildingPrivacyGrove'
+  | 'buildingMarketHall'
+  | 'buildingWoodenCabin'
+  | 'buildingOracleHouse'
+  | 'buildingGuildHouse'
+  | 'buildingTempleLodge'
+  | 'buildingStoneVault'
+  | 'buildingScaleDojo'
+  | 'buildingGreenhouseInn'
+  | 'buildingOrangeCottage'
 
 const SPRITES: Record<SpriteKey, SpriteSheet> = {
-  nxr: { src: '/temple-play/sprites/nxr.png', frameW: 190, frameH: 210, frames: 8, drawW: 76, drawH: 86 },
+  nxr: { src: '/temple-play/sprites/nxr-v2.png', frameW: 210, frameH: 280, frames: 16, drawW: 70, drawH: 94 },
   npcOracle: { src: '/temple-play/sprites/npc-oracle.png', frameW: 160, frameH: 220, frames: 4, drawW: 62, drawH: 86 },
   npcForestGuide: { src: '/temple-play/sprites/npc-forest-guide.png', frameW: 160, frameH: 220, frames: 4, drawW: 62, drawH: 86 },
   npcBuilder: { src: '/temple-play/sprites/npc-builder.png', frameW: 160, frameH: 220, frames: 4, drawW: 62, drawH: 86 },
@@ -129,12 +132,15 @@ const PROPS: Record<PropKey, string> = {
   pepperCluster: '/temple-play/sprites/pepper-cluster.png',
   sunflower: '/temple-play/sprites/sunflower.png',
   smallPepper: '/temple-play/sprites/small-pepper.png',
-  buildingTempleGate: '/temple-play/buildings/temple-gate.svg',
-  buildingRwaVault: '/temple-play/buildings/rwa-vault.svg',
-  buildingAgentCamp: '/temple-play/buildings/agent-camp.svg',
-  buildingSignalTower: '/temple-play/buildings/signal-tower.svg',
-  buildingScaleLab: '/temple-play/buildings/scale-lab.svg',
-  buildingPrivacyGrove: '/temple-play/buildings/privacy-grove.svg',
+  buildingMarketHall: '/temple-play/buildings/market-hall.png',
+  buildingWoodenCabin: '/temple-play/buildings/wooden-cabin.png',
+  buildingOracleHouse: '/temple-play/buildings/oracle-house.png',
+  buildingGuildHouse: '/temple-play/buildings/guild-house.png',
+  buildingTempleLodge: '/temple-play/buildings/temple-lodge.png',
+  buildingStoneVault: '/temple-play/buildings/stone-vault.png',
+  buildingScaleDojo: '/temple-play/buildings/scale-dojo.png',
+  buildingGreenhouseInn: '/temple-play/buildings/greenhouse-inn.png',
+  buildingOrangeCottage: '/temple-play/buildings/orange-cottage.png',
 }
 
 const QUESTS: QuestNpc[] = [
@@ -145,8 +151,8 @@ const QUESTS: QuestNpc[] = [
     npc: 'NXR',
     role: 'Builder Guide',
     sprite: 'nxr',
-    x: 420,
-    y: 420,
+    x: 520,
+    y: 600,
     color: '#f2c866',
     accent: '#57e39f',
     reward: 50,
@@ -180,8 +186,8 @@ const QUESTS: QuestNpc[] = [
     npc: 'Vault Keeper Mino',
     role: 'Asset Guardian',
     sprite: 'npcHerbalist',
-    x: 2130,
-    y: 410,
+    x: 2170,
+    y: 650,
     color: '#ffad72',
     accent: '#f2c866',
     reward: 75,
@@ -216,7 +222,7 @@ const QUESTS: QuestNpc[] = [
     role: 'Agent Coordinator',
     sprite: 'npcShadowAgent',
     x: 1320,
-    y: 920,
+    y: 1480,
     color: '#78ecff',
     accent: '#c886ff',
     reward: 75,
@@ -250,8 +256,8 @@ const QUESTS: QuestNpc[] = [
     npc: 'Zap Tiko',
     role: 'Signal Runner',
     sprite: 'npcNavigator',
-    x: 2290,
-    y: 1340,
+    x: 2320,
+    y: 1520,
     color: '#b9ff66',
     accent: '#78ecff',
     reward: 80,
@@ -285,8 +291,8 @@ const QUESTS: QuestNpc[] = [
     npc: 'Professor Rune',
     role: 'SCALE Engineer',
     sprite: 'npcAlchemist',
-    x: 650,
-    y: 1480,
+    x: 720,
+    y: 1770,
     color: '#c886ff',
     accent: '#57e39f',
     reward: 100,
@@ -334,6 +340,20 @@ const AMBIENT_NPCS: AmbientNpc[] = [
   { name: 'Minty Mox', sprite: 'npcSage', x: 1900, y: 1690, color: '#67ffc0', accent: '#f2c866', line: 'The map gets brighter when badges are claimed.' },
   { name: 'Sera API', sprite: 'npcCaptain', x: 2470, y: 280, color: '#88d7ff', accent: '#ff8066', line: 'A response scroll always comes back through Bridge Gate.' },
   { name: 'Candi Dot', sprite: 'npcForestGuide', x: 1500, y: 290, color: '#b9ff66', accent: '#f2c866', line: 'The temple is friendlier when every system can talk.' },
+]
+
+const BUILDING_COLLIDERS = [
+  { x: 230, y: 220, w: 300, h: 300 },
+  { x: 1160, y: 300, w: 330, h: 310 },
+  { x: 1940, y: 250, w: 370, h: 360 },
+  { x: 1000, y: 1010, w: 440, h: 390 },
+  { x: 2130, y: 1060, w: 360, h: 390 },
+  { x: 470, y: 1260, w: 390, h: 380 },
+  { x: 120, y: 1410, w: 360, h: 330 },
+  { x: 1570, y: 1510, w: 280, h: 230 },
+  { x: 2420, y: 1620, w: 270, h: 230 },
+  { x: 2880, y: 700, w: 330, h: 310 },
+  { x: 3040, y: 1350, w: 280, h: 260 },
 ]
 
 export default function TemplePlay() {
@@ -567,24 +587,6 @@ function TemplePlayInner() {
           </AnimatePresence>
         </div>
 
-        <section className="temple-play-questbar" aria-label="Temple Play quest shortcuts">
-          {QUESTS.map((quest) => {
-            const status = questStatus.find((item) => item.quizId === quest.quizId)
-            const completed = completedIds.has(quest.quizId)
-            return (
-              <button
-                key={quest.id}
-                type="button"
-                onClick={() => openQuest(quest)}
-                className={`temple-play-zone-pill ${completed ? 'is-complete' : ''}`}
-                style={{ '--quest-color': quest.color } as CSSProperties}
-              >
-                <span>{quest.zone}</span>
-                <strong>{completed ? 'Claimed' : `+${status?.reward ?? quest.reward} XP`}</strong>
-              </button>
-            )
-          })}
-        </section>
       </section>
 
       <AnimatePresence>
@@ -715,8 +717,18 @@ function TemplePlayCanvas({
       }
       current.moving = Math.abs(input.x) > 0.01 || Math.abs(input.y) > 0.01
       if (current.moving) {
-        current.x = clamp(current.x + input.x * PLAYER_SPEED * dt, 90, WORLD.width - 90)
-        current.y = clamp(current.y + input.y * PLAYER_SPEED * dt, 90, WORLD.height - 90)
+        const nextX = clamp(current.x + input.x * PLAYER_SPEED * dt, 90, WORLD.width - 90)
+        const nextY = clamp(current.y + input.y * PLAYER_SPEED * dt, 90, WORLD.height - 90)
+        if (!isMovementBlocked(nextX, current.y)) {
+          current.x = nextX
+        } else {
+          tapTarget.current = null
+        }
+        if (!isMovementBlocked(current.x, nextY)) {
+          current.y = nextY
+        } else {
+          tapTarget.current = null
+        }
         if (Math.abs(input.x) > Math.abs(input.y)) current.dir = input.x < 0 ? 'left' : 'right'
         else current.dir = input.y < 0 ? 'up' : 'down'
       }
@@ -758,10 +770,11 @@ function TemplePlayCanvas({
           if (event.button !== 0) return
           const rect = event.currentTarget.getBoundingClientRect()
           const camera = cameraRef.current
-          tapTarget.current = {
+          const target = {
             x: clamp((event.clientX - rect.left) / camera.zoom + camera.x, 90, WORLD.width - 90),
             y: clamp((event.clientY - rect.top) / camera.zoom + camera.y, 90, WORLD.height - 90),
           }
+          tapTarget.current = isMovementBlocked(target.x, target.y) ? null : target
           playTempleSfx('tap')
         }}
       />
@@ -992,9 +1005,9 @@ function movementFromInput(keys: Set<string>, joystick: { x: number; y: number }
 }
 
 function cameraZoom(width: number) {
-  if (width < 680) return MOBILE_CAMERA_ZOOM
-  if (width < 1100) return TABLET_CAMERA_ZOOM
-  return DESKTOP_CAMERA_ZOOM
+  const fillWidthZoom = width / WORLD.width
+  const baseZoom = width < 680 ? MOBILE_CAMERA_ZOOM : width < 1100 ? TABLET_CAMERA_ZOOM : DESKTOP_CAMERA_ZOOM
+  return Math.max(baseZoom, fillWidthZoom)
 }
 
 function nearestQuest(player: PlayerState) {
@@ -1008,6 +1021,10 @@ function nearestQuest(player: PlayerState) {
     }
   }
   return distance < 118 ? nearest : null
+}
+
+function isMovementBlocked(x: number, y: number) {
+  return BUILDING_COLLIDERS.some((rect) => x > rect.x && x < rect.x + rect.w && y > rect.y && y < rect.y + rect.h)
 }
 
 function drawWorld(
@@ -1064,37 +1081,28 @@ function drawGround(ctx: CanvasRenderingContext2D, time: number, assets: TempleP
   ctx.fillRect(0, 0, WORLD.width, WORLD.height)
   for (let y = 0; y < WORLD.height; y += 64) {
     for (let x = 0; x < WORLD.width; x += 64) {
-      const gatePlaza = x > 220 && x < 650 && y > 240 && y < 620
-      const bridgePlaza = x > 1230 && x < 1640 && y > 420 && y < 760
-      const campPlaza = x > 1070 && x < 1530 && y > 700 && y < 1080
-      const vaultPlaza = x > 1900 && x < 2360 && y > 190 && y < 620
-      const towerPlaza = x > 2080 && x < 2460 && y > 1100 && y < 1540
-      const labPlaza = x > 450 && x < 920 && y > 1260 && y < 1660
-      const plaza = gatePlaza || bridgePlaza || campPlaza || vaultPlaza || towerPlaza || labPlaza
       const grove = x > 1880 && y > 980
       const spring = x < 720 && y > 940
       const garden = x > 110 && x < 540 && y > 900 && y < 1400
       const tone = (x / 64 + y / 64) % 4
-      ctx.fillStyle = plaza
-        ? tone % 2 === 0 ? '#9c7951' : '#b1885d'
-        : grove
-          ? tone % 2 === 0 ? '#4f4674' : '#5b4e82'
-          : spring
-            ? tone % 2 === 0 ? '#2f8c78' : '#327f73'
-            : garden
-              ? tone % 2 === 0 ? '#8b503f' : '#965947'
-            : tone === 0 ? '#34784d' : tone === 1 ? '#3b8255' : tone === 2 ? '#317148' : '#3f8959'
+      ctx.fillStyle = grove
+        ? tone % 2 === 0 ? '#455c55' : '#52685b'
+        : spring
+          ? tone % 2 === 0 ? '#2f8c78' : '#327f73'
+          : garden
+            ? tone % 2 === 0 ? '#5f8b48' : '#6b944d'
+            : tone === 0 ? '#5d9a3f' : tone === 1 ? '#67a64a' : tone === 2 ? '#568f3d' : '#70ad50'
       ctx.fillRect(x, y, 64, 64)
-      ctx.fillStyle = plaza ? 'rgba(89, 60, 39, .2)' : 'rgba(247, 241, 223, .12)'
+      ctx.fillStyle = 'rgba(247, 241, 223, .1)'
       ctx.fillRect(x + 18, y + 18, 6, 6)
       ctx.fillRect(x + 42, y + 38, 5, 5)
-      if (!plaza && !garden && (x + y) % 256 === 0) {
-        ctx.fillStyle = plaza ? '#8f6d44' : '#7bc66d'
+      if (!garden && (x + y) % 256 === 0) {
+        ctx.fillStyle = '#7bc66d'
         ctx.fillRect(x + 18, y + 20 + Math.sin(time + x) * 1.5, 6, 18)
         ctx.fillRect(x + 42, y + 36, 5, 14)
       }
-      if (!plaza && (x * 3 + y) % 448 === 0) {
-        ctx.fillStyle = plaza ? '#ff7ad9' : '#d576ff'
+      if ((x * 3 + y) % 448 === 0) {
+        ctx.fillStyle = '#d576ff'
         ctx.fillRect(x + 12, y + 11, 11, 11)
         ctx.fillStyle = '#dbc9d7'
         ctx.fillRect(x + 44, y + 42, 12, 10)
@@ -1112,43 +1120,92 @@ function drawGround(ctx: CanvasRenderingContext2D, time: number, assets: TempleP
 }
 
 function drawPaths(ctx: CanvasRenderingContext2D, time: number) {
-  drawPixelPath(ctx, [[420, 500], [420, 690], [760, 690], [760, 920], [1320, 920]])
-  drawPixelPath(ctx, [[1320, 920], [1320, 720], [1650, 720], [1650, 500], [2130, 500]])
-  drawPixelPath(ctx, [[1320, 920], [1680, 920], [1680, 1130], [2290, 1130], [2290, 1340]])
-  drawPixelPath(ctx, [[1320, 920], [1030, 920], [1030, 1160], [650, 1160], [650, 1480]])
-  drawPixelPath(ctx, [[1320, 920], [1320, 640], [1440, 640], [1440, 560]])
-
-  ctx.strokeStyle = `rgba(242, 200, 102, ${0.16 + Math.sin(time * 1.4) * 0.04})`
-  ctx.lineWidth = 3
-  ctx.setLineDash([10, 38])
-  for (const route of [
-    [[420, 500], [760, 690], [1320, 920], [1650, 500], [2130, 500]],
-    [[1320, 920], [1680, 1130], [2290, 1340]],
-    [[1320, 920], [1030, 1160], [650, 1480]],
-  ] as Array<Array<[number, number]>>) {
-    ctx.beginPath()
-    route.forEach(([x, y], index) => (index === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)))
-    ctx.stroke()
-  }
-  ctx.setLineDash([])
+  drawOrganicPath(ctx, [
+    [190, 680], [430, 430], [760, 560], [1070, 590], [1320, 450],
+    [1650, 220], [1900, 330], [2210, 420], [2660, 330], [3280, 440],
+  ], 122, time)
+  drawOrganicPath(ctx, [
+    [520, 520], [430, 780], [650, 1020], [850, 1260], [820, 1610],
+    [1010, 1830], [1420, 1800], [1820, 1740], [2260, 1780], [2780, 1720], [3290, 1640],
+  ], 136, time)
+  drawOrganicPath(ctx, [
+    [1500, 1760], [1490, 1390], [1600, 1140], [1880, 1000],
+    [2260, 980], [2640, 1120], [3080, 1200], [3340, 1420],
+  ], 124, time)
+  drawOrganicPlaza(ctx, 440, 520, 310, 230, time)
+  drawOrganicPlaza(ctx, 1120, 1180, 380, 260, time)
+  drawOrganicPlaza(ctx, 2080, 470, 430, 250, time)
+  drawOrganicPlaza(ctx, 2290, 1320, 300, 260, time)
+  drawOrganicPlaza(ctx, 610, 1540, 360, 260, time)
 }
 
-function drawPixelPath(ctx: CanvasRenderingContext2D, points: Array<[number, number]>) {
-  ctx.lineWidth = 72
-  ctx.lineCap = 'square'
+function drawOrganicPath(ctx: CanvasRenderingContext2D, points: Array<[number, number]>, width: number, time: number) {
+  ctx.save()
+  ctx.lineCap = 'round'
   ctx.lineJoin = 'round'
-  ctx.strokeStyle = '#654836'
+  ctx.strokeStyle = '#4c842c'
+  ctx.lineWidth = width + 28
+  drawSmoothLine(ctx, points)
+  ctx.stroke()
+  ctx.strokeStyle = '#b7cb48'
+  ctx.lineWidth = width + 12
+  drawSmoothLine(ctx, points)
+  ctx.stroke()
+  ctx.strokeStyle = '#e8bd76'
+  ctx.lineWidth = width
+  drawSmoothLine(ctx, points)
+  ctx.stroke()
+  ctx.strokeStyle = 'rgba(129, 92, 45, .2)'
+  ctx.lineWidth = 4
+  ctx.setLineDash([8, 34])
+  ctx.lineDashOffset = -time * 10
+  drawSmoothLine(ctx, points)
+  ctx.stroke()
+  ctx.restore()
+}
+
+function drawSmoothLine(ctx: CanvasRenderingContext2D, points: Array<[number, number]>) {
   ctx.beginPath()
-  points.forEach(([x, y], index) => (index === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)))
-  ctx.stroke()
-  ctx.lineWidth = 50
-  ctx.strokeStyle = '#9b7352'
-  ctx.stroke()
-  ctx.lineWidth = 2
-  ctx.strokeStyle = 'rgba(247, 241, 223, .14)'
-  ctx.setLineDash([16, 24])
-  ctx.stroke()
-  ctx.setLineDash([])
+  ctx.moveTo(points[0][0], points[0][1])
+  for (let i = 1; i < points.length - 1; i++) {
+    const [x, y] = points[i]
+    const [nextX, nextY] = points[i + 1]
+    ctx.quadraticCurveTo(x, y, (x + nextX) / 2, (y + nextY) / 2)
+  }
+  const last = points[points.length - 1]
+  ctx.lineTo(last[0], last[1])
+}
+
+function drawOrganicPlaza(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, time: number) {
+  ctx.save()
+  ctx.translate(x, y)
+  ctx.fillStyle = '#b7cb48'
+  ctx.beginPath()
+  for (let i = 0; i < 18; i++) {
+    const angle = (Math.PI * 2 * i) / 18
+    const wobble = 0.92 + Math.sin(time * 0.35 + i * 1.7) * 0.035
+    const px = Math.cos(angle) * w * 0.5 * wobble
+    const py = Math.sin(angle) * h * 0.5 * wobble
+    if (i === 0) ctx.moveTo(px, py)
+    else ctx.lineTo(px, py)
+  }
+  ctx.closePath()
+  ctx.fill()
+  ctx.fillStyle = '#e8bd76'
+  ctx.beginPath()
+  for (let i = 0; i < 18; i++) {
+    const angle = (Math.PI * 2 * i) / 18
+    const wobble = 0.88 + Math.sin(time * 0.35 + i * 1.7) * 0.03
+    const px = Math.cos(angle) * w * 0.5 * wobble
+    const py = Math.sin(angle) * h * 0.5 * wobble
+    if (i === 0) ctx.moveTo(px, py)
+    else ctx.lineTo(px, py)
+  }
+  ctx.closePath()
+  ctx.fill()
+  ctx.fillStyle = 'rgba(129,92,45,.2)'
+  for (let i = 0; i < 18; i++) ctx.fillRect(-w * 0.4 + ((i * 47) % w), -h * 0.34 + ((i * 31) % h), 12, 5)
+  ctx.restore()
 }
 
 function drawWater(ctx: CanvasRenderingContext2D, time: number) {
@@ -1168,13 +1225,17 @@ function drawWater(ctx: CanvasRenderingContext2D, time: number) {
 }
 
 function drawBuildings(ctx: CanvasRenderingContext2D, time: number, completedIds: Set<number>, assets: TemplePlayAssets) {
-  drawBuildingAsset(ctx, assets, 'balineseTemple', 255, 120, 240, 304, 'NXR Temple', '#f2c866', time)
-  drawBuildingAsset(ctx, assets, 'buildingRwaVault', 1925, 210, 390, 282, 'RWA Vault', '#f2c866', time)
-  drawBuildingAsset(ctx, assets, 'buildingAgentCamp', 1085, 710, 430, 270, 'Agent Camp', '#78ecff', time)
-  drawBuildingAsset(ctx, assets, 'buildingSignalTower', 2125, 1064, 320, 384, 'Signal Tower', '#b9ff66', time)
-  drawBuildingAsset(ctx, assets, 'buildingScaleLab', 455, 1245, 395, 286, 'SCALE Lab', '#c886ff', time)
-  drawBuildingAsset(ctx, assets, 'buildingTempleGate', 1268, 430, 338, 254, 'Bridge Gate', '#57e39f', time)
-  drawBuildingAsset(ctx, assets, 'buildingPrivacyGrove', 168, 1500, 332, 232, 'Privacy Grove', '#ff7ad9', time)
+  drawBuildingAsset(ctx, assets, 'balineseTemple', 255, 170, 250, 318, 'NXR Temple', '#f2c866', time)
+  drawBuildingAsset(ctx, assets, 'buildingOracleHouse', 1170, 250, 305, 340, 'Bridge Gate', '#57e39f', time)
+  drawBuildingAsset(ctx, assets, 'buildingStoneVault', 1985, 210, 315, 374, 'RWA Vault', '#f2c866', time)
+  drawBuildingAsset(ctx, assets, 'buildingTempleLodge', 1010, 970, 420, 354, 'Agent Camp', '#78ecff', time)
+  drawBuildingAsset(ctx, assets, 'buildingMarketHall', 2120, 1040, 350, 334, 'Signal Tower', '#b9ff66', time)
+  drawBuildingAsset(ctx, assets, 'buildingScaleDojo', 500, 1240, 340, 384, 'SCALE Lab', '#c886ff', time)
+  drawBuildingAsset(ctx, assets, 'buildingGreenhouseInn', 140, 1395, 300, 386, 'Privacy Grove', '#ff7ad9', time)
+  drawBuildingAsset(ctx, assets, 'buildingWoodenCabin', 1580, 1500, 260, 240, 'Rest Stop', '#ffad72', time)
+  drawBuildingAsset(ctx, assets, 'buildingOrangeCottage', 2430, 1605, 250, 254, 'Quest Hut', '#f2c866', time)
+  drawBuildingAsset(ctx, assets, 'buildingGuildHouse', 2890, 655, 320, 305, 'Guild Hall', '#78ecff', time)
+  drawBuildingAsset(ctx, assets, 'buildingOrangeCottage', 3050, 1320, 270, 274, 'Farm Hut', '#f2c866', time)
 
   QUESTS.forEach((quest) => {
     if (!completedIds.has(quest.quizId)) return
@@ -1255,13 +1316,19 @@ function drawEnvironmentProps(ctx: CanvasRenderingContext2D, time: number, asset
 
 function isNearMainPlaySpace(x: number, y: number) {
   const blockedRects = [
-    [180, 100, 690, 690],
-    [1010, 360, 1700, 1040],
-    [1830, 120, 2380, 690],
-    [2050, 1030, 2510, 1510],
-    [420, 1200, 950, 1650],
-    [1500, 810, 2030, 1130],
-    [100, 880, 590, 1390],
+    [120, 120, 720, 760],
+    [1040, 180, 1640, 680],
+    [1850, 120, 2380, 760],
+    [950, 900, 1500, 1580],
+    [2030, 960, 2570, 1640],
+    [400, 1160, 950, 1840],
+    [80, 1320, 540, 1870],
+    [1450, 1420, 1900, 1780],
+    [2380, 1540, 2720, 1900],
+    [2840, 600, 3260, 1060],
+    [3000, 1260, 3350, 1660],
+    [240, 500, 2680, 760],
+    [580, 1650, 2760, 1980],
   ]
   return blockedRects.some(([left, top, right, bottom]) => x > left && x < right && y > top && y < bottom)
 }
@@ -1446,20 +1513,18 @@ function chooseSpriteFrame(
   time: number,
   seed: number,
   moving: boolean,
-  near: boolean,
-  completed: boolean,
-  player: boolean,
+  _near: boolean,
+  _completed: boolean,
+  _player: boolean,
   direction: PlayerState['dir'],
 ) {
   if (frameCount <= 1) return 0
-  if (frameCount === 4) return frameForDirection(direction)
   if (sprite === 'nxr') {
-    if (moving) return 1 + (Math.floor(time * 5.2 + seed) % 4)
-    if (near && frameCount > 6) return 6
-    if (completed && frameCount > 7) return 7
-    if (player && Math.sin(time * 1.1) > 0.9 && frameCount > 6) return 6
-    return 0
+    const row = direction === 'up' ? 1 : direction === 'left' ? 3 : direction === 'right' ? 2 : 0
+    const step = moving ? Math.floor(time * 6.4 + seed) % 4 : 0
+    return Math.min(frameCount - 1, row * 4 + step)
   }
+  if (frameCount === 4) return frameForDirection(direction)
   return 0
 }
 
