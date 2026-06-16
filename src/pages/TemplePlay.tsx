@@ -95,6 +95,12 @@ type PropKey =
   | 'pepperCluster'
   | 'sunflower'
   | 'smallPepper'
+  | 'buildingTempleGate'
+  | 'buildingRwaVault'
+  | 'buildingAgentCamp'
+  | 'buildingSignalTower'
+  | 'buildingScaleLab'
+  | 'buildingPrivacyGrove'
 
 const SPRITES: Record<SpriteKey, SpriteSheet> = {
   nxr: { src: '/temple-play/sprites/nxr.png', frameW: 190, frameH: 210, frames: 8, drawW: 76, drawH: 86 },
@@ -123,6 +129,12 @@ const PROPS: Record<PropKey, string> = {
   pepperCluster: '/temple-play/sprites/pepper-cluster.png',
   sunflower: '/temple-play/sprites/sunflower.png',
   smallPepper: '/temple-play/sprites/small-pepper.png',
+  buildingTempleGate: '/temple-play/buildings/temple-gate.svg',
+  buildingRwaVault: '/temple-play/buildings/rwa-vault.svg',
+  buildingAgentCamp: '/temple-play/buildings/agent-camp.svg',
+  buildingSignalTower: '/temple-play/buildings/signal-tower.svg',
+  buildingScaleLab: '/temple-play/buildings/scale-lab.svg',
+  buildingPrivacyGrove: '/temple-play/buildings/privacy-grove.svg',
 }
 
 const QUESTS: QuestNpc[] = [
@@ -433,6 +445,7 @@ function TemplePlayInner() {
   }, [activeStatus?.reward, claimingQuest, receipt.isSuccess, reset, statusQuery, userQuery])
 
   const openQuest = useCallback((quest: QuestNpc) => {
+    playTempleSfx('talk')
     setActiveQuest(quest)
     setAnswers({})
     setQuizDone(false)
@@ -445,11 +458,14 @@ function TemplePlayInner() {
 
   function answer(questionIndex: number, optionIndex: number) {
     if (quizDone) return
+    const correct = activeQuest?.questions[questionIndex]?.answer === optionIndex
+    playTempleSfx(correct ? 'correct' : 'wrong')
     setAnswers((current) => ({ ...current, [questionIndex]: optionIndex }))
   }
 
   function finishQuiz() {
     if (!activeQuest || answeredCount < activeQuest.questions.length) return
+    playTempleSfx(correctCount >= Math.ceil(activeQuest.questions.length * 0.7) ? 'success' : 'wrong')
     setQuizDone(true)
     setToast(correctCount >= Math.ceil(activeQuest.questions.length * 0.7)
       ? 'Nice. Claim the badge to record this quest on-chain.'
@@ -473,6 +489,7 @@ function TemplePlayInner() {
       return
     }
     setClaimingQuest(activeQuest)
+    playTempleSfx('claim')
     setToast('Open your wallet to claim this Temple Play badge.')
     writeContract({
       address: RIALO_TEMPLE_ADDRESS,
@@ -512,7 +529,8 @@ function TemplePlayInner() {
           />
 
           <div className="temple-play-hud">
-            <span><Gamepad2 className="h-4 w-4" /> WASD / Arrow keys</span>
+            <span><Gamepad2 className="h-4 w-4" /> Click / tap map to move</span>
+            <span><Gamepad2 className="h-4 w-4" /> WASD optional</span>
             <span><MapPin className="h-4 w-4" /> Press E near glowing NPC</span>
           </div>
 
@@ -605,6 +623,8 @@ function TemplePlayCanvas({
   const nearId = useRef<number | null>(null)
   const completedLatest = useRef(completedIds)
   const assetsRef = useRef<TemplePlayAssets | null>(null)
+  const tapTarget = useRef<{ x: number; y: number } | null>(null)
+  const cameraRef = useRef({ x: 0, y: 0, zoom: DESKTOP_CAMERA_ZOOM })
 
   useEffect(() => {
     completedLatest.current = completedIds
@@ -642,7 +662,10 @@ function TemplePlayCanvas({
       keys.current.add(key)
       if (key === 'e') {
         const quest = QUESTS.find((item) => item.id === nearId.current)
-        if (quest) onOpenQuest(quest)
+        if (quest) {
+          playTempleSfx('talk')
+          onOpenQuest(quest)
+        }
       }
     }
 
@@ -674,8 +697,22 @@ function TemplePlayCanvas({
         return
       }
 
-      const input = movementFromInput(keys.current, joystickVectorRef.current)
+      let input = movementFromInput(keys.current, joystickVectorRef.current)
       const current = player.current
+      const hasManualInput = Math.abs(input.x) > 0.01 || Math.abs(input.y) > 0.01
+      if (hasManualInput) {
+        tapTarget.current = null
+      } else if (tapTarget.current) {
+        const dx = tapTarget.current.x - current.x
+        const dy = tapTarget.current.y - current.y
+        const distance = Math.hypot(dx, dy)
+        if (distance < 10) {
+          tapTarget.current = null
+          input = { x: 0, y: 0 }
+        } else {
+          input = { x: dx / distance, y: dy / distance }
+        }
+      }
       current.moving = Math.abs(input.x) > 0.01 || Math.abs(input.y) > 0.01
       if (current.moving) {
         current.x = clamp(current.x + input.x * PLAYER_SPEED * dt, 90, WORLD.width - 90)
@@ -696,8 +733,9 @@ function TemplePlayCanvas({
         x: clamp(current.x - viewport.width / 2, 0, Math.max(0, WORLD.width - viewport.width)),
         y: clamp(current.y - viewport.height / 2, 0, Math.max(0, WORLD.height - viewport.height)),
       }
+      cameraRef.current = { ...camera, zoom }
 
-      drawWorld(context, rect.width, rect.height, viewport.width, viewport.height, camera, zoom, frame, current, completedLatest.current, nearId.current, assets)
+      drawWorld(context, rect.width, rect.height, viewport.width, viewport.height, camera, zoom, frame, current, completedLatest.current, nearId.current, assets, tapTarget.current)
       window.requestAnimationFrame(tick)
     }
 
@@ -713,7 +751,20 @@ function TemplePlayCanvas({
 
   return (
     <div ref={wrapRef} className="temple-play-canvas-wrap">
-      <canvas ref={canvasRef} aria-label="Temple Play pixel art world" />
+      <canvas
+        ref={canvasRef}
+        aria-label="Temple Play pixel art world"
+        onPointerDown={(event) => {
+          if (event.button !== 0) return
+          const rect = event.currentTarget.getBoundingClientRect()
+          const camera = cameraRef.current
+          tapTarget.current = {
+            x: clamp((event.clientX - rect.left) / camera.zoom + camera.x, 90, WORLD.width - 90),
+            y: clamp((event.clientY - rect.top) / camera.zoom + camera.y, 90, WORLD.height - 90),
+          }
+          playTempleSfx('tap')
+        }}
+      />
     </div>
   )
 }
@@ -972,6 +1023,7 @@ function drawWorld(
   completedIds: Set<number>,
   nearNpcId: number | null,
   assets: TemplePlayAssets,
+  target: { x: number; y: number } | null,
 ) {
   ctx.clearRect(0, 0, width, height)
   ctx.save()
@@ -982,10 +1034,29 @@ function drawWorld(
   drawWater(ctx, time)
   drawEnvironmentProps(ctx, time, assets)
   drawBuildings(ctx, time, completedIds, assets)
+  drawTapTarget(ctx, time, target)
   drawActors(ctx, time, completedIds, nearNpcId, player, assets)
   drawWeather(ctx, camera, viewportWidth, viewportHeight, time)
   ctx.restore()
   drawScanlines(ctx, width, height)
+}
+
+function drawTapTarget(ctx: CanvasRenderingContext2D, time: number, target: { x: number; y: number } | null) {
+  if (!target) return
+  const pulse = 1 + Math.sin(time * 6) * 0.12
+  ctx.save()
+  ctx.translate(target.x, target.y)
+  ctx.strokeStyle = 'rgba(242, 200, 102, .92)'
+  ctx.fillStyle = 'rgba(87, 227, 159, .18)'
+  ctx.lineWidth = 4
+  ctx.beginPath()
+  ctx.ellipse(0, -4, 30 * pulse, 16 * pulse, 0, 0, Math.PI * 2)
+  ctx.fill()
+  ctx.stroke()
+  ctx.fillStyle = '#f2c866'
+  ctx.fillRect(-4, -28, 8, 18)
+  ctx.fillRect(-18, -14, 36, 8)
+  ctx.restore()
 }
 
 function drawGround(ctx: CanvasRenderingContext2D, time: number, assets: TemplePlayAssets) {
@@ -1097,13 +1168,13 @@ function drawWater(ctx: CanvasRenderingContext2D, time: number) {
 }
 
 function drawBuildings(ctx: CanvasRenderingContext2D, time: number, completedIds: Set<number>, assets: TemplePlayAssets) {
-  drawProp(ctx, assets, 'balineseTemple', 255, 120, 240, 304)
-  drawTempleBuilding(ctx, 1930, 210, 390, 260, '#604a3e', '#f2c866', 'RWA Vault', time, 'vault')
-  drawTempleBuilding(ctx, 1090, 710, 430, 250, '#385e5d', '#78ecff', 'Agent Camp', time, 'camp')
-  drawTempleBuilding(ctx, 2115, 1080, 330, 340, '#45375f', '#b9ff66', 'Signal Tower', time, 'tower')
-  drawTempleBuilding(ctx, 465, 1245, 385, 270, '#4b3d65', '#c886ff', 'SCALE Lab', time, 'lab')
-  drawTempleBuilding(ctx, 1258, 440, 340, 210, '#3e605a', '#57e39f', 'Bridge Gate', time, 'gate')
-  drawTempleBuilding(ctx, 170, 1500, 330, 220, '#455d45', '#ff7ad9', 'Privacy Grove', time, 'grove')
+  drawBuildingAsset(ctx, assets, 'balineseTemple', 255, 120, 240, 304, 'NXR Temple', '#f2c866', time)
+  drawBuildingAsset(ctx, assets, 'buildingRwaVault', 1925, 210, 390, 282, 'RWA Vault', '#f2c866', time)
+  drawBuildingAsset(ctx, assets, 'buildingAgentCamp', 1085, 710, 430, 270, 'Agent Camp', '#78ecff', time)
+  drawBuildingAsset(ctx, assets, 'buildingSignalTower', 2125, 1064, 320, 384, 'Signal Tower', '#b9ff66', time)
+  drawBuildingAsset(ctx, assets, 'buildingScaleLab', 455, 1245, 395, 286, 'SCALE Lab', '#c886ff', time)
+  drawBuildingAsset(ctx, assets, 'buildingTempleGate', 1268, 430, 338, 254, 'Bridge Gate', '#57e39f', time)
+  drawBuildingAsset(ctx, assets, 'buildingPrivacyGrove', 168, 1500, 332, 232, 'Privacy Grove', '#ff7ad9', time)
 
   QUESTS.forEach((quest) => {
     if (!completedIds.has(quest.quizId)) return
@@ -1127,133 +1198,35 @@ function drawBuildings(ctx: CanvasRenderingContext2D, time: number, completedIds
   })
 }
 
-function drawTempleBuilding(
+function drawBuildingAsset(
   ctx: CanvasRenderingContext2D,
+  assets: TemplePlayAssets,
+  key: PropKey,
   x: number,
   y: number,
   w: number,
   h: number,
-  wall: string,
-  glow: string,
   label: string,
+  color: string,
   time: number,
-  shape: 'vault' | 'camp' | 'tower' | 'lab' | 'gate' | 'grove',
 ) {
-  const pulse = 0.72 + Math.sin(time * 1.7 + x * 0.01) * 0.16
-  ctx.fillStyle = 'rgba(0,0,0,.28)'
-  ctx.fillRect(x + 18, y + h - 10, w - 14, 30)
+  const bob = Math.sin(time * 1.1 + x * 0.01) * 1.2
+  ctx.fillStyle = 'rgba(0,0,0,.24)'
+  ctx.fillRect(x + 18, y + h - 14, w - 22, 26)
+  drawProp(ctx, assets, key, x, y + bob, w, h)
+  drawBuildingLabel(ctx, x + 18, y + h + 10, label, color)
+}
 
-  if (shape === 'vault') {
-    drawPixelRect(ctx, x + 28, y + 74, w - 56, h - 74, wall, '#07100c', 6)
-    drawPixelRoof(ctx, x + 2, y + 24, w - 4, 82, glow)
-    drawPixelRect(ctx, x + w / 2 - 62, y + h - 112, 124, 112, '#1a1711', glow, 5)
-    drawPixelRect(ctx, x + w / 2 - 42, y + h - 92, 84, 76, '#2d2519', '#07100c', 3)
-    ctx.strokeStyle = glow
-    ctx.lineWidth = 4
-    ctx.beginPath()
-    ctx.arc(x + w / 2, y + h - 54, 18 + pulse * 3, 0, Math.PI * 2)
-    ctx.stroke()
-    drawPixelRect(ctx, x + 64, y + 120, 42, 34, '#f4d27b', '#07100c', 3)
-    drawPixelRect(ctx, x + w - 110, y + 122, 46, 32, '#57e39f', '#07100c', 3)
-  } else if (shape === 'tower') {
-    drawPixelRect(ctx, x + w / 2 - 70, y + 108, 140, h - 108, wall, '#07100c', 6)
-    drawPixelRoof(ctx, x + w / 2 - 110, y + 54, 220, 78, glow)
-    drawPixelRect(ctx, x + w / 2 - 26, y + 8, 52, 100, '#24322c', '#07100c', 5)
-    drawPixelRect(ctx, x + w / 2 - 10, y + 20, 20, h - 70, glow, '#07100c', 3)
-    ctx.globalAlpha = pulse
-    drawPixelRect(ctx, x + w / 2 - 50, y + 168, 28, 44, '#f7f1df', '#07100c', 3)
-    drawPixelRect(ctx, x + w / 2 + 22, y + 168, 28, 44, '#f7f1df', '#07100c', 3)
-    ctx.globalAlpha = 1
-  } else if (shape === 'lab') {
-    drawPixelRect(ctx, x + 38, y + 76, w - 76, h - 76, wall, '#07100c', 6)
-    drawPixelRoof(ctx, x + 10, y + 20, w - 20, 74, glow)
-    drawPixelRect(ctx, x + 74, y + 132, 72, 42, '#57e39f', '#07100c', 3)
-    drawPixelRect(ctx, x + w - 146, y + 126, 70, 48, '#78ecff', '#07100c', 3)
-    drawPixelRect(ctx, x + w / 2 - 34, y + h - 82, 68, 82, '#151c22', '#07100c', 4)
-  } else if (shape === 'camp') {
-    drawPixelRect(ctx, x + 28, y + 126, w - 56, h - 126, '#4b3a2b', '#07100c', 5)
-    drawTent(ctx, x + 48, y + 64, 138, 120, '#f2c866', '#473227')
-    drawTent(ctx, x + w - 188, y + 74, 138, 112, '#78ecff', '#294253')
-    drawPixelRect(ctx, x + w / 2 - 44, y + 136, 88, 48, wall, '#07100c', 4)
-    ctx.fillStyle = glow
-    ctx.fillRect(x + w / 2 - 16, y + 151, 32, 12)
-  } else if (shape === 'gate') {
-    drawPixelRect(ctx, x + 28, y + 70, 58, h - 70, wall, '#07100c', 5)
-    drawPixelRect(ctx, x + w - 86, y + 70, 58, h - 70, wall, '#07100c', 5)
-    drawPixelRoof(ctx, x + 8, y + 18, w - 16, 72, glow)
-    drawPixelRect(ctx, x + 88, y + 98, w - 176, 36, '#1d2e28', glow, 4)
-    ctx.fillStyle = 'rgba(87,227,159,.24)'
-    ctx.fillRect(x + 118, y + 136, w - 236, h - 136)
-  } else if (shape === 'grove') {
-    drawPixelRect(ctx, x + 58, y + 78, w - 116, h - 78, wall, '#07100c', 5)
-    drawPixelRoof(ctx, x + 28, y + 32, w - 56, 70, glow)
-    for (let i = 0; i < 4; i++) {
-      const tx = x + 18 + i * 84
-      drawPixelRect(ctx, tx + 14, y + h - 76, 18, 58, '#4b3427', '#07100c', 2)
-      ctx.fillStyle = i % 2 ? '#4c8452' : '#57a663'
-      ctx.fillRect(tx, y + h - 126 + Math.sin(time * 1.2 + i) * 2, 48, 48)
-      ctx.fillStyle = '#315f43'
-      ctx.fillRect(tx + 8, y + h - 146, 34, 32)
-    }
-  }
-
+function drawBuildingLabel(ctx: CanvasRenderingContext2D, x: number, y: number, label: string, color: string) {
+  const width = Math.max(118, label.length * 11 + 24)
   ctx.fillStyle = '#07100c'
-  ctx.fillRect(x + 18, y + h + 14, Math.max(118, label.length * 12), 34)
-  ctx.fillStyle = glow
-  ctx.font = '900 18px monospace'
-  ctx.fillText(label, x + 30, y + h + 38)
-}
-
-function drawPixelRect(
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  w: number,
-  h: number,
-  fill: string,
-  stroke = '#07100c',
-  line = 4,
-) {
-  ctx.fillStyle = fill
-  ctx.fillRect(x, y, w, h)
-  ctx.strokeStyle = stroke
-  ctx.lineWidth = line
-  ctx.strokeRect(x, y, w, h)
-}
-
-function drawPixelRoof(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, fill: string) {
-  ctx.fillStyle = fill
-  ctx.beginPath()
-  ctx.moveTo(x + w / 2, y)
-  ctx.lineTo(x + w, y + h)
-  ctx.lineTo(x, y + h)
-  ctx.closePath()
-  ctx.fill()
-  ctx.strokeStyle = '#07100c'
-  ctx.lineWidth = 6
-  ctx.stroke()
-  ctx.fillStyle = 'rgba(247,241,223,.22)'
-  ctx.fillRect(x + 34, y + h - 18, w - 68, 9)
-}
-
-function drawTent(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, cloth: string, shade: string) {
-  ctx.fillStyle = cloth
-  ctx.beginPath()
-  ctx.moveTo(x + w / 2, y)
-  ctx.lineTo(x + w, y + h)
-  ctx.lineTo(x, y + h)
-  ctx.closePath()
-  ctx.fill()
-  ctx.strokeStyle = '#07100c'
-  ctx.lineWidth = 5
-  ctx.stroke()
-  ctx.fillStyle = shade
-  ctx.beginPath()
-  ctx.moveTo(x + w / 2, y + 18)
-  ctx.lineTo(x + w / 2 + 32, y + h)
-  ctx.lineTo(x + w / 2 - 32, y + h)
-  ctx.closePath()
-  ctx.fill()
+  ctx.fillRect(x, y, width, 30)
+  ctx.strokeStyle = color
+  ctx.lineWidth = 2
+  ctx.strokeRect(x + 1, y + 1, width - 2, 28)
+  ctx.fillStyle = color
+  ctx.font = '900 16px monospace'
+  ctx.fillText(label, x + 12, y + 21)
 }
 
 function drawEnvironmentProps(ctx: CanvasRenderingContext2D, time: number, assets: TemplePlayAssets) {
@@ -1540,6 +1513,42 @@ function drawScanlines(ctx: CanvasRenderingContext2D, width: number, height: num
 
 function clamp(value: number, min: number, max: number) {
   return Math.max(min, Math.min(max, value))
+}
+
+let templeAudioContext: AudioContext | null = null
+
+function playTempleSfx(kind: 'tap' | 'talk' | 'correct' | 'wrong' | 'success' | 'claim') {
+  if (typeof window === 'undefined') return
+  const AudioContextCtor = window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext
+  if (!AudioContextCtor) return
+  templeAudioContext ??= new AudioContextCtor()
+  const ctx = templeAudioContext
+  if (ctx.state === 'suspended') void ctx.resume()
+
+  const now = ctx.currentTime
+  const gain = ctx.createGain()
+  gain.connect(ctx.destination)
+  gain.gain.setValueAtTime(0.0001, now)
+  gain.gain.exponentialRampToValueAtTime(0.045, now + 0.015)
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.24)
+
+  const tones: Record<typeof kind, number[]> = {
+    tap: [260, 392],
+    talk: [392, 523],
+    correct: [523, 659, 784],
+    wrong: [220, 164],
+    success: [392, 523, 659, 880],
+    claim: [330, 494, 740],
+  }
+
+  tones[kind].forEach((frequency, index) => {
+    const osc = ctx.createOscillator()
+    osc.type = kind === 'wrong' ? 'triangle' : 'square'
+    osc.frequency.setValueAtTime(frequency, now + index * 0.045)
+    osc.connect(gain)
+    osc.start(now + index * 0.045)
+    osc.stop(now + index * 0.045 + 0.09)
+  })
 }
 
 function friendlyPlayError(message: string) {
