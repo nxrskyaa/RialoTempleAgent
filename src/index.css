@@ -2388,12 +2388,12 @@
 
   .temple-play-topbar {
     position: absolute;
-    left: 16px;
-    right: 16px;
-    top: 14px;
+    left: 12px;
+    right: 12px;
+    top: 10px;
     z-index: 6;
     display: flex;
-    gap: 16px;
+    gap: 10px;
     align-items: flex-start;
     justify-content: space-between;
     pointer-events: none;
@@ -2404,18 +2404,29 @@
   }
 
   .temple-play-topbar h1 {
-    font-size: clamp(1.6rem, 2.4vw, 2.3rem);
-    line-height: 0.95;
+    width: max-content;
+    border: 1px solid rgba(245, 239, 218, 0.14);
+    border-radius: 10px;
+    background: rgba(5, 8, 7, 0.72);
+    padding: 8px 10px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: clamp(0.92rem, 1.6vw, 1.22rem);
+    line-height: 1;
+    text-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
+  }
+
+  .temple-play-topbar p:last-child {
+    display: none;
   }
 
   .temple-play-passport {
     display: grid;
-    min-width: 190px;
+    min-width: 168px;
     gap: 4px;
     border: 1px solid rgba(245, 239, 218, 0.14);
-    border-radius: 14px;
+    border-radius: 11px;
     background: rgba(5, 12, 10, 0.72);
-    padding: 14px;
+    padding: 10px 12px;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
   }
 
@@ -2429,7 +2440,7 @@
 
   .temple-play-passport strong {
     color: var(--temple-gold);
-    font-size: 28px;
+    font-size: 22px;
     font-weight: 950;
     line-height: 1;
   }
@@ -2466,8 +2477,8 @@
 
   .temple-play-hud {
     position: absolute;
-    left: 16px;
-    top: 92px;
+    left: 12px;
+    top: 72px;
     z-index: 5;
     display: flex;
     flex-wrap: wrap;
@@ -2491,8 +2502,8 @@
 
   .temple-play-miniquest {
     position: absolute;
-    right: 16px;
-    top: 92px;
+    right: 12px;
+    top: 72px;
     z-index: 5;
     width: min(320px, calc(100% - 32px));
     border-radius: 16px;
@@ -2659,9 +2670,12 @@
     --npc: var(--temple-gold);
     --npc-accent: var(--temple-emerald);
     position: relative;
+    display: grid;
+    place-items: end center;
     width: 86px;
     height: 92px;
     flex: 0 0 auto;
+    overflow: hidden;
     border: 4px solid #07100c;
     border-radius: 24px 24px 18px 18px;
     background: var(--npc);
@@ -2669,41 +2683,14 @@
     animation: templePlayNpcBreathe 2.8s ease-in-out infinite;
   }
 
-  .temple-play-npc-portrait i,
-  .temple-play-npc-portrait b,
-  .temple-play-npc-portrait span {
-    position: absolute;
+  .temple-play-npc-sprite {
     display: block;
-  }
-
-  .temple-play-npc-portrait i {
-    left: 17px;
-    top: 34px;
-    width: 12px;
-    height: 13px;
-    border-radius: 4px;
-    background: #f7f1df;
-    box-shadow: 37px 0 0 #f7f1df;
-    animation: templePlayBlink 4.2s infinite;
-  }
-
-  .temple-play-npc-portrait b {
-    left: 33px;
-    top: 59px;
-    width: 20px;
-    height: 6px;
-    border-radius: 999px;
-    background: #07100c;
-  }
-
-  .temple-play-npc-portrait span {
-    left: 21px;
-    top: -16px;
-    width: 44px;
-    height: 22px;
-    border: 4px solid #07100c;
-    border-radius: 12px 12px 4px 4px;
-    background: var(--npc-accent);
+    width: 82px;
+    height: 90px;
+    background-repeat: no-repeat;
+    image-rendering: pixelated;
+    filter: drop-shadow(0 6px 0 rgba(0, 0, 0, 0.22));
+    animation: templePlaySpriteIdle 2.8s ease-in-out infinite;
   }
 
   .temple-play-quiz-header p,
@@ -2890,12 +2877,12 @@
 
   @keyframes templePlayNpcBreathe {
     0%, 100% { transform: translateY(0) scale(1); }
-    50% { transform: translateY(-6px) scale(1.02); }
+    50% { transform: translateY(-2px) scale(1.01); }
   }
 
-  @keyframes templePlayBlink {
-    0%, 92%, 100% { transform: scaleY(1); }
-    95% { transform: scaleY(0.1); }
+  @keyframes templePlaySpriteIdle {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-2px); }
   }
 
   @media (max-width: 960px) {
@@ -3006,7 +2993,7 @@
 
   @media (prefers-reduced-motion: reduce) {
     .temple-play-npc-portrait,
-    .temple-play-npc-portrait i {
+    .temple-play-npc-sprite {
       animation: none !important;
     }
   }

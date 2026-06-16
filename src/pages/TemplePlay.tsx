@@ -19,7 +19,7 @@ type QuestNpc = {
   zone: string
   npc: string
   role: string
-  kind: PixelCharacterKind
+  sprite: SpriteKey
   x: number
   y: number
   color: string
@@ -32,7 +32,7 @@ type QuestNpc = {
 
 type AmbientNpc = {
   name: string
-  kind: PixelCharacterKind
+  sprite: SpriteKey
   x: number
   y: number
   color: string
@@ -47,24 +47,74 @@ type PlayerState = {
   moving: boolean
 }
 
-type PixelCharacterKind =
-  | 'builder'
-  | 'keeper'
-  | 'scout'
-  | 'signal'
-  | 'professor'
-  | 'boba'
-  | 'moss'
-  | 'bond'
-  | 'messenger'
-  | 'jade'
-  | 'privacy'
-  | 'timer'
-  | 'orb'
+type SpriteKey =
+  | 'nxr'
+  | 'runeMage'
+  | 'shadowScout'
+  | 'questRunner'
+  | 'labProfessor'
+  | 'siggyCat'
+  | 'templeBear'
 
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000' as const
 const WORLD = { width: 2100, height: 1460 }
 const PLAYER_SPEED = 245
+
+type SpriteSheet = {
+  src: string
+  frameW: number
+  frameH: number
+  frames: number
+  drawW: number
+  drawH: number
+}
+
+type TemplePlayAssets = {
+  sprites: Record<SpriteKey, HTMLImageElement>
+  props: Record<PropKey, HTMLImageElement>
+  loaded: boolean
+}
+
+type PropKey =
+  | 'balineseTemple'
+  | 'guardianStatue'
+  | 'gardenTile'
+  | 'soilTile'
+  | 'soilCross'
+  | 'vineCornerA'
+  | 'vineCornerB'
+  | 'vineCornerC'
+  | 'leafPlant'
+  | 'pepperPlant'
+  | 'pepperCluster'
+  | 'sunflower'
+  | 'smallPepper'
+
+const SPRITES: Record<SpriteKey, SpriteSheet> = {
+  nxr: { src: '/temple-play/sprites/nxr.png', frameW: 190, frameH: 210, frames: 8, drawW: 94, drawH: 104 },
+  runeMage: { src: '/temple-play/sprites/rune-mage.png', frameW: 160, frameH: 185, frames: 10, drawW: 72, drawH: 84 },
+  shadowScout: { src: '/temple-play/sprites/shadow-scout.png', frameW: 150, frameH: 180, frames: 10, drawW: 70, drawH: 84 },
+  questRunner: { src: '/temple-play/sprites/quest-runner.png', frameW: 145, frameH: 185, frames: 10, drawW: 70, drawH: 90 },
+  labProfessor: { src: '/temple-play/sprites/lab-professor.png', frameW: 150, frameH: 185, frames: 10, drawW: 72, drawH: 88 },
+  siggyCat: { src: '/temple-play/sprites/siggy-cat.png', frameW: 160, frameH: 170, frames: 10, drawW: 76, drawH: 82 },
+  templeBear: { src: '/temple-play/sprites/temple-bear.png', frameW: 155, frameH: 180, frames: 10, drawW: 74, drawH: 86 },
+}
+
+const PROPS: Record<PropKey, string> = {
+  balineseTemple: '/temple-play/sprites/balinese-temple.png',
+  guardianStatue: '/temple-play/sprites/guardian-statue.png',
+  gardenTile: '/temple-play/sprites/garden-tile.png',
+  soilTile: '/temple-play/sprites/soil-tile.png',
+  soilCross: '/temple-play/sprites/soil-cross.png',
+  vineCornerA: '/temple-play/sprites/vine-corner-a.png',
+  vineCornerB: '/temple-play/sprites/vine-corner-b.png',
+  vineCornerC: '/temple-play/sprites/vine-corner-c.png',
+  leafPlant: '/temple-play/sprites/leaf-plant.png',
+  pepperPlant: '/temple-play/sprites/pepper-plant.png',
+  pepperCluster: '/temple-play/sprites/pepper-cluster.png',
+  sunflower: '/temple-play/sprites/sunflower.png',
+  smallPepper: '/temple-play/sprites/small-pepper.png',
+}
 
 const QUESTS: QuestNpc[] = [
   {
@@ -73,7 +123,7 @@ const QUESTS: QuestNpc[] = [
     zone: 'Temple Gate',
     npc: 'NXR',
     role: 'Builder Guide',
-    kind: 'builder',
+    sprite: 'nxr',
     x: 420,
     y: 420,
     color: '#f2c866',
@@ -108,7 +158,7 @@ const QUESTS: QuestNpc[] = [
     zone: 'RWA Vault',
     npc: 'Vault Keeper Mino',
     role: 'Asset Guardian',
-    kind: 'keeper',
+    sprite: 'templeBear',
     x: 1450,
     y: 360,
     color: '#ffad72',
@@ -143,7 +193,7 @@ const QUESTS: QuestNpc[] = [
     zone: 'Agent Camp',
     npc: 'Scout Luma',
     role: 'Agent Coordinator',
-    kind: 'scout',
+    sprite: 'shadowScout',
     x: 1050,
     y: 790,
     color: '#78ecff',
@@ -178,7 +228,7 @@ const QUESTS: QuestNpc[] = [
     zone: 'Signal Tower',
     npc: 'Zap Tiko',
     role: 'Signal Runner',
-    kind: 'signal',
+    sprite: 'questRunner',
     x: 1650,
     y: 980,
     color: '#b9ff66',
@@ -213,7 +263,7 @@ const QUESTS: QuestNpc[] = [
     zone: 'SCALE Lab',
     npc: 'Professor Rune',
     role: 'SCALE Engineer',
-    kind: 'professor',
+    sprite: 'labProfessor',
     x: 720,
     y: 1080,
     color: '#c886ff',
@@ -251,18 +301,18 @@ const QUESTS: QuestNpc[] = [
 ]
 
 const AMBIENT_NPCS: AmbientNpc[] = [
-  { name: 'Boba Byte', kind: 'boba', x: 310, y: 880, color: '#ff7ad9', accent: '#f2c866', line: 'Rain makes the data spring louder.' },
-  { name: 'Mossy Dex', kind: 'moss', x: 640, y: 630, color: '#57e39f', accent: '#78ecff', line: 'Try walking near a glowing NPC and press E.' },
-  { name: 'Peeko Bond', kind: 'bond', x: 870, y: 300, color: '#f2c866', accent: '#ffad72', line: 'RWA vaults like clean verification stamps.' },
-  { name: 'Firo Mail', kind: 'messenger', x: 1260, y: 610, color: '#78ecff', accent: '#ff7ad9', line: 'Bridge Gate scrolls carry API messages out and back.' },
-  { name: 'Jade Numi', kind: 'jade', x: 1800, y: 570, color: '#b9ff66', accent: '#57e39f', line: 'Temple Energy returns when the daily ritual cools down.' },
-  { name: 'Pixel Kora', kind: 'privacy', x: 360, y: 1230, color: '#c886ff', accent: '#f2c866', line: 'Privacy chambers turn plain scrolls into protected ones.' },
-  { name: 'Tama Tick', kind: 'timer', x: 1340, y: 1180, color: '#ffad72', accent: '#78ecff', line: 'Signals are tiny real-world updates with big consequences.' },
-  { name: 'Orb Nalo', kind: 'orb', x: 1880, y: 1120, color: '#57e39f', accent: '#c886ff', line: 'Every badge is better when the ledger can verify it.' },
-  { name: 'Rune Pika', kind: 'scout', x: 520, y: 1010, color: '#ffe36e', accent: '#57e39f', line: 'Quest boards like brave learners.' },
-  { name: 'Minty Mox', kind: 'moss', x: 1510, y: 1260, color: '#67ffc0', accent: '#f2c866', line: 'The map gets brighter when badges are claimed.' },
-  { name: 'Sera API', kind: 'messenger', x: 1930, y: 290, color: '#88d7ff', accent: '#ff8066', line: 'A response scroll always comes back through Bridge Gate.' },
-  { name: 'Candi Dot', kind: 'jade', x: 1130, y: 260, color: '#b9ff66', accent: '#f2c866', line: 'The temple is friendlier when every system can talk.' },
+  { name: 'Boba Byte', sprite: 'siggyCat', x: 310, y: 880, color: '#ff7ad9', accent: '#f2c866', line: 'Rain makes the data spring louder.' },
+  { name: 'Mossy Dex', sprite: 'runeMage', x: 640, y: 630, color: '#57e39f', accent: '#78ecff', line: 'Try walking near a glowing NPC and press E.' },
+  { name: 'Peeko Bond', sprite: 'templeBear', x: 870, y: 300, color: '#f2c866', accent: '#ffad72', line: 'RWA vaults like clean verification stamps.' },
+  { name: 'Firo Mail', sprite: 'shadowScout', x: 1260, y: 610, color: '#78ecff', accent: '#ff7ad9', line: 'Bridge Gate scrolls carry API messages out and back.' },
+  { name: 'Jade Numi', sprite: 'siggyCat', x: 1800, y: 570, color: '#b9ff66', accent: '#57e39f', line: 'Temple Energy returns when the daily ritual cools down.' },
+  { name: 'Pixel Kora', sprite: 'runeMage', x: 360, y: 1230, color: '#c886ff', accent: '#f2c866', line: 'Privacy chambers turn plain scrolls into protected ones.' },
+  { name: 'Tama Tick', sprite: 'questRunner', x: 1340, y: 1180, color: '#ffad72', accent: '#78ecff', line: 'Signals are tiny real-world updates with big consequences.' },
+  { name: 'Orb Nalo', sprite: 'labProfessor', x: 1880, y: 1120, color: '#57e39f', accent: '#c886ff', line: 'Every badge is better when the ledger can verify it.' },
+  { name: 'Rune Pika', sprite: 'shadowScout', x: 520, y: 1010, color: '#ffe36e', accent: '#57e39f', line: 'Quest boards like brave learners.' },
+  { name: 'Minty Mox', sprite: 'siggyCat', x: 1510, y: 1260, color: '#67ffc0', accent: '#f2c866', line: 'The map gets brighter when badges are claimed.' },
+  { name: 'Sera API', sprite: 'shadowScout', x: 1930, y: 290, color: '#88d7ff', accent: '#ff8066', line: 'A response scroll always comes back through Bridge Gate.' },
+  { name: 'Candi Dot', sprite: 'runeMage', x: 1130, y: 260, color: '#b9ff66', accent: '#f2c866', line: 'The temple is friendlier when every system can talk.' },
 ]
 
 export default function TemplePlay() {
@@ -545,6 +595,7 @@ function TemplePlayCanvas({
   const player = useRef<PlayerState>({ x: 570, y: 570, dir: 'down', moving: false })
   const nearId = useRef<number | null>(null)
   const completedLatest = useRef(completedIds)
+  const assetsRef = useRef<TemplePlayAssets | null>(null)
 
   useEffect(() => {
     completedLatest.current = completedIds
@@ -595,12 +646,24 @@ function TemplePlayCanvas({
     window.addEventListener('keydown', keyDown)
     window.addEventListener('keyup', keyUp)
 
+    void loadTemplePlayAssets().then((assets) => {
+      if (disposed) return
+      assetsRef.current = assets
+    })
+
     function tick(now: number) {
       if (disposed || !canvas || !context || !wrap) return
       const rect = wrap.getBoundingClientRect()
       const dt = Math.min(0.033, (now - last) / 1000)
       last = now
       frame += dt
+
+      const assets = assetsRef.current
+      if (!assets) {
+        drawAssetLoading(context, rect.width, rect.height, frame)
+        window.requestAnimationFrame(tick)
+        return
+      }
 
       const input = movementFromInput(keys.current, joystickVectorRef.current)
       const current = player.current
@@ -623,7 +686,7 @@ function TemplePlayCanvas({
         y: clamp(current.y - rect.height / 2, 0, Math.max(0, WORLD.height - rect.height)),
       }
 
-      drawWorld(context, rect.width, rect.height, camera, frame, current, completedLatest.current, nearId.current)
+      drawWorld(context, rect.width, rect.height, camera, frame, current, completedLatest.current, nearId.current, assets)
       window.requestAnimationFrame(tick)
     }
 
@@ -677,6 +740,9 @@ function QuizOverlay({
   onRetry: () => void
   onClaim: () => void
 }) {
+  const portrait = SPRITES[quest.sprite]
+  const portraitFrame = portrait.frames > 6 ? 6 : 0
+
   return (
     <motion.div className="temple-play-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
       <motion.section
@@ -687,9 +753,14 @@ function QuizOverlay({
       >
         <div className="temple-play-quiz-header">
           <div className="temple-play-npc-portrait" style={{ '--npc': quest.color, '--npc-accent': quest.accent } as CSSProperties}>
-            <i />
-            <b />
-            <span />
+            <span
+              className="temple-play-npc-sprite"
+              style={{
+                backgroundImage: `url(${portrait.src})`,
+                backgroundSize: `${portrait.frames * 100}% 100%`,
+                backgroundPosition: portrait.frames > 1 ? `${(portraitFrame / (portrait.frames - 1)) * 100}% 0` : '0 0',
+              }}
+            />
           </div>
           <div>
             <p>{quest.npc} / {quest.role}</p>
@@ -806,6 +877,46 @@ function Joystick({
   )
 }
 
+async function loadTemplePlayAssets(): Promise<TemplePlayAssets> {
+  const spriteEntries = await Promise.all(
+    Object.entries(SPRITES).map(async ([key, sheet]) => [key, await loadImage(sheet.src)] as const),
+  )
+  const propEntries = await Promise.all(
+    Object.entries(PROPS).map(async ([key, src]) => [key, await loadImage(src)] as const),
+  )
+
+  return {
+    sprites: Object.fromEntries(spriteEntries) as Record<SpriteKey, HTMLImageElement>,
+    props: Object.fromEntries(propEntries) as Record<PropKey, HTMLImageElement>,
+    loaded: true,
+  }
+}
+
+function loadImage(src: string) {
+  return new Promise<HTMLImageElement>((resolve, reject) => {
+    const image = new Image()
+    image.onload = () => resolve(image)
+    image.onerror = () => reject(new Error(`Failed to load ${src}`))
+    image.src = src
+  })
+}
+
+function drawAssetLoading(ctx: CanvasRenderingContext2D, width: number, height: number, time: number) {
+  ctx.fillStyle = '#101711'
+  ctx.fillRect(0, 0, width, height)
+  const cx = width / 2
+  const cy = height / 2
+  ctx.fillStyle = '#f2c866'
+  ctx.font = '900 14px monospace'
+  ctx.textAlign = 'center'
+  ctx.fillText('LOADING TEMPLE SPRITES', cx, cy - 28)
+  ctx.fillStyle = 'rgba(245,239,218,.18)'
+  ctx.fillRect(cx - 110, cy, 220, 18)
+  ctx.fillStyle = '#57e39f'
+  ctx.fillRect(cx - 106, cy + 4, 32 + ((Math.sin(time * 4) + 1) / 2) * 148, 10)
+  ctx.textAlign = 'left'
+}
+
 function movementFromInput(keys: Set<string>, joystick: { x: number; y: number }) {
   let x = joystick.x
   let y = joystick.y
@@ -839,53 +950,64 @@ function drawWorld(
   player: PlayerState,
   completedIds: Set<number>,
   nearNpcId: number | null,
+  assets: TemplePlayAssets,
 ) {
   ctx.clearRect(0, 0, width, height)
   ctx.save()
   ctx.translate(-camera.x, -camera.y)
-  drawGround(ctx, time)
+  drawGround(ctx, time, assets)
   drawPaths(ctx, time)
   drawWater(ctx, time)
-  drawBuildings(ctx, time, completedIds)
-  drawTrees(ctx, time)
-  drawNpcLayer(ctx, time, completedIds, nearNpcId)
-  drawPlayer(ctx, player, time)
+  drawEnvironmentProps(ctx, time, assets)
+  drawBuildings(ctx, time, completedIds, assets)
+  drawActors(ctx, time, completedIds, nearNpcId, player, assets)
   drawWeather(ctx, camera, width, height, time)
   ctx.restore()
   drawScanlines(ctx, width, height)
 }
 
-function drawGround(ctx: CanvasRenderingContext2D, time: number) {
-  ctx.fillStyle = '#2f6f45'
+function drawGround(ctx: CanvasRenderingContext2D, time: number, assets: TemplePlayAssets) {
+  ctx.fillStyle = '#315f43'
   ctx.fillRect(0, 0, WORLD.width, WORLD.height)
   for (let y = 0; y < WORLD.height; y += 64) {
     for (let x = 0; x < WORLD.width; x += 64) {
-      const plaza = (x > 610 && x < 1880 && y > 110 && y < 610) || (x > 760 && x < 1680 && y > 520 && y < 1120)
-      const grove = x > 1370 && y > 820
-      const spring = x < 690 && y > 860
+      const plaza = (x > 550 && x < 1660 && y > 180 && y < 620) || (x > 700 && x < 1700 && y > 560 && y < 1180)
+      const grove = x > 1300 && y > 820
+      const spring = x < 680 && y > 850
+      const garden = x > 120 && x < 540 && y > 780 && y < 1220
       const tone = (x / 64 + y / 64) % 4
       ctx.fillStyle = plaza
-        ? tone % 2 === 0 ? '#b58b58' : '#c39a65'
+        ? tone % 2 === 0 ? '#a98357' : '#ba9362'
         : grove
           ? tone % 2 === 0 ? '#604b86' : '#6c5595'
           : spring
             ? tone % 2 === 0 ? '#2f8c78' : '#327f73'
+            : garden
+              ? tone % 2 === 0 ? '#8b503f' : '#965947'
             : tone === 0 ? '#34784d' : tone === 1 ? '#3b8255' : tone === 2 ? '#317148' : '#3f8959'
       ctx.fillRect(x, y, 64, 64)
-      ctx.fillStyle = plaza ? 'rgba(89, 60, 39, .18)' : 'rgba(247, 241, 223, .12)'
+      ctx.fillStyle = plaza ? 'rgba(89, 60, 39, .2)' : 'rgba(247, 241, 223, .12)'
       ctx.fillRect(x + 18, y + 18, 6, 6)
       ctx.fillRect(x + 42, y + 38, 5, 5)
-      if ((x + y) % 256 === 0) {
+      if (!plaza && !garden && (x + y) % 256 === 0) {
         ctx.fillStyle = plaza ? '#8f6d44' : '#7bc66d'
         ctx.fillRect(x + 18, y + 20 + Math.sin(time + x) * 1.5, 6, 18)
         ctx.fillRect(x + 42, y + 36, 5, 14)
       }
-      if ((x * 3 + y) % 448 === 0) {
+      if (!plaza && (x * 3 + y) % 448 === 0) {
         ctx.fillStyle = plaza ? '#ff7ad9' : '#d576ff'
         ctx.fillRect(x + 12, y + 11, 11, 11)
         ctx.fillStyle = '#dbc9d7'
         ctx.fillRect(x + 44, y + 42, 12, 10)
       }
+    }
+  }
+
+  for (let y = 790; y <= 1130; y += 110) {
+    for (let x = 145; x <= 470; x += 112) {
+      drawProp(ctx, assets, 'soilTile', x, y, 82, 82)
+      const plant: PropKey = (x + y) % 3 === 0 ? 'pepperCluster' : (x + y) % 3 === 1 ? 'pepperPlant' : 'leafPlant'
+      drawProp(ctx, assets, plant, x + 12, y + 4 + Math.sin(time * 1.5 + x) * 2, 58, 64)
     }
   }
 }
@@ -936,14 +1058,14 @@ function drawWater(ctx: CanvasRenderingContext2D, time: number) {
   }
 }
 
-function drawBuildings(ctx: CanvasRenderingContext2D, time: number, completedIds: Set<number>) {
-  drawTempleBuilding(ctx, 250, 260, 270, 190, '#87674d', '#f2c866', 'Gate')
-  drawTempleBuilding(ctx, 1320, 180, 300, 230, '#685149', '#f2c866', 'RWA Vault')
-  drawTempleBuilding(ctx, 910, 650, 310, 220, '#4c5d65', '#78ecff', 'Agent Camp')
-  drawTempleBuilding(ctx, 1525, 820, 260, 260, '#493b64', '#b9ff66', 'Signal Tower')
-  drawTempleBuilding(ctx, 585, 920, 300, 220, '#4b3d65', '#c886ff', 'SCALE Lab')
-  drawTempleBuilding(ctx, 1170, 470, 270, 160, '#3e605a', '#57e39f', 'Bridge Gate')
-  drawTempleBuilding(ctx, 170, 1030, 230, 170, '#455d45', '#ff7ad9', 'Privacy Grove')
+function drawBuildings(ctx: CanvasRenderingContext2D, time: number, completedIds: Set<number>, assets: TemplePlayAssets) {
+  drawProp(ctx, assets, 'balineseTemple', 254, 120, 250, 316)
+  drawTempleBuilding(ctx, 1260, 170, 330, 238, '#685149', '#f2c866', 'RWA Vault', time, 'vault')
+  drawTempleBuilding(ctx, 865, 635, 330, 228, '#3f5d68', '#78ecff', 'Agent Camp', time, 'camp')
+  drawTempleBuilding(ctx, 1510, 790, 282, 286, '#493b64', '#b9ff66', 'Signal Tower', time, 'tower')
+  drawTempleBuilding(ctx, 560, 910, 316, 238, '#4b3d65', '#c886ff', 'SCALE Lab', time, 'lab')
+  drawTempleBuilding(ctx, 1130, 465, 280, 174, '#3e605a', '#57e39f', 'Bridge Gate', time, 'gate')
+  drawTempleBuilding(ctx, 138, 1020, 258, 188, '#455d45', '#ff7ad9', 'Privacy Grove', time, 'grove')
 
   QUESTS.forEach((quest) => {
     if (!completedIds.has(quest.quizId)) return
@@ -967,7 +1089,18 @@ function drawBuildings(ctx: CanvasRenderingContext2D, time: number, completedIds
   })
 }
 
-function drawTempleBuilding(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, wall: string, glow: string, label: string) {
+function drawTempleBuilding(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  wall: string,
+  glow: string,
+  label: string,
+  time: number,
+  shape: 'vault' | 'camp' | 'tower' | 'lab' | 'gate' | 'grove',
+) {
   ctx.fillStyle = 'rgba(0,0,0,.25)'
   ctx.fillRect(x + 18, y + h - 16, w, 34)
   ctx.fillStyle = wall
@@ -982,10 +1115,49 @@ function drawTempleBuilding(ctx: CanvasRenderingContext2D, x: number, y: number,
   ctx.strokeStyle = '#07100c'
   ctx.lineWidth = 6
   ctx.stroke()
+  ctx.fillStyle = 'rgba(255,255,255,.12)'
+  ctx.fillRect(x + 16, y + 68, w - 32, 8)
   ctx.fillStyle = '#161611'
   ctx.fillRect(x + w / 2 - 30, y + h - 74, 60, 74)
-  ctx.fillStyle = 'rgba(247,241,223,.8)'
-  for (let i = 0; i < 5; i++) ctx.fillRect(x + 26 + i * 48, y + 92, 20, 28)
+  ctx.fillStyle = glow
+  ctx.fillRect(x + w / 2 - 18, y + h - 58, 36, 10)
+  ctx.fillStyle = 'rgba(247,241,223,.82)'
+  const windows = Math.max(3, Math.floor(w / 72))
+  for (let i = 0; i < windows; i++) {
+    const wx = x + 28 + i * ((w - 56) / Math.max(1, windows - 1))
+    const pulse = 0.65 + Math.sin(time * 2 + i) * 0.2
+    ctx.globalAlpha = pulse
+    ctx.fillRect(wx, y + 94, 18, 28)
+    ctx.globalAlpha = 1
+  }
+  if (shape === 'vault') {
+    ctx.strokeStyle = '#f2c866'
+    ctx.lineWidth = 5
+    ctx.strokeRect(x + w / 2 - 50, y + h - 92, 100, 92)
+    ctx.fillStyle = '#07100c'
+    ctx.fillRect(x + w / 2 - 10, y + h - 52, 20, 18)
+  } else if (shape === 'tower') {
+    ctx.fillStyle = '#07100c'
+    ctx.fillRect(x + w / 2 - 18, y + 20, 36, h - 18)
+    ctx.fillStyle = glow
+    ctx.fillRect(x + w / 2 - 9, y + 2, 18, h - 32)
+  } else if (shape === 'lab') {
+    ctx.fillStyle = '#57e39f'
+    ctx.fillRect(x + 40, y + 124, 48, 20)
+    ctx.fillStyle = '#78ecff'
+    ctx.fillRect(x + w - 92, y + 120, 42, 26)
+  } else if (shape === 'camp') {
+    ctx.fillStyle = '#f2c866'
+    ctx.fillRect(x + 54, y + h - 108, 52, 46)
+    ctx.fillStyle = '#78ecff'
+    ctx.fillRect(x + w - 110, y + h - 108, 52, 46)
+  } else if (shape === 'gate') {
+    ctx.fillStyle = '#07100c'
+    ctx.fillRect(x + 44, y + h - 104, 30, 104)
+    ctx.fillRect(x + w - 74, y + h - 104, 30, 104)
+    ctx.fillStyle = glow
+    ctx.fillRect(x + 74, y + h - 102, w - 148, 14)
+  }
   ctx.fillStyle = '#07100c'
   ctx.fillRect(x + 18, y + h + 14, Math.max(116, label.length * 12), 34)
   ctx.fillStyle = glow
@@ -993,7 +1165,15 @@ function drawTempleBuilding(ctx: CanvasRenderingContext2D, x: number, y: number,
   ctx.fillText(label, x + 30, y + h + 38)
 }
 
-function drawTrees(ctx: CanvasRenderingContext2D, time: number) {
+function drawEnvironmentProps(ctx: CanvasRenderingContext2D, time: number, assets: TemplePlayAssets) {
+  drawProp(ctx, assets, 'sunflower', 96, 790 + Math.sin(time * 1.4) * 2, 50, 58)
+  drawProp(ctx, assets, 'pepperCluster', 510, 1040 + Math.sin(time * 1.2) * 2, 58, 62)
+  drawProp(ctx, assets, 'guardianStatue', 1135, 350, 82, 104)
+  drawProp(ctx, assets, 'guardianStatue', 1550, 350, 82, 104)
+  drawProp(ctx, assets, 'vineCornerA', 1660, 1180, 88, 88)
+  drawProp(ctx, assets, 'vineCornerB', 1840, 970, 88, 88)
+  drawProp(ctx, assets, 'vineCornerC', 90, 1180, 88, 88)
+
   for (let i = 0; i < 52; i++) {
     const x = 90 + ((i * 257) % (WORLD.width - 180))
     const y = 120 + ((i * 181) % (WORLD.height - 240))
@@ -1009,316 +1189,199 @@ function drawTrees(ctx: CanvasRenderingContext2D, time: number) {
   }
 }
 
-function drawNpcLayer(ctx: CanvasRenderingContext2D, time: number, completedIds: Set<number>, nearNpcId: number | null) {
-  AMBIENT_NPCS.forEach((npc, index) => drawPixelCritter(ctx, {
-    x: npc.x,
-    y: npc.y,
-    kind: npc.kind,
-    primary: npc.color,
-    accent: npc.accent,
-    name: npc.name,
-    time,
-    seed: index * 0.67,
-    scale: 3.2,
-    compactLabel: true,
-  }))
-  QUESTS.forEach((quest) => {
-    const completed = completedIds.has(quest.quizId)
-    drawPixelCharacter(ctx, {
-      x: quest.x,
-      y: quest.y,
-      kind: quest.kind,
-      primary: quest.color,
-      accent: quest.accent,
-      name: quest.npc,
-      time,
-      seed: quest.id * 0.48,
-      scale: 3.8,
-      near: nearNpcId === quest.id,
-      completed,
+function drawProp(
+  ctx: CanvasRenderingContext2D,
+  assets: TemplePlayAssets,
+  key: PropKey,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+) {
+  const image = assets.props[key]
+  if (!image) return
+  ctx.drawImage(image, Math.round(x), Math.round(y), Math.round(w), Math.round(h))
+}
+
+function drawActors(
+  ctx: CanvasRenderingContext2D,
+  time: number,
+  completedIds: Set<number>,
+  nearNpcId: number | null,
+  player: PlayerState,
+  assets: TemplePlayAssets,
+) {
+  const actors: Array<{ y: number; draw: () => void }> = []
+
+  AMBIENT_NPCS.forEach((npc, index) => {
+    const walkX = Math.sin(time * 0.42 + index * 1.8) * 18
+    const walkY = Math.cos(time * 0.36 + index * 1.2) * 9
+    actors.push({
+      y: npc.y + walkY,
+      draw: () => drawSpriteActor(ctx, assets, {
+        sprite: npc.sprite,
+        x: npc.x + walkX,
+        y: npc.y + walkY,
+        name: npc.name,
+        tone: npc.color,
+        accent: npc.accent,
+        time,
+        seed: index * 0.73,
+        compact: true,
+        moving: Math.abs(walkX) > 8,
+      }),
     })
   })
+
+  QUESTS.forEach((quest) => {
+    const completed = completedIds.has(quest.quizId)
+    actors.push({
+      y: quest.y,
+      draw: () => drawSpriteActor(ctx, assets, {
+        sprite: quest.sprite,
+        x: quest.x,
+        y: quest.y,
+        name: completed ? `${quest.npc} OK` : quest.npc,
+        tone: quest.color,
+        accent: quest.accent,
+        time,
+        seed: quest.id * 0.48,
+        near: nearNpcId === quest.id,
+        completed,
+      }),
+    })
+  })
+
+  actors.push({
+    y: player.y,
+    draw: () => drawSpriteActor(ctx, assets, {
+      sprite: 'nxr',
+      x: player.x,
+      y: player.y,
+      name: 'NXR (you)',
+      tone: '#f2c866',
+      accent: '#57e39f',
+      time,
+      seed: 1.4,
+      player: true,
+      moving: player.moving,
+    }),
+  })
+
+  actors.sort((a, b) => a.y - b.y).forEach((actor) => actor.draw())
 }
 
-function drawPixelCritter(
+function drawSpriteActor(
   ctx: CanvasRenderingContext2D,
+  assets: TemplePlayAssets,
   {
+    sprite,
     x,
     y,
-    kind,
-    primary,
-    accent,
     name,
-    time,
-    seed = 0,
-    scale = 3.2,
-    compactLabel = true,
-  }: {
-    x: number
-    y: number
-    kind: PixelCharacterKind
-    primary: string
-    accent: string
-    name: string
-    time: number
-    seed?: number
-    scale?: number
-    compactLabel?: boolean
-  },
-) {
-  const s = scale
-  const left = Math.round(x - 8 * s)
-  const top = Math.round(y - 20 * s)
-  const blink = Math.sin(time * 3.2 + seed) > 0.965
-  const wiggle = Math.sin(time * 2 + seed)
-  const px = (gx: number, gy: number, gw: number, gh: number, color: string) => {
-    ctx.fillStyle = color
-    ctx.fillRect(Math.round(left + gx * s), Math.round(top + gy * s), Math.ceil(gw * s), Math.ceil(gh * s))
-  }
-
-  ctx.fillStyle = 'rgba(0,0,0,.3)'
-  ctx.fillRect(Math.round(x - 6 * s), Math.round(y - 1 * s), Math.round(12 * s), Math.round(3 * s))
-
-  if (kind === 'boba') {
-    px(3, 5, 10, 12, '#07100c')
-    px(4, 6, 8, 10, primary)
-    px(5, 3, 6, 4, '#07100c')
-    px(6, 4, 4, 2, accent)
-    px(12, 8 + wiggle * 0.4, 3, 4, '#07100c')
-    px(12.6, 8.5 + wiggle * 0.4, 2, 2, accent)
-  } else if (kind === 'moss') {
-    px(2, 8, 12, 9, '#07100c')
-    px(3, 9, 10, 7, primary)
-    px(2, 5 + wiggle * 0.4, 4, 4, '#07100c')
-    px(3, 6 + wiggle * 0.4, 2, 2, accent)
-    px(10, 4 - wiggle * 0.4, 5, 5, '#07100c')
-    px(11, 5 - wiggle * 0.4, 3, 3, accent)
-  } else if (kind === 'bond') {
-    px(3, 6, 10, 10, '#07100c')
-    px(4, 7, 8, 8, primary)
-    px(2, 4, 4, 4, '#07100c')
-    px(10, 4, 4, 4, '#07100c')
-    px(3, 5, 2, 2, accent)
-    px(11, 5, 2, 2, accent)
-    px(12, 12, 3, 2, '#07100c')
-  } else if (kind === 'messenger') {
-    px(4, 5, 8, 11, '#07100c')
-    px(5, 6, 6, 9, primary)
-    px(1, 9 + wiggle * 0.5, 4, 4, '#07100c')
-    px(11, 9 - wiggle * 0.5, 4, 4, '#07100c')
-    px(2, 10 + wiggle * 0.5, 2, 2, accent)
-    px(12, 10 - wiggle * 0.5, 2, 2, accent)
-    px(6, 3, 4, 2, accent)
-  } else if (kind === 'jade') {
-    px(3, 7, 10, 10, '#07100c')
-    px(4, 8, 8, 8, primary)
-    px(7, 3, 2, 5, '#07100c')
-    px(6, 2, 2, 3, accent)
-    px(9, 2, 2, 3, accent)
-  } else if (kind === 'privacy') {
-    px(3, 4, 10, 13, '#07100c')
-    px(4, 5, 8, 11, primary)
-    px(5, 11, 6, 3, accent)
-    px(6, 2, 4, 3, '#07100c')
-    px(7, 3, 2, 1, accent)
-  } else if (kind === 'timer') {
-    px(3, 5, 10, 11, '#07100c')
-    px(4, 6, 8, 9, primary)
-    px(5, 3, 2, 3, '#07100c')
-    px(10, 3, 2, 3, '#07100c')
-    px(7, 10, 2, 1, accent)
-    px(8, 8, 1, 4, '#07100c')
-  } else {
-    px(3, 6, 10, 10, '#07100c')
-    px(4, 7, 8, 8, primary)
-    px(6, 2 + wiggle * 0.4, 4, 4, '#07100c')
-    px(7, 3 + wiggle * 0.4, 2, 2, accent)
-  }
-
-  if (blink) {
-    px(5, 10, 2, 0.8, '#07100c')
-    px(9, 10, 2, 0.8, '#07100c')
-  } else {
-    px(5, 9, 2, 2, '#f7f1df')
-    px(9, 9, 2, 2, '#f7f1df')
-    px(5.5, 9.5, 1, 1, '#07100c')
-    px(9.5, 9.5, 1, 1, '#07100c')
-  }
-  px(7, 13, 2, 0.8, '#07100c')
-  drawPixelNameTag(ctx, x, y - 23 * s, name, '#f7f1df', compactLabel)
-}
-
-function drawPixelCharacter(
-  ctx: CanvasRenderingContext2D,
-  {
-    x,
-    y,
-    kind,
-    primary,
+    tone,
     accent,
-    name,
     time,
-    seed = 0,
-    scale = 4,
+    seed,
     near = false,
     completed = false,
+    compact = false,
+    player = false,
     moving = false,
-    compactLabel = false,
   }: {
+    sprite: SpriteKey
     x: number
     y: number
-    kind: PixelCharacterKind
-    primary: string
-    accent: string
     name: string
+    tone: string
+    accent: string
     time: number
-    seed?: number
-    scale?: number
+    seed: number
     near?: boolean
     completed?: boolean
+    compact?: boolean
+    player?: boolean
     moving?: boolean
-    compactLabel?: boolean
   },
 ) {
-  const s = scale
-  const left = Math.round(x - 9 * s)
-  const top = Math.round(y - 27 * s)
-  const walk = moving ? Math.floor(time * 9 + seed) % 2 : 0
-  const breath = moving ? (walk === 0 ? 0 : -1) : Math.sin(time * 2.2 + seed) > 0.35 ? -0.35 : 0
-  const blink = !moving && Math.sin(time * 3.4 + seed) > 0.965
-  const wave = Math.sin(time * 2.6 + seed)
-
-  const px = (gx: number, gy: number, gw: number, gh: number, color: string) => {
-    ctx.fillStyle = color
-    ctx.fillRect(Math.round(left + gx * s), Math.round(top + gy * s), Math.ceil(gw * s), Math.ceil(gh * s))
-  }
+  const sheet = SPRITES[sprite]
+  const image = assets.sprites[sprite]
+  const frame = chooseSpriteFrame(sheet.frames, time, seed, moving, near, completed, player)
+  const drawW = player ? sheet.drawW * 1.1 : sheet.drawW
+  const drawH = player ? sheet.drawH * 1.1 : sheet.drawH
+  const dx = Math.round(x - drawW / 2)
+  const dy = Math.round(y - drawH)
 
   ctx.fillStyle = 'rgba(0,0,0,.34)'
-  ctx.fillRect(Math.round(x - 7 * s), Math.round(y - 1 * s), Math.round(14 * s), Math.round(3 * s))
+  ctx.fillRect(Math.round(x - drawW * 0.28), Math.round(y - 10), Math.round(drawW * 0.56), 12)
 
   if (near) {
-    ctx.strokeStyle = primary
+    const pulse = 1 + Math.sin(time * 5) * 0.08
+    ctx.strokeStyle = tone
     ctx.lineWidth = 4
     ctx.beginPath()
-    ctx.arc(x, y - 13 * s, 15 * s + Math.sin(time * 4) * 3, 0, Math.PI * 2)
+    ctx.ellipse(x, y - drawH * 0.45, drawW * 0.54 * pulse, drawH * 0.48 * pulse, 0, 0, Math.PI * 2)
+    ctx.stroke()
+    ctx.fillStyle = 'rgba(242,200,102,.16)'
+    ctx.beginPath()
+    ctx.ellipse(x, y - drawH * 0.45, drawW * 0.42, drawH * 0.36, 0, 0, Math.PI * 2)
+    ctx.fill()
+  }
+
+  ctx.drawImage(
+    image,
+    frame * sheet.frameW,
+    0,
+    sheet.frameW,
+    sheet.frameH,
+    dx,
+    dy,
+    drawW,
+    drawH,
+  )
+
+  if (completed) {
+    ctx.fillStyle = accent
+    ctx.strokeStyle = '#07100c'
+    ctx.lineWidth = 3
+    ctx.beginPath()
+    ctx.moveTo(x + drawW * 0.34, y - drawH * 0.88)
+    ctx.lineTo(x + drawW * 0.44, y - drawH * 0.76)
+    ctx.lineTo(x + drawW * 0.29, y - drawH * 0.8)
+    ctx.closePath()
+    ctx.fill()
     ctx.stroke()
   }
 
-  const bodyY = 14 + breath
-  const headY = 4 + breath
-  const armLift = kind === 'messenger' || kind === 'scout' ? Math.max(0, wave) : 0
-
-  px(5, 23 + (walk === 0 ? 0 : -1), 3, 3, '#07100c')
-  px(10, 23 + (walk === 1 ? 0 : -1), 3, 3, '#07100c')
-  px(6, 22 + (walk === 0 ? 0 : -1), 2, 3, primary)
-  px(10, 22 + (walk === 1 ? 0 : -1), 2, 3, primary)
-
-  px(4, bodyY, 10, 8, '#07100c')
-  px(5, bodyY + 1, 8, 6, primary)
-  px(7, bodyY + 1, 4, 2, accent)
-  px(6, bodyY + 5, 6, 1, '#f2c866')
-
-  px(2, bodyY + 2 - armLift, 3, 5, '#07100c')
-  px(13, bodyY + 2 + armLift * 0.25, 3, 5, '#07100c')
-  px(2.6, bodyY + 2.5 - armLift, 2, 3.4, primary)
-  px(13.4, bodyY + 2.5 + armLift * 0.25, 2, 3.4, primary)
-
-  if (kind === 'builder') {
-    px(1, headY + 3, 3, 5, '#07100c')
-    px(14, headY + 3, 3, 5, '#07100c')
-    px(1.7, headY + 4, 2, 3, '#f7f1df')
-    px(14.3, headY + 4, 2, 3, '#f7f1df')
-    px(5, headY - 2, 8, 3, '#07100c')
-    px(6, headY - 1, 6, 2, accent)
-    px(7, headY - 2.8, 1, 1, '#f2c866')
-    px(10, headY - 2.8, 1, 1, '#f2c866')
-  } else if (kind === 'keeper') {
-    px(2, headY + 1, 3, 4, '#07100c')
-    px(13, headY + 1, 3, 4, '#07100c')
-    px(2.8, headY + 1.8, 2, 2.5, accent)
-    px(13.2, headY + 1.8, 2, 2.5, accent)
-    px(6, headY - 1, 6, 2, '#07100c')
-    px(7, headY - 0.4, 4, 1.4, accent)
-  } else if (kind === 'signal' || kind === 'timer') {
-    px(8, headY - 3, 2, 4, '#07100c')
-    px(8.5, headY - 4, 1, 1, accent)
-    px(5, headY - 1, 8, 2, '#07100c')
-    px(6, headY - 0.4, 6, 1.4, accent)
-  } else if (kind === 'professor') {
-    px(3, headY - 3, 12, 3, '#07100c')
-    px(5, headY - 6, 8, 4, '#07100c')
-    px(6, headY - 5, 6, 3, accent)
-    px(2, bodyY + 6, 14, 2, '#07100c')
-    px(3, bodyY + 6, 12, 1, '#f7f1df')
-  } else if (kind === 'privacy') {
-    px(4, headY - 2, 10, 4, '#07100c')
-    px(5, headY - 1, 8, 3, accent)
-    px(7, bodyY + 2, 4, 4, '#07100c')
-    px(8, bodyY + 3, 2, 2, '#f7f1df')
-  } else if (kind === 'orb') {
-    px(13, headY - 2 + Math.sin(time * 2 + seed) * 0.45, 3, 3, '#07100c')
-    px(13.5, headY - 1.5 + Math.sin(time * 2 + seed) * 0.45, 2, 2, accent)
-  } else if (kind === 'bond' || kind === 'jade') {
-    px(5, headY - 2, 8, 3, '#07100c')
-    px(6, headY - 1.2, 6, 2, accent)
-  } else if (kind === 'boba') {
-    px(4, headY - 2, 10, 3, '#07100c')
-    px(5, headY - 1, 8, 2, accent)
-    px(11, headY - 3, 2, 2, '#07100c')
-    px(11.5, headY - 2.5, 1, 1, '#f7f1df')
-  } else if (kind === 'moss') {
-    px(3, headY - 1, 12, 3, '#07100c')
-    px(4, headY - 0.2, 3, 2, accent)
-    px(8, headY - 0.8, 2, 2, accent)
-    px(11, headY - 0.2, 3, 2, accent)
-  } else if (kind === 'scout' || kind === 'messenger') {
-    px(5, headY - 3, 8, 4, '#07100c')
-    px(6, headY - 2.2, 6, 3, accent)
-    px(12, headY - 1, 3, 1.5, '#07100c')
-  }
-
-  px(3, headY + 2, 12, 11, '#07100c')
-  px(4, headY + 3, 10, 9, '#f7d983')
-  px(4, headY + 3, 10, 2, primary)
-
-  if (blink) {
-    px(6, headY + 7, 2, 0.8, '#07100c')
-    px(10, headY + 7, 2, 0.8, '#07100c')
-  } else {
-    px(6, headY + 6, 2, 2, '#f7f1df')
-    px(10, headY + 6, 2, 2, '#f7f1df')
-    px(6.5, headY + 6.5, 1, 1, '#07100c')
-    px(10.5, headY + 6.5, 1, 1, '#07100c')
-  }
-  px(7.5, headY + 10, 3, 0.8, '#07100c')
-
-  if (near || completed) {
-    px(14.5, bodyY + 1, 2, 2, completed ? '#57e39f' : '#f2c866')
-  }
-
-  drawPixelNameTag(ctx, x, y - 31 * s, completed ? `${name} OK` : name, completed ? '#57e39f' : '#f7f1df', compactLabel)
+  drawPixelNameTag(ctx, x, y - drawH - (compact ? 18 : 24), name, completed ? '#57e39f' : '#f7f1df', compact, tone)
 }
 
-function drawPlayer(ctx: CanvasRenderingContext2D, player: PlayerState, time: number) {
-  drawPixelCharacter(ctx, {
-    x: player.x,
-    y: player.y,
-    kind: 'builder',
-    primary: '#f2c866',
-    accent: '#57e39f',
-    name: 'You',
-    time,
-    scale: 4.45,
-    moving: player.moving,
-  })
+function chooseSpriteFrame(
+  frameCount: number,
+  time: number,
+  seed: number,
+  moving: boolean,
+  near: boolean,
+  completed: boolean,
+  player: boolean,
+) {
+  if (frameCount <= 1) return 0
+  if (moving) return 1 + (Math.floor(time * 8 + seed) % Math.max(1, Math.min(frameCount - 1, 4)))
+  if (near && frameCount > 6) return 6
+  if (completed && frameCount > 7) return 7
+  if (player && Math.sin(time * 1.3) > 0.82 && frameCount > 6) return 6
+  return Math.floor(time * 1.8 + seed) % 2
 }
 
-function drawPixelNameTag(ctx: CanvasRenderingContext2D, x: number, y: number, text: string, color: string, compact = false) {
+function drawPixelNameTag(ctx: CanvasRenderingContext2D, x: number, y: number, text: string, color: string, compact = false, border = '#f2c866') {
   const fontSize = compact ? 11 : 12
   ctx.font = `900 ${fontSize}px monospace`
   const width = Math.ceil(ctx.measureText(text).width) + 16
-  ctx.fillStyle = 'rgba(7, 16, 12, .92)'
+  ctx.fillStyle = 'rgba(7, 16, 12, .9)'
   ctx.fillRect(Math.round(x - width / 2), Math.round(y), width, compact ? 20 : 22)
+  ctx.strokeStyle = border
+  ctx.lineWidth = 1
+  ctx.strokeRect(Math.round(x - width / 2) + 0.5, Math.round(y) + 0.5, width - 1, (compact ? 20 : 22) - 1)
   ctx.fillStyle = color
   ctx.fillText(text, Math.round(x - width / 2 + 8), Math.round(y + (compact ? 14 : 16)))
 }
