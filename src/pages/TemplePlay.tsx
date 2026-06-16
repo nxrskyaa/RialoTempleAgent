@@ -19,6 +19,7 @@ type QuestNpc = {
   zone: string
   npc: string
   role: string
+  kind: PixelCharacterKind
   x: number
   y: number
   color: string
@@ -31,9 +32,11 @@ type QuestNpc = {
 
 type AmbientNpc = {
   name: string
+  kind: PixelCharacterKind
   x: number
   y: number
   color: string
+  accent: string
   line: string
 }
 
@@ -43,6 +46,21 @@ type PlayerState = {
   dir: 'down' | 'up' | 'left' | 'right'
   moving: boolean
 }
+
+type PixelCharacterKind =
+  | 'builder'
+  | 'keeper'
+  | 'scout'
+  | 'signal'
+  | 'professor'
+  | 'boba'
+  | 'moss'
+  | 'bond'
+  | 'messenger'
+  | 'jade'
+  | 'privacy'
+  | 'timer'
+  | 'orb'
 
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000' as const
 const WORLD = { width: 2100, height: 1460 }
@@ -55,6 +73,7 @@ const QUESTS: QuestNpc[] = [
     zone: 'Temple Gate',
     npc: 'NXR',
     role: 'Builder Guide',
+    kind: 'builder',
     x: 420,
     y: 420,
     color: '#f2c866',
@@ -89,6 +108,7 @@ const QUESTS: QuestNpc[] = [
     zone: 'RWA Vault',
     npc: 'Vault Keeper Mino',
     role: 'Asset Guardian',
+    kind: 'keeper',
     x: 1450,
     y: 360,
     color: '#ffad72',
@@ -123,6 +143,7 @@ const QUESTS: QuestNpc[] = [
     zone: 'Agent Camp',
     npc: 'Scout Luma',
     role: 'Agent Coordinator',
+    kind: 'scout',
     x: 1050,
     y: 790,
     color: '#78ecff',
@@ -157,6 +178,7 @@ const QUESTS: QuestNpc[] = [
     zone: 'Signal Tower',
     npc: 'Zap Tiko',
     role: 'Signal Runner',
+    kind: 'signal',
     x: 1650,
     y: 980,
     color: '#b9ff66',
@@ -191,6 +213,7 @@ const QUESTS: QuestNpc[] = [
     zone: 'SCALE Lab',
     npc: 'Professor Rune',
     role: 'SCALE Engineer',
+    kind: 'professor',
     x: 720,
     y: 1080,
     color: '#c886ff',
@@ -228,14 +251,18 @@ const QUESTS: QuestNpc[] = [
 ]
 
 const AMBIENT_NPCS: AmbientNpc[] = [
-  { name: 'Boba Byte', x: 310, y: 880, color: '#ff7ad9', line: 'Rain makes the data spring louder.' },
-  { name: 'Mossy Dex', x: 640, y: 630, color: '#57e39f', line: 'Try walking near a glowing NPC and press E.' },
-  { name: 'Peeko Bond', x: 870, y: 300, color: '#f2c866', line: 'RWA vaults like clean verification stamps.' },
-  { name: 'Firo Mail', x: 1260, y: 610, color: '#78ecff', line: 'Bridge Gate scrolls carry API messages out and back.' },
-  { name: 'Jade Numi', x: 1800, y: 570, color: '#b9ff66', line: 'Temple Energy returns when the daily ritual cools down.' },
-  { name: 'Pixel Kora', x: 360, y: 1230, color: '#c886ff', line: 'Privacy chambers turn plain scrolls into protected ones.' },
-  { name: 'Tama Tick', x: 1340, y: 1180, color: '#ffad72', line: 'Signals are tiny real-world updates with big consequences.' },
-  { name: 'Orb Nalo', x: 1880, y: 1120, color: '#57e39f', line: 'Every badge is better when the ledger can verify it.' },
+  { name: 'Boba Byte', kind: 'boba', x: 310, y: 880, color: '#ff7ad9', accent: '#f2c866', line: 'Rain makes the data spring louder.' },
+  { name: 'Mossy Dex', kind: 'moss', x: 640, y: 630, color: '#57e39f', accent: '#78ecff', line: 'Try walking near a glowing NPC and press E.' },
+  { name: 'Peeko Bond', kind: 'bond', x: 870, y: 300, color: '#f2c866', accent: '#ffad72', line: 'RWA vaults like clean verification stamps.' },
+  { name: 'Firo Mail', kind: 'messenger', x: 1260, y: 610, color: '#78ecff', accent: '#ff7ad9', line: 'Bridge Gate scrolls carry API messages out and back.' },
+  { name: 'Jade Numi', kind: 'jade', x: 1800, y: 570, color: '#b9ff66', accent: '#57e39f', line: 'Temple Energy returns when the daily ritual cools down.' },
+  { name: 'Pixel Kora', kind: 'privacy', x: 360, y: 1230, color: '#c886ff', accent: '#f2c866', line: 'Privacy chambers turn plain scrolls into protected ones.' },
+  { name: 'Tama Tick', kind: 'timer', x: 1340, y: 1180, color: '#ffad72', accent: '#78ecff', line: 'Signals are tiny real-world updates with big consequences.' },
+  { name: 'Orb Nalo', kind: 'orb', x: 1880, y: 1120, color: '#57e39f', accent: '#c886ff', line: 'Every badge is better when the ledger can verify it.' },
+  { name: 'Rune Pika', kind: 'scout', x: 520, y: 1010, color: '#ffe36e', accent: '#57e39f', line: 'Quest boards like brave learners.' },
+  { name: 'Minty Mox', kind: 'moss', x: 1510, y: 1260, color: '#67ffc0', accent: '#f2c866', line: 'The map gets brighter when badges are claimed.' },
+  { name: 'Sera API', kind: 'messenger', x: 1930, y: 290, color: '#88d7ff', accent: '#ff8066', line: 'A response scroll always comes back through Bridge Gate.' },
+  { name: 'Candi Dot', kind: 'jade', x: 1130, y: 260, color: '#b9ff66', accent: '#f2c866', line: 'The temple is friendlier when every system can talk.' },
 ]
 
 export default function TemplePlay() {
@@ -247,7 +274,7 @@ function TemplePlayInner() {
   const [activeQuest, setActiveQuest] = useState<QuestNpc | null>(null)
   const [answers, setAnswers] = useState<Record<number, number>>({})
   const [quizDone, setQuizDone] = useState(false)
-  const [nearNpcId, setNearNpcId] = useState<number | null>(QUESTS[0].id)
+  const [nearNpcId, setNearNpcId] = useState<number | null>(null)
   const [toast, setToast] = useState('')
   const [joystick, setJoystick] = useState({ active: false, x: 0, y: 0 })
   const [claimingQuest, setClaimingQuest] = useState<QuestNpc | null>(null)
@@ -400,14 +427,14 @@ function TemplePlayInner() {
   const nearestQuest = nearNpcId ? QUESTS.find((quest) => quest.id === nearNpcId) : null
 
   return (
-    <main className="temple-play-page mx-auto max-w-7xl px-4 pb-14 pt-8 sm:px-6">
-      <section className="temple-card temple-play-shell overflow-hidden rounded-lg">
+    <main className="temple-play-page">
+      <section className="temple-play-shell">
         <div className="temple-play-topbar">
           <div>
             <p className="text-xs font-black uppercase tracking-[0.18em] text-[var(--temple-gold)]">Temple Play</p>
-            <h1 className="arcade-title text-3xl font-black sm:text-5xl">Pixel Rialo Quest Map</h1>
+            <h1 className="arcade-title text-3xl font-black sm:text-5xl">Rialo Pixel Quest</h1>
             <p className="mt-2 max-w-2xl text-sm font-semibold text-[var(--temple-muted)]">
-              Walk with WASD, talk to NPCs, answer Rialo lessons, then claim badges on Arc Testnet.
+              Explore the map, meet pixel NPCs, clear Rialo lessons, then claim badges on Arc Testnet.
             </p>
           </div>
           <div className="temple-play-passport">
@@ -440,25 +467,25 @@ function TemplePlayInner() {
 
           <Joystick value={joystick} setValue={setJoystick} joystickVectorRef={joystickVector} />
         </div>
-      </section>
 
-      <section className="temple-play-questbar">
-        {QUESTS.map((quest) => {
-          const status = questStatus.find((item) => item.quizId === quest.quizId)
-          const completed = completedIds.has(quest.quizId)
-          return (
-            <button
-              key={quest.id}
-              type="button"
-              onClick={() => openQuest(quest)}
-              className={`temple-play-zone-pill ${completed ? 'is-complete' : ''}`}
-              style={{ '--quest-color': quest.color } as CSSProperties}
-            >
-              <span>{quest.zone}</span>
-              <strong>{completed ? 'Claimed' : `+${status?.reward ?? quest.reward} XP`}</strong>
-            </button>
-          )
-        })}
+        <section className="temple-play-questbar" aria-label="Temple Play quest shortcuts">
+          {QUESTS.map((quest) => {
+            const status = questStatus.find((item) => item.quizId === quest.quizId)
+            const completed = completedIds.has(quest.quizId)
+            return (
+              <button
+                key={quest.id}
+                type="button"
+                onClick={() => openQuest(quest)}
+                className={`temple-play-zone-pill ${completed ? 'is-complete' : ''}`}
+                style={{ '--quest-color': quest.color } as CSSProperties}
+              >
+                <span>{quest.zone}</span>
+                <strong>{completed ? 'Claimed' : `+${status?.reward ?? quest.reward} XP`}</strong>
+              </button>
+            )
+          })}
+        </section>
       </section>
 
       <AnimatePresence>
@@ -515,22 +542,13 @@ function TemplePlayCanvas({
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const wrapRef = useRef<HTMLDivElement | null>(null)
   const keys = useRef(new Set<string>())
-  const player = useRef<PlayerState>({ x: 470, y: 500, dir: 'down', moving: false })
+  const player = useRef<PlayerState>({ x: 570, y: 570, dir: 'down', moving: false })
   const nearId = useRef<number | null>(null)
   const completedLatest = useRef(completedIds)
-  const nxrImage = useRef<HTMLImageElement | null>(null)
 
   useEffect(() => {
     completedLatest.current = completedIds
   }, [completedIds])
-
-  useEffect(() => {
-    const image = new Image()
-    image.src = '/temple-play/nxr-sprites.png'
-    image.onload = () => {
-      nxrImage.current = image
-    }
-  }, [])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -605,7 +623,7 @@ function TemplePlayCanvas({
         y: clamp(current.y - rect.height / 2, 0, Math.max(0, WORLD.height - rect.height)),
       }
 
-      drawWorld(context, rect.width, rect.height, camera, frame, current, completedLatest.current, nxrImage.current, nearId.current)
+      drawWorld(context, rect.width, rect.height, camera, frame, current, completedLatest.current, nearId.current)
       window.requestAnimationFrame(tick)
     }
 
@@ -820,7 +838,6 @@ function drawWorld(
   time: number,
   player: PlayerState,
   completedIds: Set<number>,
-  nxr: HTMLImageElement | null,
   nearNpcId: number | null,
 ) {
   ctx.clearRect(0, 0, width, height)
@@ -832,27 +849,39 @@ function drawWorld(
   drawBuildings(ctx, time, completedIds)
   drawTrees(ctx, time)
   drawNpcLayer(ctx, time, completedIds, nearNpcId)
-  drawPlayer(ctx, player, time, nxr)
+  drawPlayer(ctx, player, time)
   drawWeather(ctx, camera, width, height, time)
   ctx.restore()
   drawScanlines(ctx, width, height)
 }
 
 function drawGround(ctx: CanvasRenderingContext2D, time: number) {
-  ctx.fillStyle = '#28442f'
+  ctx.fillStyle = '#2f6f45'
   ctx.fillRect(0, 0, WORLD.width, WORLD.height)
   for (let y = 0; y < WORLD.height; y += 64) {
     for (let x = 0; x < WORLD.width; x += 64) {
-      const tone = (x / 64 + y / 64) % 3
-      ctx.fillStyle = tone === 0 ? '#2f4b35' : tone === 1 ? '#314f39' : '#294530'
+      const plaza = (x > 610 && x < 1880 && y > 110 && y < 610) || (x > 760 && x < 1680 && y > 520 && y < 1120)
+      const grove = x > 1370 && y > 820
+      const spring = x < 690 && y > 860
+      const tone = (x / 64 + y / 64) % 4
+      ctx.fillStyle = plaza
+        ? tone % 2 === 0 ? '#b58b58' : '#c39a65'
+        : grove
+          ? tone % 2 === 0 ? '#604b86' : '#6c5595'
+          : spring
+            ? tone % 2 === 0 ? '#2f8c78' : '#327f73'
+            : tone === 0 ? '#34784d' : tone === 1 ? '#3b8255' : tone === 2 ? '#317148' : '#3f8959'
       ctx.fillRect(x, y, 64, 64)
+      ctx.fillStyle = plaza ? 'rgba(89, 60, 39, .18)' : 'rgba(247, 241, 223, .12)'
+      ctx.fillRect(x + 18, y + 18, 6, 6)
+      ctx.fillRect(x + 42, y + 38, 5, 5)
       if ((x + y) % 256 === 0) {
-        ctx.fillStyle = '#6d8350'
-        ctx.fillRect(x + 18, y + 20 + Math.sin(time + x) * 2, 6, 18)
+        ctx.fillStyle = plaza ? '#8f6d44' : '#7bc66d'
+        ctx.fillRect(x + 18, y + 20 + Math.sin(time + x) * 1.5, 6, 18)
         ctx.fillRect(x + 42, y + 36, 5, 14)
       }
       if ((x * 3 + y) % 448 === 0) {
-        ctx.fillStyle = '#b66ce8'
+        ctx.fillStyle = plaza ? '#ff7ad9' : '#d576ff'
         ctx.fillRect(x + 12, y + 11, 11, 11)
         ctx.fillStyle = '#dbc9d7'
         ctx.fillRect(x + 44, y + 42, 12, 10)
@@ -981,81 +1010,317 @@ function drawTrees(ctx: CanvasRenderingContext2D, time: number) {
 }
 
 function drawNpcLayer(ctx: CanvasRenderingContext2D, time: number, completedIds: Set<number>, nearNpcId: number | null) {
-  AMBIENT_NPCS.forEach((npc, index) => drawMonsterNpc(ctx, npc.x, npc.y, npc.color, time + index, npc.name, false, false))
+  AMBIENT_NPCS.forEach((npc, index) => drawPixelCritter(ctx, {
+    x: npc.x,
+    y: npc.y,
+    kind: npc.kind,
+    primary: npc.color,
+    accent: npc.accent,
+    name: npc.name,
+    time,
+    seed: index * 0.67,
+    scale: 3.2,
+    compactLabel: true,
+  }))
   QUESTS.forEach((quest) => {
     const completed = completedIds.has(quest.quizId)
-    drawMonsterNpc(ctx, quest.x, quest.y, quest.color, time + quest.id, quest.npc, nearNpcId === quest.id, completed, quest.accent)
+    drawPixelCharacter(ctx, {
+      x: quest.x,
+      y: quest.y,
+      kind: quest.kind,
+      primary: quest.color,
+      accent: quest.accent,
+      name: quest.npc,
+      time,
+      seed: quest.id * 0.48,
+      scale: 3.8,
+      near: nearNpcId === quest.id,
+      completed,
+    })
   })
 }
 
-function drawMonsterNpc(ctx: CanvasRenderingContext2D, x: number, y: number, color: string, time: number, name: string, near: boolean, completed: boolean, accent = '#f2c866') {
-  const bob = Math.sin(time * 3) * 4
-  ctx.fillStyle = 'rgba(0,0,0,.32)'
-  ctx.fillRect(x - 28, y + 37, 56, 13)
-  if (near) {
-    ctx.strokeStyle = color
-    ctx.lineWidth = 4
-    ctx.beginPath()
-    ctx.arc(x, y + 10, 58 + Math.sin(time * 5) * 4, 0, Math.PI * 2)
-    ctx.stroke()
+function drawPixelCritter(
+  ctx: CanvasRenderingContext2D,
+  {
+    x,
+    y,
+    kind,
+    primary,
+    accent,
+    name,
+    time,
+    seed = 0,
+    scale = 3.2,
+    compactLabel = true,
+  }: {
+    x: number
+    y: number
+    kind: PixelCharacterKind
+    primary: string
+    accent: string
+    name: string
+    time: number
+    seed?: number
+    scale?: number
+    compactLabel?: boolean
+  },
+) {
+  const s = scale
+  const left = Math.round(x - 8 * s)
+  const top = Math.round(y - 20 * s)
+  const blink = Math.sin(time * 3.2 + seed) > 0.965
+  const wiggle = Math.sin(time * 2 + seed)
+  const px = (gx: number, gy: number, gw: number, gh: number, color: string) => {
+    ctx.fillStyle = color
+    ctx.fillRect(Math.round(left + gx * s), Math.round(top + gy * s), Math.ceil(gw * s), Math.ceil(gh * s))
   }
-  ctx.fillStyle = color
-  ctx.strokeStyle = '#07100c'
-  ctx.lineWidth = 5
-  ctx.beginPath()
-  ctx.roundRect(x - 30, y - 40 + bob, 60, 76, 18)
-  ctx.fill()
-  ctx.stroke()
-  ctx.fillStyle = accent
-  ctx.fillRect(x - 20, y - 58 + bob, 40, 20)
-  ctx.strokeRect(x - 20, y - 58 + bob, 40, 20)
-  ctx.fillStyle = '#f7f1df'
-  ctx.fillRect(x - 16, y - 18 + bob, 10, 12)
-  ctx.fillRect(x + 6, y - 18 + bob, 10, 12)
-  if (Math.sin(time * 6) > 0.94) {
-    ctx.fillStyle = '#07100c'
-    ctx.fillRect(x - 16, y - 13 + bob, 10, 3)
-    ctx.fillRect(x + 6, y - 13 + bob, 10, 3)
+
+  ctx.fillStyle = 'rgba(0,0,0,.3)'
+  ctx.fillRect(Math.round(x - 6 * s), Math.round(y - 1 * s), Math.round(12 * s), Math.round(3 * s))
+
+  if (kind === 'boba') {
+    px(3, 5, 10, 12, '#07100c')
+    px(4, 6, 8, 10, primary)
+    px(5, 3, 6, 4, '#07100c')
+    px(6, 4, 4, 2, accent)
+    px(12, 8 + wiggle * 0.4, 3, 4, '#07100c')
+    px(12.6, 8.5 + wiggle * 0.4, 2, 2, accent)
+  } else if (kind === 'moss') {
+    px(2, 8, 12, 9, '#07100c')
+    px(3, 9, 10, 7, primary)
+    px(2, 5 + wiggle * 0.4, 4, 4, '#07100c')
+    px(3, 6 + wiggle * 0.4, 2, 2, accent)
+    px(10, 4 - wiggle * 0.4, 5, 5, '#07100c')
+    px(11, 5 - wiggle * 0.4, 3, 3, accent)
+  } else if (kind === 'bond') {
+    px(3, 6, 10, 10, '#07100c')
+    px(4, 7, 8, 8, primary)
+    px(2, 4, 4, 4, '#07100c')
+    px(10, 4, 4, 4, '#07100c')
+    px(3, 5, 2, 2, accent)
+    px(11, 5, 2, 2, accent)
+    px(12, 12, 3, 2, '#07100c')
+  } else if (kind === 'messenger') {
+    px(4, 5, 8, 11, '#07100c')
+    px(5, 6, 6, 9, primary)
+    px(1, 9 + wiggle * 0.5, 4, 4, '#07100c')
+    px(11, 9 - wiggle * 0.5, 4, 4, '#07100c')
+    px(2, 10 + wiggle * 0.5, 2, 2, accent)
+    px(12, 10 - wiggle * 0.5, 2, 2, accent)
+    px(6, 3, 4, 2, accent)
+  } else if (kind === 'jade') {
+    px(3, 7, 10, 10, '#07100c')
+    px(4, 8, 8, 8, primary)
+    px(7, 3, 2, 5, '#07100c')
+    px(6, 2, 2, 3, accent)
+    px(9, 2, 2, 3, accent)
+  } else if (kind === 'privacy') {
+    px(3, 4, 10, 13, '#07100c')
+    px(4, 5, 8, 11, primary)
+    px(5, 11, 6, 3, accent)
+    px(6, 2, 4, 3, '#07100c')
+    px(7, 3, 2, 1, accent)
+  } else if (kind === 'timer') {
+    px(3, 5, 10, 11, '#07100c')
+    px(4, 6, 8, 9, primary)
+    px(5, 3, 2, 3, '#07100c')
+    px(10, 3, 2, 3, '#07100c')
+    px(7, 10, 2, 1, accent)
+    px(8, 8, 1, 4, '#07100c')
   } else {
-    ctx.fillStyle = '#07100c'
-    ctx.fillRect(x - 13, y - 16 + bob, 4, 6)
-    ctx.fillRect(x + 9, y - 16 + bob, 4, 6)
+    px(3, 6, 10, 10, '#07100c')
+    px(4, 7, 8, 8, primary)
+    px(6, 2 + wiggle * 0.4, 4, 4, '#07100c')
+    px(7, 3 + wiggle * 0.4, 2, 2, accent)
   }
-  ctx.fillRect(x - 8, y + 7 + bob, 16, 5)
-  ctx.fillStyle = completed ? '#57e39f' : 'rgba(7,16,12,.9)'
-  ctx.fillRect(x - 52, y - 86 + bob, Math.max(74, name.length * 9), 24)
-  ctx.fillStyle = completed ? '#07100c' : '#f7f1df'
-  ctx.font = '900 12px monospace'
-  ctx.fillText(completed ? `${name} ✓` : name, x - 44, y - 69 + bob)
+
+  if (blink) {
+    px(5, 10, 2, 0.8, '#07100c')
+    px(9, 10, 2, 0.8, '#07100c')
+  } else {
+    px(5, 9, 2, 2, '#f7f1df')
+    px(9, 9, 2, 2, '#f7f1df')
+    px(5.5, 9.5, 1, 1, '#07100c')
+    px(9.5, 9.5, 1, 1, '#07100c')
+  }
+  px(7, 13, 2, 0.8, '#07100c')
+  drawPixelNameTag(ctx, x, y - 23 * s, name, '#f7f1df', compactLabel)
 }
 
-function drawPlayer(ctx: CanvasRenderingContext2D, player: PlayerState, time: number, nxr: HTMLImageElement | null) {
-  ctx.fillStyle = 'rgba(0,0,0,.34)'
-  ctx.fillRect(player.x - 32, player.y + 42, 64, 16)
-  if (!nxr) {
-    drawMonsterNpc(ctx, player.x, player.y, '#f2c866', time, 'NXR', false, false, '#57e39f')
-    return
+function drawPixelCharacter(
+  ctx: CanvasRenderingContext2D,
+  {
+    x,
+    y,
+    kind,
+    primary,
+    accent,
+    name,
+    time,
+    seed = 0,
+    scale = 4,
+    near = false,
+    completed = false,
+    moving = false,
+    compactLabel = false,
+  }: {
+    x: number
+    y: number
+    kind: PixelCharacterKind
+    primary: string
+    accent: string
+    name: string
+    time: number
+    seed?: number
+    scale?: number
+    near?: boolean
+    completed?: boolean
+    moving?: boolean
+    compactLabel?: boolean
+  },
+) {
+  const s = scale
+  const left = Math.round(x - 9 * s)
+  const top = Math.round(y - 27 * s)
+  const walk = moving ? Math.floor(time * 9 + seed) % 2 : 0
+  const breath = moving ? (walk === 0 ? 0 : -1) : Math.sin(time * 2.2 + seed) > 0.35 ? -0.35 : 0
+  const blink = !moving && Math.sin(time * 3.4 + seed) > 0.965
+  const wave = Math.sin(time * 2.6 + seed)
+
+  const px = (gx: number, gy: number, gw: number, gh: number, color: string) => {
+    ctx.fillStyle = color
+    ctx.fillRect(Math.round(left + gx * s), Math.round(top + gy * s), Math.ceil(gw * s), Math.ceil(gh * s))
   }
 
-  const frame = player.moving ? Math.floor(time * 8) % 4 + 1 : Math.floor(time * 1.8) % 2 === 0 ? 0 : 6
-  const cols = 4
-  const rows = 2
-  const frameW = nxr.width / cols
-  const frameH = nxr.height / rows
-  const sx = (frame % cols) * frameW
-  const sy = Math.floor(frame / cols) * frameH
-  const scale = player.dir === 'up' ? 0.5 : 0.56
-  const dw = frameW * scale
-  const dh = frameH * scale
-  ctx.save()
-  if (player.dir === 'left') {
-    ctx.translate(player.x + dw / 2, player.y - dh / 2)
-    ctx.scale(-1, 1)
-    ctx.drawImage(nxr, sx, sy, frameW, frameH, 0, 0, dw, dh)
-  } else {
-    ctx.drawImage(nxr, sx, sy, frameW, frameH, player.x - dw / 2, player.y - dh / 2, dw, dh)
+  ctx.fillStyle = 'rgba(0,0,0,.34)'
+  ctx.fillRect(Math.round(x - 7 * s), Math.round(y - 1 * s), Math.round(14 * s), Math.round(3 * s))
+
+  if (near) {
+    ctx.strokeStyle = primary
+    ctx.lineWidth = 4
+    ctx.beginPath()
+    ctx.arc(x, y - 13 * s, 15 * s + Math.sin(time * 4) * 3, 0, Math.PI * 2)
+    ctx.stroke()
   }
-  ctx.restore()
+
+  const bodyY = 14 + breath
+  const headY = 4 + breath
+  const armLift = kind === 'messenger' || kind === 'scout' ? Math.max(0, wave) : 0
+
+  px(5, 23 + (walk === 0 ? 0 : -1), 3, 3, '#07100c')
+  px(10, 23 + (walk === 1 ? 0 : -1), 3, 3, '#07100c')
+  px(6, 22 + (walk === 0 ? 0 : -1), 2, 3, primary)
+  px(10, 22 + (walk === 1 ? 0 : -1), 2, 3, primary)
+
+  px(4, bodyY, 10, 8, '#07100c')
+  px(5, bodyY + 1, 8, 6, primary)
+  px(7, bodyY + 1, 4, 2, accent)
+  px(6, bodyY + 5, 6, 1, '#f2c866')
+
+  px(2, bodyY + 2 - armLift, 3, 5, '#07100c')
+  px(13, bodyY + 2 + armLift * 0.25, 3, 5, '#07100c')
+  px(2.6, bodyY + 2.5 - armLift, 2, 3.4, primary)
+  px(13.4, bodyY + 2.5 + armLift * 0.25, 2, 3.4, primary)
+
+  if (kind === 'builder') {
+    px(1, headY + 3, 3, 5, '#07100c')
+    px(14, headY + 3, 3, 5, '#07100c')
+    px(1.7, headY + 4, 2, 3, '#f7f1df')
+    px(14.3, headY + 4, 2, 3, '#f7f1df')
+    px(5, headY - 2, 8, 3, '#07100c')
+    px(6, headY - 1, 6, 2, accent)
+    px(7, headY - 2.8, 1, 1, '#f2c866')
+    px(10, headY - 2.8, 1, 1, '#f2c866')
+  } else if (kind === 'keeper') {
+    px(2, headY + 1, 3, 4, '#07100c')
+    px(13, headY + 1, 3, 4, '#07100c')
+    px(2.8, headY + 1.8, 2, 2.5, accent)
+    px(13.2, headY + 1.8, 2, 2.5, accent)
+    px(6, headY - 1, 6, 2, '#07100c')
+    px(7, headY - 0.4, 4, 1.4, accent)
+  } else if (kind === 'signal' || kind === 'timer') {
+    px(8, headY - 3, 2, 4, '#07100c')
+    px(8.5, headY - 4, 1, 1, accent)
+    px(5, headY - 1, 8, 2, '#07100c')
+    px(6, headY - 0.4, 6, 1.4, accent)
+  } else if (kind === 'professor') {
+    px(3, headY - 3, 12, 3, '#07100c')
+    px(5, headY - 6, 8, 4, '#07100c')
+    px(6, headY - 5, 6, 3, accent)
+    px(2, bodyY + 6, 14, 2, '#07100c')
+    px(3, bodyY + 6, 12, 1, '#f7f1df')
+  } else if (kind === 'privacy') {
+    px(4, headY - 2, 10, 4, '#07100c')
+    px(5, headY - 1, 8, 3, accent)
+    px(7, bodyY + 2, 4, 4, '#07100c')
+    px(8, bodyY + 3, 2, 2, '#f7f1df')
+  } else if (kind === 'orb') {
+    px(13, headY - 2 + Math.sin(time * 2 + seed) * 0.45, 3, 3, '#07100c')
+    px(13.5, headY - 1.5 + Math.sin(time * 2 + seed) * 0.45, 2, 2, accent)
+  } else if (kind === 'bond' || kind === 'jade') {
+    px(5, headY - 2, 8, 3, '#07100c')
+    px(6, headY - 1.2, 6, 2, accent)
+  } else if (kind === 'boba') {
+    px(4, headY - 2, 10, 3, '#07100c')
+    px(5, headY - 1, 8, 2, accent)
+    px(11, headY - 3, 2, 2, '#07100c')
+    px(11.5, headY - 2.5, 1, 1, '#f7f1df')
+  } else if (kind === 'moss') {
+    px(3, headY - 1, 12, 3, '#07100c')
+    px(4, headY - 0.2, 3, 2, accent)
+    px(8, headY - 0.8, 2, 2, accent)
+    px(11, headY - 0.2, 3, 2, accent)
+  } else if (kind === 'scout' || kind === 'messenger') {
+    px(5, headY - 3, 8, 4, '#07100c')
+    px(6, headY - 2.2, 6, 3, accent)
+    px(12, headY - 1, 3, 1.5, '#07100c')
+  }
+
+  px(3, headY + 2, 12, 11, '#07100c')
+  px(4, headY + 3, 10, 9, '#f7d983')
+  px(4, headY + 3, 10, 2, primary)
+
+  if (blink) {
+    px(6, headY + 7, 2, 0.8, '#07100c')
+    px(10, headY + 7, 2, 0.8, '#07100c')
+  } else {
+    px(6, headY + 6, 2, 2, '#f7f1df')
+    px(10, headY + 6, 2, 2, '#f7f1df')
+    px(6.5, headY + 6.5, 1, 1, '#07100c')
+    px(10.5, headY + 6.5, 1, 1, '#07100c')
+  }
+  px(7.5, headY + 10, 3, 0.8, '#07100c')
+
+  if (near || completed) {
+    px(14.5, bodyY + 1, 2, 2, completed ? '#57e39f' : '#f2c866')
+  }
+
+  drawPixelNameTag(ctx, x, y - 31 * s, completed ? `${name} OK` : name, completed ? '#57e39f' : '#f7f1df', compactLabel)
+}
+
+function drawPlayer(ctx: CanvasRenderingContext2D, player: PlayerState, time: number) {
+  drawPixelCharacter(ctx, {
+    x: player.x,
+    y: player.y,
+    kind: 'builder',
+    primary: '#f2c866',
+    accent: '#57e39f',
+    name: 'You',
+    time,
+    scale: 4.45,
+    moving: player.moving,
+  })
+}
+
+function drawPixelNameTag(ctx: CanvasRenderingContext2D, x: number, y: number, text: string, color: string, compact = false) {
+  const fontSize = compact ? 11 : 12
+  ctx.font = `900 ${fontSize}px monospace`
+  const width = Math.ceil(ctx.measureText(text).width) + 16
+  ctx.fillStyle = 'rgba(7, 16, 12, .92)'
+  ctx.fillRect(Math.round(x - width / 2), Math.round(y), width, compact ? 20 : 22)
+  ctx.fillStyle = color
+  ctx.fillText(text, Math.round(x - width / 2 + 8), Math.round(y + (compact ? 14 : 16)))
 }
 
 function drawWeather(ctx: CanvasRenderingContext2D, camera: { x: number; y: number }, width: number, height: number, time: number) {
