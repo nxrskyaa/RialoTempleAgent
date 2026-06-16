@@ -49,16 +49,22 @@ type PlayerState = {
 
 type SpriteKey =
   | 'nxr'
-  | 'runeMage'
-  | 'shadowScout'
-  | 'questRunner'
-  | 'labProfessor'
-  | 'siggyCat'
-  | 'templeBear'
+  | 'npcOracle'
+  | 'npcForestGuide'
+  | 'npcBuilder'
+  | 'npcCaptain'
+  | 'npcNavigator'
+  | 'npcShadowAgent'
+  | 'npcSage'
+  | 'npcHerbalist'
+  | 'npcAlchemist'
 
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000' as const
-const WORLD = { width: 2100, height: 1460 }
+const WORLD = { width: 2360, height: 1680 }
 const PLAYER_SPEED = 245
+const DESKTOP_CAMERA_ZOOM = 0.62
+const TABLET_CAMERA_ZOOM = 0.66
+const MOBILE_CAMERA_ZOOM = 0.72
 
 type SpriteSheet = {
   src: string
@@ -91,13 +97,16 @@ type PropKey =
   | 'smallPepper'
 
 const SPRITES: Record<SpriteKey, SpriteSheet> = {
-  nxr: { src: '/temple-play/sprites/nxr.png', frameW: 190, frameH: 210, frames: 8, drawW: 94, drawH: 104 },
-  runeMage: { src: '/temple-play/sprites/rune-mage.png', frameW: 160, frameH: 185, frames: 10, drawW: 72, drawH: 84 },
-  shadowScout: { src: '/temple-play/sprites/shadow-scout.png', frameW: 150, frameH: 180, frames: 10, drawW: 70, drawH: 84 },
-  questRunner: { src: '/temple-play/sprites/quest-runner.png', frameW: 145, frameH: 185, frames: 10, drawW: 70, drawH: 90 },
-  labProfessor: { src: '/temple-play/sprites/lab-professor.png', frameW: 150, frameH: 185, frames: 10, drawW: 72, drawH: 88 },
-  siggyCat: { src: '/temple-play/sprites/siggy-cat.png', frameW: 160, frameH: 170, frames: 10, drawW: 76, drawH: 82 },
-  templeBear: { src: '/temple-play/sprites/temple-bear.png', frameW: 155, frameH: 180, frames: 10, drawW: 74, drawH: 86 },
+  nxr: { src: '/temple-play/sprites/nxr.png', frameW: 190, frameH: 210, frames: 8, drawW: 76, drawH: 86 },
+  npcOracle: { src: '/temple-play/sprites/npc-oracle.png', frameW: 160, frameH: 220, frames: 4, drawW: 62, drawH: 86 },
+  npcForestGuide: { src: '/temple-play/sprites/npc-forest-guide.png', frameW: 160, frameH: 220, frames: 4, drawW: 62, drawH: 86 },
+  npcBuilder: { src: '/temple-play/sprites/npc-builder.png', frameW: 160, frameH: 220, frames: 4, drawW: 62, drawH: 86 },
+  npcCaptain: { src: '/temple-play/sprites/npc-captain.png', frameW: 160, frameH: 220, frames: 4, drawW: 62, drawH: 86 },
+  npcNavigator: { src: '/temple-play/sprites/npc-navigator.png', frameW: 160, frameH: 220, frames: 4, drawW: 62, drawH: 86 },
+  npcShadowAgent: { src: '/temple-play/sprites/npc-shadow-agent.png', frameW: 160, frameH: 220, frames: 4, drawW: 62, drawH: 86 },
+  npcSage: { src: '/temple-play/sprites/npc-sage.png', frameW: 160, frameH: 220, frames: 4, drawW: 62, drawH: 86 },
+  npcHerbalist: { src: '/temple-play/sprites/npc-herbalist.png', frameW: 160, frameH: 220, frames: 4, drawW: 62, drawH: 86 },
+  npcAlchemist: { src: '/temple-play/sprites/npc-alchemist.png', frameW: 160, frameH: 220, frames: 4, drawW: 62, drawH: 86 },
 }
 
 const PROPS: Record<PropKey, string> = {
@@ -158,7 +167,7 @@ const QUESTS: QuestNpc[] = [
     zone: 'RWA Vault',
     npc: 'Vault Keeper Mino',
     role: 'Asset Guardian',
-    sprite: 'templeBear',
+    sprite: 'npcHerbalist',
     x: 1450,
     y: 360,
     color: '#ffad72',
@@ -193,7 +202,7 @@ const QUESTS: QuestNpc[] = [
     zone: 'Agent Camp',
     npc: 'Scout Luma',
     role: 'Agent Coordinator',
-    sprite: 'shadowScout',
+    sprite: 'npcShadowAgent',
     x: 1050,
     y: 790,
     color: '#78ecff',
@@ -228,7 +237,7 @@ const QUESTS: QuestNpc[] = [
     zone: 'Signal Tower',
     npc: 'Zap Tiko',
     role: 'Signal Runner',
-    sprite: 'questRunner',
+    sprite: 'npcNavigator',
     x: 1650,
     y: 980,
     color: '#b9ff66',
@@ -263,7 +272,7 @@ const QUESTS: QuestNpc[] = [
     zone: 'SCALE Lab',
     npc: 'Professor Rune',
     role: 'SCALE Engineer',
-    sprite: 'labProfessor',
+    sprite: 'npcAlchemist',
     x: 720,
     y: 1080,
     color: '#c886ff',
@@ -301,18 +310,18 @@ const QUESTS: QuestNpc[] = [
 ]
 
 const AMBIENT_NPCS: AmbientNpc[] = [
-  { name: 'Boba Byte', sprite: 'siggyCat', x: 310, y: 880, color: '#ff7ad9', accent: '#f2c866', line: 'Rain makes the data spring louder.' },
-  { name: 'Mossy Dex', sprite: 'runeMage', x: 640, y: 630, color: '#57e39f', accent: '#78ecff', line: 'Try walking near a glowing NPC and press E.' },
-  { name: 'Peeko Bond', sprite: 'templeBear', x: 870, y: 300, color: '#f2c866', accent: '#ffad72', line: 'RWA vaults like clean verification stamps.' },
-  { name: 'Firo Mail', sprite: 'shadowScout', x: 1260, y: 610, color: '#78ecff', accent: '#ff7ad9', line: 'Bridge Gate scrolls carry API messages out and back.' },
-  { name: 'Jade Numi', sprite: 'siggyCat', x: 1800, y: 570, color: '#b9ff66', accent: '#57e39f', line: 'Temple Energy returns when the daily ritual cools down.' },
-  { name: 'Pixel Kora', sprite: 'runeMage', x: 360, y: 1230, color: '#c886ff', accent: '#f2c866', line: 'Privacy chambers turn plain scrolls into protected ones.' },
-  { name: 'Tama Tick', sprite: 'questRunner', x: 1340, y: 1180, color: '#ffad72', accent: '#78ecff', line: 'Signals are tiny real-world updates with big consequences.' },
-  { name: 'Orb Nalo', sprite: 'labProfessor', x: 1880, y: 1120, color: '#57e39f', accent: '#c886ff', line: 'Every badge is better when the ledger can verify it.' },
-  { name: 'Rune Pika', sprite: 'shadowScout', x: 520, y: 1010, color: '#ffe36e', accent: '#57e39f', line: 'Quest boards like brave learners.' },
-  { name: 'Minty Mox', sprite: 'siggyCat', x: 1510, y: 1260, color: '#67ffc0', accent: '#f2c866', line: 'The map gets brighter when badges are claimed.' },
-  { name: 'Sera API', sprite: 'shadowScout', x: 1930, y: 290, color: '#88d7ff', accent: '#ff8066', line: 'A response scroll always comes back through Bridge Gate.' },
-  { name: 'Candi Dot', sprite: 'runeMage', x: 1130, y: 260, color: '#b9ff66', accent: '#f2c866', line: 'The temple is friendlier when every system can talk.' },
+  { name: 'Boba Byte', sprite: 'npcSage', x: 310, y: 880, color: '#ff7ad9', accent: '#f2c866', line: 'Rain makes the data spring louder.' },
+  { name: 'Mossy Dex', sprite: 'npcForestGuide', x: 640, y: 630, color: '#57e39f', accent: '#78ecff', line: 'Try walking near a glowing NPC and press E.' },
+  { name: 'Peeko Bond', sprite: 'npcHerbalist', x: 870, y: 300, color: '#f2c866', accent: '#ffad72', line: 'RWA vaults like clean verification stamps.' },
+  { name: 'Firo Mail', sprite: 'npcCaptain', x: 1260, y: 610, color: '#78ecff', accent: '#ff7ad9', line: 'Bridge Gate scrolls carry API messages out and back.' },
+  { name: 'Jade Numi', sprite: 'npcAlchemist', x: 1800, y: 570, color: '#b9ff66', accent: '#57e39f', line: 'Temple Energy returns when the daily ritual cools down.' },
+  { name: 'Pixel Kora', sprite: 'npcOracle', x: 360, y: 1230, color: '#c886ff', accent: '#f2c866', line: 'Privacy chambers turn plain scrolls into protected ones.' },
+  { name: 'Tama Tick', sprite: 'npcNavigator', x: 1340, y: 1180, color: '#ffad72', accent: '#78ecff', line: 'Signals are tiny real-world updates with big consequences.' },
+  { name: 'Orb Nalo', sprite: 'npcBuilder', x: 1880, y: 1120, color: '#57e39f', accent: '#c886ff', line: 'Every badge is better when the ledger can verify it.' },
+  { name: 'Rune Pika', sprite: 'npcShadowAgent', x: 520, y: 1010, color: '#ffe36e', accent: '#57e39f', line: 'Quest boards like brave learners.' },
+  { name: 'Minty Mox', sprite: 'npcSage', x: 1510, y: 1260, color: '#67ffc0', accent: '#f2c866', line: 'The map gets brighter when badges are claimed.' },
+  { name: 'Sera API', sprite: 'npcCaptain', x: 1930, y: 290, color: '#88d7ff', accent: '#ff8066', line: 'A response scroll always comes back through Bridge Gate.' },
+  { name: 'Candi Dot', sprite: 'npcForestGuide', x: 1130, y: 260, color: '#b9ff66', accent: '#f2c866', line: 'The temple is friendlier when every system can talk.' },
 ]
 
 export default function TemplePlay() {
@@ -427,7 +436,7 @@ function TemplePlayInner() {
     setActiveQuest(quest)
     setAnswers({})
     setQuizDone(false)
-    setToast(quest.intro)
+    setToast('')
   }, [])
 
   useEffect(() => {
@@ -450,7 +459,7 @@ function TemplePlayInner() {
   function retryQuiz() {
     setAnswers({})
     setQuizDone(false)
-    setToast(activeQuest?.intro ?? '')
+    setToast('')
   }
 
   function claimBadge() {
@@ -478,7 +487,7 @@ function TemplePlayInner() {
 
   return (
     <main className="temple-play-page">
-      <section className="temple-play-shell">
+      <section className={`temple-play-shell ${activeQuest ? 'is-dialog-open' : ''}`}>
         <div className="temple-play-topbar">
           <div>
             <p className="text-xs font-black uppercase tracking-[0.18em] text-[var(--temple-gold)]">Temple Play</p>
@@ -516,6 +525,28 @@ function TemplePlayInner() {
           </div>
 
           <Joystick value={joystick} setValue={setJoystick} joystickVectorRef={joystickVector} />
+
+          <AnimatePresence>
+            {activeQuest ? (
+              <QuizOverlay
+                quest={activeQuest}
+                answers={answers}
+                answeredCount={answeredCount}
+                correctCount={correctCount}
+                score={score}
+                quizDone={quizDone}
+                passed={passed}
+                completed={hasCompletedActive}
+                reward={activeStatus?.reward ?? activeQuest.reward}
+                isPending={isPending || receipt.isLoading}
+                onAnswer={answer}
+                onClose={() => setActiveQuest(null)}
+                onFinish={finishQuiz}
+                onRetry={retryQuiz}
+                onClaim={claimBadge}
+              />
+            ) : null}
+          </AnimatePresence>
         </div>
 
         <section className="temple-play-questbar" aria-label="Temple Play quest shortcuts">
@@ -537,28 +568,6 @@ function TemplePlayInner() {
           })}
         </section>
       </section>
-
-      <AnimatePresence>
-        {activeQuest ? (
-          <QuizOverlay
-            quest={activeQuest}
-            answers={answers}
-            answeredCount={answeredCount}
-            correctCount={correctCount}
-            score={score}
-            quizDone={quizDone}
-            passed={passed}
-            completed={hasCompletedActive}
-            reward={activeStatus?.reward ?? activeQuest.reward}
-            isPending={isPending || receipt.isLoading}
-            onAnswer={answer}
-            onClose={() => setActiveQuest(null)}
-            onFinish={finishQuiz}
-            onRetry={retryQuiz}
-            onClaim={claimBadge}
-          />
-        ) : null}
-      </AnimatePresence>
 
       <AnimatePresence>
         {toast ? (
@@ -681,12 +690,14 @@ function TemplePlayCanvas({
         onNearQuestChange(nearId.current)
       }
 
+      const zoom = cameraZoom(rect.width)
+      const viewport = { width: rect.width / zoom, height: rect.height / zoom }
       const camera = {
-        x: clamp(current.x - rect.width / 2, 0, Math.max(0, WORLD.width - rect.width)),
-        y: clamp(current.y - rect.height / 2, 0, Math.max(0, WORLD.height - rect.height)),
+        x: clamp(current.x - viewport.width / 2, 0, Math.max(0, WORLD.width - viewport.width)),
+        y: clamp(current.y - viewport.height / 2, 0, Math.max(0, WORLD.height - viewport.height)),
       }
 
-      drawWorld(context, rect.width, rect.height, camera, frame, current, completedLatest.current, nearId.current, assets)
+      drawWorld(context, rect.width, rect.height, viewport.width, viewport.height, camera, zoom, frame, current, completedLatest.current, nearId.current, assets)
       window.requestAnimationFrame(tick)
     }
 
@@ -742,6 +753,9 @@ function QuizOverlay({
 }) {
   const portrait = SPRITES[quest.sprite]
   const portraitFrame = portrait.frames > 6 ? 6 : 0
+  const currentQuestionIndex = Math.min(answeredCount, quest.questions.length - 1)
+  const currentQuestion = quest.questions[currentQuestionIndex]
+  const selectedAnswer = answers[currentQuestionIndex]
 
   return (
     <motion.div className="temple-play-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
@@ -776,29 +790,27 @@ function QuizOverlay({
         </div>
 
         <div className="temple-play-question-list">
-          {quest.questions.map((question, questionIndex) => (
-            <div key={question.prompt} className="temple-play-question-card">
-              <p>{question.prompt}</p>
-              <div>
-                {question.options.map((option, optionIndex) => {
-                  const selected = answers[questionIndex] === optionIndex
-                  const correct = question.answer === optionIndex
-                  return (
-                    <button
-                      key={option}
-                      type="button"
-                      onClick={() => onAnswer(questionIndex, optionIndex)}
-                      className={selected ? (correct ? 'is-correct' : 'is-wrong') : ''}
-                    >
-                      {selected ? correct ? <CheckCircle2 className="h-4 w-4" /> : <XCircle className="h-4 w-4" /> : <span />}
-                      {option}
-                    </button>
-                  )
-                })}
-              </div>
-              {answers[questionIndex] !== undefined ? <small>{question.note}</small> : null}
+          <div className="temple-play-question-card">
+            <p>{currentQuestion.prompt}</p>
+            <div>
+              {currentQuestion.options.map((option, optionIndex) => {
+                const selected = selectedAnswer === optionIndex
+                const correct = currentQuestion.answer === optionIndex
+                return (
+                  <button
+                    key={option}
+                    type="button"
+                    onClick={() => onAnswer(currentQuestionIndex, optionIndex)}
+                    className={selected ? (correct ? 'is-correct' : 'is-wrong') : ''}
+                  >
+                    {selected ? correct ? <CheckCircle2 className="h-4 w-4" /> : <XCircle className="h-4 w-4" /> : <span />}
+                    {option}
+                  </button>
+                )
+              })}
             </div>
-          ))}
+            {selectedAnswer !== undefined ? <small>{currentQuestion.note}</small> : null}
+          </div>
         </div>
 
         <div className="temple-play-quiz-actions">
@@ -928,6 +940,12 @@ function movementFromInput(keys: Set<string>, joystick: { x: number; y: number }
   return length > 0 ? { x: x / length, y: y / length } : { x: 0, y: 0 }
 }
 
+function cameraZoom(width: number) {
+  if (width < 680) return MOBILE_CAMERA_ZOOM
+  if (width < 1100) return TABLET_CAMERA_ZOOM
+  return DESKTOP_CAMERA_ZOOM
+}
+
 function nearestQuest(player: PlayerState) {
   let nearest: QuestNpc | null = null
   let distance = Number.POSITIVE_INFINITY
@@ -945,7 +963,10 @@ function drawWorld(
   ctx: CanvasRenderingContext2D,
   width: number,
   height: number,
+  viewportWidth: number,
+  viewportHeight: number,
   camera: { x: number; y: number },
+  zoom: number,
   time: number,
   player: PlayerState,
   completedIds: Set<number>,
@@ -954,6 +975,7 @@ function drawWorld(
 ) {
   ctx.clearRect(0, 0, width, height)
   ctx.save()
+  ctx.scale(zoom, zoom)
   ctx.translate(-camera.x, -camera.y)
   drawGround(ctx, time, assets)
   drawPaths(ctx, time)
@@ -961,7 +983,7 @@ function drawWorld(
   drawEnvironmentProps(ctx, time, assets)
   drawBuildings(ctx, time, completedIds, assets)
   drawActors(ctx, time, completedIds, nearNpcId, player, assets)
-  drawWeather(ctx, camera, width, height, time)
+  drawWeather(ctx, camera, viewportWidth, viewportHeight, time)
   ctx.restore()
   drawScanlines(ctx, width, height)
 }
@@ -1216,6 +1238,9 @@ function drawActors(
   AMBIENT_NPCS.forEach((npc, index) => {
     const walkX = Math.sin(time * 0.42 + index * 1.8) * 18
     const walkY = Math.cos(time * 0.36 + index * 1.2) * 9
+    const direction = Math.abs(walkX) > Math.abs(walkY)
+      ? walkX > 0 ? 'right' : 'left'
+      : walkY > 0 ? 'down' : 'up'
     actors.push({
       y: npc.y + walkY,
       draw: () => drawSpriteActor(ctx, assets, {
@@ -1229,6 +1254,7 @@ function drawActors(
         seed: index * 0.73,
         compact: true,
         moving: Math.abs(walkX) > 8,
+        direction,
       }),
     })
   })
@@ -1248,6 +1274,7 @@ function drawActors(
         seed: quest.id * 0.48,
         near: nearNpcId === quest.id,
         completed,
+        direction: 'down',
       }),
     })
   })
@@ -1265,6 +1292,7 @@ function drawActors(
       seed: 1.4,
       player: true,
       moving: player.moving,
+      direction: player.dir,
     }),
   })
 
@@ -1288,6 +1316,7 @@ function drawSpriteActor(
     compact = false,
     player = false,
     moving = false,
+    direction = 'down',
   }: {
     sprite: SpriteKey
     x: number
@@ -1302,15 +1331,17 @@ function drawSpriteActor(
     compact?: boolean
     player?: boolean
     moving?: boolean
+    direction?: PlayerState['dir']
   },
 ) {
   const sheet = SPRITES[sprite]
   const image = assets.sprites[sprite]
-  const frame = chooseSpriteFrame(sheet.frames, time, seed, moving, near, completed, player)
-  const drawW = player ? sheet.drawW * 1.1 : sheet.drawW
-  const drawH = player ? sheet.drawH * 1.1 : sheet.drawH
+  const frame = chooseSpriteFrame(sprite, sheet.frames, time, seed, moving, near, completed, player, direction)
+  const breathe = moving ? 0 : Math.sin(time * 2 + seed) * 1.4
+  const drawW = player ? sheet.drawW * 1.04 : sheet.drawW
+  const drawH = player ? sheet.drawH * 1.04 : sheet.drawH
   const dx = Math.round(x - drawW / 2)
-  const dy = Math.round(y - drawH)
+  const dy = Math.round(y - drawH + breathe)
 
   ctx.fillStyle = 'rgba(0,0,0,.34)'
   ctx.fillRect(Math.round(x - drawW * 0.28), Math.round(y - 10), Math.round(drawW * 0.56), 12)
@@ -1357,6 +1388,7 @@ function drawSpriteActor(
 }
 
 function chooseSpriteFrame(
+  sprite: SpriteKey,
   frameCount: number,
   time: number,
   seed: number,
@@ -1364,13 +1396,25 @@ function chooseSpriteFrame(
   near: boolean,
   completed: boolean,
   player: boolean,
+  direction: PlayerState['dir'],
 ) {
   if (frameCount <= 1) return 0
-  if (moving) return 1 + (Math.floor(time * 8 + seed) % Math.max(1, Math.min(frameCount - 1, 4)))
-  if (near && frameCount > 6) return 6
-  if (completed && frameCount > 7) return 7
-  if (player && Math.sin(time * 1.3) > 0.82 && frameCount > 6) return 6
-  return Math.floor(time * 1.8 + seed) % 2
+  if (frameCount === 4) return frameForDirection(direction)
+  if (sprite === 'nxr') {
+    if (moving) return 1 + (Math.floor(time * 7 + seed) % 4)
+    if (near && frameCount > 6) return 6
+    if (completed && frameCount > 7) return 7
+    if (player && Math.sin(time * 1.1) > 0.9 && frameCount > 6) return 6
+    return 0
+  }
+  return 0
+}
+
+function frameForDirection(direction: PlayerState['dir']) {
+  if (direction === 'right') return 1
+  if (direction === 'up') return 2
+  if (direction === 'left') return 3
+  return 0
 }
 
 function drawPixelNameTag(ctx: CanvasRenderingContext2D, x: number, y: number, text: string, color: string, compact = false, border = '#f2c866') {
