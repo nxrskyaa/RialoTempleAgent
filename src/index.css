@@ -2365,9 +2365,10 @@
 @layer components {
   .temple-play-page {
     width: 100vw;
-    height: calc(100svh - 72px);
-    min-height: 620px;
+    height: calc(100svh - 80px);
+    min-height: 560px;
     margin-left: calc(50% - 50vw);
+    margin-top: 8px;
     padding: 0;
     overflow-x: hidden;
     overflow-y: hidden;
@@ -2561,40 +2562,120 @@
     opacity: 0.5;
   }
 
-  .temple-play-joystick {
-    position: absolute;
-    left: 18px;
-    bottom: 18px;
-    z-index: 6;
-    display: none;
-    width: 128px;
-    height: 128px;
-    touch-action: none;
-    border: 2px solid rgba(245, 239, 218, 0.16);
-    border-radius: 999px;
-    background:
-      radial-gradient(circle, rgba(87, 227, 159, 0.18), transparent 52%),
-      rgba(5, 8, 7, 0.64);
-    box-shadow: 0 22px 52px rgba(0, 0, 0, 0.38), inset 0 0 0 1px rgba(255, 255, 255, 0.04);
-    backdrop-filter: blur(12px);
-  }
-
-  .temple-play-joystick span {
-    position: absolute;
-    left: 39px;
-    top: 39px;
-    width: 50px;
-    height: 50px;
-    border: 2px solid #07100c;
-    border-radius: 18px;
-    background: linear-gradient(135deg, var(--temple-gold), var(--temple-pink));
-    box-shadow: 0 8px 0 rgba(0, 0, 0, 0.24), 0 0 24px rgba(242, 200, 102, 0.22);
-  }
-
   .temple-play-shell.is-dialog-open .temple-play-miniquest {
     opacity: 0;
     pointer-events: none;
     transform: translateY(8px);
+  }
+
+  .temple-play-guide-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 18;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-start;
+    padding: 18px;
+    background:
+      linear-gradient(180deg, rgba(0, 0, 0, 0.04), rgba(0, 0, 0, 0.22)),
+      radial-gradient(circle at 16% 82%, rgba(242, 200, 102, 0.2), transparent 20rem);
+    pointer-events: none;
+  }
+
+  .temple-play-guide-card {
+    pointer-events: auto;
+    display: grid;
+    grid-template-columns: 86px minmax(0, 1fr) auto;
+    width: min(760px, calc(100% - 24px));
+    align-items: center;
+    gap: 14px;
+    border: 4px solid #171009;
+    border-radius: 8px;
+    background:
+      linear-gradient(180deg, rgba(242, 200, 102, 0.16), transparent 34%),
+      repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.025) 0 2px, transparent 2px 5px),
+      rgba(7, 16, 12, 0.94);
+    padding: 13px;
+    box-shadow: 0 7px 0 rgba(0, 0, 0, 0.32), 0 24px 74px rgba(0, 0, 0, 0.46);
+  }
+
+  .temple-play-guide-avatar {
+    display: grid;
+    place-items: end center;
+    width: 82px;
+    height: 88px;
+    overflow: hidden;
+    border: 3px solid #07100c;
+    border-radius: 7px;
+    background:
+      radial-gradient(circle at 50% 36%, color-mix(in srgb, var(--npc) 54%, transparent), transparent 58%),
+      rgba(247, 241, 223, 0.08);
+    box-shadow: 0 5px 0 rgba(0, 0, 0, 0.28), 0 0 24px color-mix(in srgb, var(--npc-accent) 24%, transparent);
+    animation: templePlayNpcBreathe 3.2s ease-in-out infinite;
+  }
+
+  .temple-play-guide-sprite {
+    display: block;
+    width: 78px;
+    height: 86px;
+    background-repeat: no-repeat;
+    image-rendering: pixelated;
+    filter: drop-shadow(0 6px 0 rgba(0, 0, 0, 0.22));
+  }
+
+  .temple-play-guide-copy p {
+    margin: 0;
+    color: var(--temple-gold);
+    font-size: 11px;
+    font-weight: 950;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .temple-play-guide-copy h2 {
+    margin: 3px 0 5px;
+    color: var(--temple-text);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: clamp(1.1rem, 3vw, 1.75rem);
+    font-weight: 950;
+    line-height: 1;
+  }
+
+  .temple-play-guide-copy span {
+    display: block;
+    max-width: 560px;
+    color: var(--temple-muted);
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1.45;
+  }
+
+  .temple-play-guide-copy div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .temple-play-guide-copy small {
+    border: 2px solid rgba(245, 239, 218, 0.1);
+    border-radius: 5px;
+    background: rgba(245, 239, 218, 0.07);
+    color: var(--temple-soft);
+    padding: 5px 7px;
+    font-size: 10px;
+    font-weight: 950;
+  }
+
+  .temple-play-guide-card > button {
+    border: 2px solid #171009;
+    border-radius: 5px;
+    background: linear-gradient(135deg, var(--temple-gold), var(--temple-emerald));
+    color: #07100c;
+    padding: 10px 14px;
+    font-size: 12px;
+    font-weight: 950;
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.26);
   }
 
   .temple-play-overlay {
@@ -2877,12 +2958,8 @@
       align-items: center;
     }
 
-    .temple-play-joystick {
-      display: block;
-    }
-
     .temple-play-miniquest {
-      bottom: 154px;
+      bottom: 22px;
     }
 
     .temple-play-quiz-card {
@@ -2895,7 +2972,9 @@
     .temple-play-page {
       width: 100vw;
       max-width: 100vw;
-      min-height: 620px;
+      height: calc(100svh - 80px);
+      min-height: 560px;
+      margin-top: 8px;
     }
 
     .temple-play-topbar {
@@ -2938,10 +3017,40 @@
     .temple-play-miniquest {
       top: auto;
       right: 12px;
-      bottom: 130px;
-      left: 148px;
+      bottom: 12px;
+      left: 12px;
       width: auto;
       padding: 9px;
+    }
+
+    .temple-play-guide-layer {
+      padding: 10px;
+    }
+
+    .temple-play-guide-card {
+      grid-template-columns: 58px minmax(0, 1fr);
+      width: 100%;
+      gap: 9px;
+      padding: 10px;
+    }
+
+    .temple-play-guide-avatar {
+      width: 56px;
+      height: 64px;
+    }
+
+    .temple-play-guide-sprite {
+      width: 54px;
+      height: 62px;
+    }
+
+    .temple-play-guide-copy div {
+      display: none;
+    }
+
+    .temple-play-guide-card > button {
+      grid-column: 1 / -1;
+      width: 100%;
     }
 
     .temple-play-overlay {
@@ -2982,7 +3091,8 @@
 
   @media (prefers-reduced-motion: reduce) {
     .temple-play-npc-portrait,
-    .temple-play-npc-sprite {
+    .temple-play-npc-sprite,
+    .temple-play-guide-avatar {
       animation: none !important;
     }
   }

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import type { CSSProperties, MutableRefObject, PointerEvent } from 'react'
+import type { CSSProperties } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Award, CheckCircle2, Gamepad2, Loader2, MapPin, Sparkles, XCircle } from 'lucide-react'
 import { useAccount, useReadContract, useReadContracts, useWaitForTransactionReceipt, useWriteContract } from 'wagmi'
@@ -329,7 +329,7 @@ const QUESTS: QuestNpc[] = [
 
 const AMBIENT_NPCS: AmbientNpc[] = [
   { name: 'Boba Byte', sprite: 'npcSage', x: 300, y: 1040, color: '#ff7ad9', accent: '#f2c866', line: 'Rain makes the data spring louder.' },
-  { name: 'Mossy Dex', sprite: 'npcForestGuide', x: 690, y: 700, color: '#57e39f', accent: '#78ecff', line: 'Try walking near a glowing NPC and press E.' },
+  { name: 'Mossy Dex', sprite: 'npcForestGuide', x: 690, y: 700, color: '#57e39f', accent: '#78ecff', line: 'Follow the gold arrow, then tap the quest guide.' },
   { name: 'Peeko Bond', sprite: 'npcHerbalist', x: 1160, y: 430, color: '#f2c866', accent: '#ffad72', line: 'RWA vaults like clean verification stamps.' },
   { name: 'Firo Mail', sprite: 'npcCaptain', x: 1560, y: 650, color: '#78ecff', accent: '#ff7ad9', line: 'Bridge Gate scrolls carry API messages out and back.' },
   { name: 'Jade Numi', sprite: 'npcAlchemist', x: 2490, y: 620, color: '#b9ff66', accent: '#57e39f', line: 'Temple Energy returns when the daily ritual cools down.' },
@@ -366,12 +366,11 @@ function TemplePlayInner() {
   const [answers, setAnswers] = useState<Record<number, number>>({})
   const [quizDone, setQuizDone] = useState(false)
   const [nearNpcId, setNearNpcId] = useState<number | null>(null)
+  const [showGuide, setShowGuide] = useState(true)
   const [toast, setToast] = useState('')
-  const [joystick, setJoystick] = useState({ active: false, x: 0, y: 0 })
   const [claimingQuest, setClaimingQuest] = useState<QuestNpc | null>(null)
   const completedRef = useRef<Set<number>>(new Set())
   const openQuestRef = useRef<(quest: QuestNpc) => void>(() => undefined)
-  const joystickVector = useRef({ x: 0, y: 0 })
 
   const userQuery = useReadContract({
     address: RIALO_TEMPLE_ADDRESS,
@@ -426,6 +425,8 @@ function TemplePlayInner() {
     })
     return ids
   }, [questStatus])
+
+  const nextQuest = useMemo(() => QUESTS.find((quest) => !completedIds.has(quest.quizId)) ?? QUESTS[0], [completedIds])
 
   useEffect(() => {
     completedRef.current = completedIds
@@ -543,26 +544,30 @@ function TemplePlayInner() {
         <div className="temple-play-stage">
           <TemplePlayCanvas
             completedIds={completedIds}
-            joystickVectorRef={joystickVector}
+            nextQuest={nextQuest}
             onNearQuestChange={setNearNpcId}
             onOpenQuest={(quest) => openQuestRef.current(quest)}
           />
 
           <div className="temple-play-hud">
             <span><Gamepad2 className="h-4 w-4" /> Click / tap map to move</span>
-            <span><Gamepad2 className="h-4 w-4" /> WASD optional</span>
-            <span><MapPin className="h-4 w-4" /> Press E near glowing NPC</span>
+            <span><MapPin className="h-4 w-4" /> Follow the gold arrow</span>
+            <span><Gamepad2 className="h-4 w-4" /> WASD optional on desktop</span>
           </div>
 
           <div className="temple-play-miniquest">
-            <p>{nearestQuest ? 'Nearby guide' : 'Quest radar'}</p>
-            <strong>{nearestQuest ? `${nearestQuest.npc} / ${nearestQuest.zone}` : 'Find a glowing NPC'}</strong>
+            <p>{nearestQuest ? 'Talk now' : 'Next destination'}</p>
+            <strong>{nearestQuest ? `${nearestQuest.npc} / ${nearestQuest.zone}` : `${nextQuest.zone} - follow arrow`}</strong>
             <button type="button" disabled={!nearestQuest} onClick={() => nearestQuest && openQuest(nearestQuest)}>
-              {nearestQuest ? 'Talk' : 'Walk closer'}
+              {nearestQuest ? 'Talk' : 'Move there'}
             </button>
           </div>
 
-          <Joystick value={joystick} setValue={setJoystick} joystickVectorRef={joystickVector} />
+          <AnimatePresence>
+            {showGuide && !activeQuest ? (
+              <GuideOverlay onClose={() => setShowGuide(false)} />
+            ) : null}
+          </AnimatePresence>
 
           <AnimatePresence>
             {activeQuest ? (
@@ -609,12 +614,12 @@ function TemplePlayInner() {
 
 function TemplePlayCanvas({
   completedIds,
-  joystickVectorRef,
+  nextQuest,
   onNearQuestChange,
   onOpenQuest,
 }: {
   completedIds: Set<number>
-  joystickVectorRef: MutableRefObject<{ x: number; y: number }>
+  nextQuest: QuestNpc
   onNearQuestChange: (id: number | null) => void
   onOpenQuest: (quest: QuestNpc) => void
 }) {
@@ -699,7 +704,7 @@ function TemplePlayCanvas({
         return
       }
 
-      let input = movementFromInput(keys.current, joystickVectorRef.current)
+      let input = movementFromInput(keys.current)
       const current = player.current
       const hasManualInput = Math.abs(input.x) > 0.01 || Math.abs(input.y) > 0.01
       if (hasManualInput) {
@@ -747,7 +752,7 @@ function TemplePlayCanvas({
       }
       cameraRef.current = { ...camera, zoom }
 
-      drawWorld(context, rect.width, rect.height, viewport.width, viewport.height, camera, zoom, frame, current, completedLatest.current, nearId.current, assets, tapTarget.current)
+      drawWorld(context, rect.width, rect.height, viewport.width, viewport.height, camera, zoom, frame, current, completedLatest.current, nearId.current, assets, tapTarget.current, nextQuest)
       window.requestAnimationFrame(tick)
     }
 
@@ -759,7 +764,7 @@ function TemplePlayCanvas({
       window.removeEventListener('keydown', keyDown)
       window.removeEventListener('keyup', keyUp)
     }
-  }, [joystickVectorRef, onNearQuestChange, onOpenQuest])
+  }, [nextQuest, onNearQuestChange, onOpenQuest])
 
   return (
     <div ref={wrapRef} className="temple-play-canvas-wrap">
@@ -904,52 +909,43 @@ function QuizOverlay({
   )
 }
 
-function Joystick({
-  value,
-  setValue,
-  joystickVectorRef,
-}: {
-  value: { active: boolean; x: number; y: number }
-  setValue: (value: { active: boolean; x: number; y: number }) => void
-  joystickVectorRef: MutableRefObject<{ x: number; y: number }>
-}) {
-  const baseRef = useRef<HTMLDivElement | null>(null)
-
-  function update(pointer: PointerEvent<HTMLDivElement>) {
-    const rect = baseRef.current?.getBoundingClientRect()
-    if (!rect) return
-    const dx = pointer.clientX - (rect.left + rect.width / 2)
-    const dy = pointer.clientY - (rect.top + rect.height / 2)
-    const length = Math.hypot(dx, dy) || 1
-    const max = rect.width * 0.34
-    const x = (dx / Math.max(max, length)) * Math.min(length, max)
-    const y = (dy / Math.max(max, length)) * Math.min(length, max)
-    const normalized = length > 10 ? { x: dx / length, y: dy / length } : { x: 0, y: 0 }
-    joystickVectorRef.current = normalized
-    setValue({ active: true, x, y })
-  }
-
-  function release() {
-    joystickVectorRef.current = { x: 0, y: 0 }
-    setValue({ active: false, x: 0, y: 0 })
-  }
+function GuideOverlay({ onClose }: { onClose: () => void }) {
+  const portrait = SPRITES.nxr
 
   return (
-    <div
-      ref={baseRef}
-      className="temple-play-joystick"
-      onPointerDown={(event) => {
-        event.currentTarget.setPointerCapture(event.pointerId)
-        update(event)
-      }}
-      onPointerMove={(event) => {
-        if (value.active) update(event)
-      }}
-      onPointerUp={release}
-      onPointerCancel={release}
-    >
-      <span style={{ transform: `translate(${value.x}px, ${value.y}px)` }} />
-    </div>
+    <motion.div className="temple-play-guide-layer" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+      <motion.section
+        className="temple-play-guide-card"
+        initial={{ y: 26, scale: 0.96 }}
+        animate={{ y: 0, scale: 1 }}
+        exit={{ y: 16, scale: 0.97 }}
+        transition={{ type: 'spring', stiffness: 230, damping: 22 }}
+      >
+        <div className="temple-play-guide-avatar" style={{ '--npc': '#f2c866', '--npc-accent': '#57e39f' } as CSSProperties}>
+          <span
+            className="temple-play-guide-sprite"
+            style={{
+              backgroundImage: `url(${portrait.src})`,
+              backgroundSize: `${portrait.frames * 100}% 100%`,
+              backgroundPosition: '0 0',
+            }}
+          />
+        </div>
+        <div className="temple-play-guide-copy">
+          <p>NXR Guide</p>
+          <h2>Welcome to Temple Play</h2>
+          <span>
+            This is a pixel quest for learning Rialo. Tap the map to move, follow the gold arrow, talk to NPCs, answer mini quizzes, then claim badges on-chain.
+          </span>
+          <div>
+            <small>Tap map: move</small>
+            <small>Arrow: next quest</small>
+            <small>E key: talk nearby</small>
+          </div>
+        </div>
+        <button type="button" onClick={onClose}>Start</button>
+      </motion.section>
+    </motion.div>
   )
 }
 
@@ -993,9 +989,9 @@ function drawAssetLoading(ctx: CanvasRenderingContext2D, width: number, height: 
   ctx.textAlign = 'left'
 }
 
-function movementFromInput(keys: Set<string>, joystick: { x: number; y: number }) {
-  let x = joystick.x
-  let y = joystick.y
+function movementFromInput(keys: Set<string>) {
+  let x = 0
+  let y = 0
   if (keys.has('a') || keys.has('arrowleft')) x -= 1
   if (keys.has('d') || keys.has('arrowright')) x += 1
   if (keys.has('w') || keys.has('arrowup')) y -= 1
@@ -1041,6 +1037,7 @@ function drawWorld(
   nearNpcId: number | null,
   assets: TemplePlayAssets,
   target: { x: number; y: number } | null,
+  nextQuest: QuestNpc,
 ) {
   ctx.clearRect(0, 0, width, height)
   ctx.save()
@@ -1052,6 +1049,7 @@ function drawWorld(
   drawEnvironmentProps(ctx, time, assets)
   drawBuildings(ctx, time, completedIds, assets)
   drawTapTarget(ctx, time, target)
+  drawQuestDirection(ctx, time, player, nextQuest, nearNpcId)
   drawActors(ctx, time, completedIds, nearNpcId, player, assets)
   drawWeather(ctx, camera, viewportWidth, viewportHeight, time)
   ctx.restore()
@@ -1074,6 +1072,66 @@ function drawTapTarget(ctx: CanvasRenderingContext2D, time: number, target: { x:
   ctx.fillRect(-4, -28, 8, 18)
   ctx.fillRect(-18, -14, 36, 8)
   ctx.restore()
+}
+
+function drawQuestDirection(
+  ctx: CanvasRenderingContext2D,
+  time: number,
+  player: PlayerState,
+  quest: QuestNpc,
+  nearNpcId: number | null,
+) {
+  const dx = quest.x - player.x
+  const dy = quest.y - player.y
+  const distance = Math.hypot(dx, dy)
+  const angle = Math.atan2(dy, dx)
+  const close = nearNpcId === quest.id || distance < 130
+  const arrowDistance = clamp(distance * 0.34, 84, 172)
+  const ax = player.x + Math.cos(angle) * arrowDistance
+  const ay = player.y + Math.sin(angle) * arrowDistance - 44 + Math.sin(time * 3) * 5
+
+  ctx.save()
+  ctx.globalAlpha = close ? 0.55 : 0.96
+  ctx.strokeStyle = 'rgba(242, 200, 102, 0.84)'
+  ctx.lineWidth = 5
+  ctx.setLineDash([16, 14])
+  ctx.lineDashOffset = -time * 38
+  ctx.beginPath()
+  ctx.moveTo(player.x, player.y - 42)
+  ctx.lineTo(quest.x, quest.y - 44)
+  ctx.stroke()
+  ctx.setLineDash([])
+
+  ctx.translate(ax, ay)
+  ctx.rotate(angle)
+  ctx.fillStyle = '#f2c866'
+  ctx.strokeStyle = '#07100c'
+  ctx.lineWidth = 5
+  ctx.beginPath()
+  ctx.moveTo(34, 0)
+  ctx.lineTo(-24, -24)
+  ctx.lineTo(-13, 0)
+  ctx.lineTo(-24, 24)
+  ctx.closePath()
+  ctx.fill()
+  ctx.stroke()
+  ctx.fillStyle = '#57e39f'
+  ctx.fillRect(-12, -6, 24, 12)
+  ctx.restore()
+
+  const ring = 1 + Math.sin(time * 4.2) * 0.08
+  ctx.save()
+  ctx.translate(quest.x, quest.y - 12)
+  ctx.strokeStyle = close ? 'rgba(87, 227, 159, 0.9)' : 'rgba(242, 200, 102, 0.86)'
+  ctx.fillStyle = close ? 'rgba(87, 227, 159, 0.18)' : 'rgba(242, 200, 102, 0.14)'
+  ctx.lineWidth = 5
+  ctx.beginPath()
+  ctx.ellipse(0, 0, 60 * ring, 26 * ring, 0, 0, Math.PI * 2)
+  ctx.fill()
+  ctx.stroke()
+  ctx.restore()
+
+  drawPixelNameTag(ctx, quest.x, quest.y - 170, close ? 'Tap Talk' : `Next: ${quest.zone}`, '#07100c', false, '#f2c866', true)
 }
 
 function drawGround(ctx: CanvasRenderingContext2D, time: number, assets: TemplePlayAssets) {
@@ -1209,19 +1267,60 @@ function drawOrganicPlaza(ctx: CanvasRenderingContext2D, x: number, y: number, w
 }
 
 function drawWater(ctx: CanvasRenderingContext2D, time: number) {
-  ctx.fillStyle = '#263d68'
-  ctx.fillRect(1580, 850, 390, 260)
-  ctx.strokeStyle = '#7aa0c9'
-  ctx.lineWidth = 8
-  ctx.strokeRect(1580, 850, 390, 260)
-  for (let i = 0; i < 12; i++) {
-    const x = 1610 + (i * 51) % 330
-    const y = 892 + (i * 31) % 174
-    ctx.fillStyle = i % 3 === 0 ? '#b985d8' : '#4c6d55'
-    ctx.fillRect(x + Math.sin(time * 1.3 + i) * 5, y, 34, 10)
-    ctx.fillStyle = '#f2c866'
-    ctx.fillRect(x + 10, y - 7, 10, 7)
+  const x = 1580
+  const y = 850
+  const w = 390
+  const h = 260
+
+  ctx.save()
+  ctx.fillStyle = '#438a8f'
+  ctx.fillRect(x - 12, y - 12, w + 24, h + 24)
+  ctx.fillStyle = '#55b9c8'
+  ctx.fillRect(x, y, w, h)
+  ctx.fillStyle = '#367ea3'
+  ctx.fillRect(x + 18, y + 18, w - 36, h - 36)
+  ctx.fillStyle = '#4fc7d8'
+  ctx.fillRect(x + 34, y + 34, w - 68, h - 68)
+
+  ctx.strokeStyle = 'rgba(214, 251, 255, .48)'
+  ctx.lineWidth = 4
+  for (let row = 0; row < 6; row++) {
+    const yy = y + 44 + row * 34
+    ctx.beginPath()
+    for (let i = 0; i <= 10; i++) {
+      const xx = x + 34 + i * 32
+      const wave = Math.sin(time * 2.2 + row * 0.8 + i * 0.74) * 7
+      if (i === 0) ctx.moveTo(xx, yy + wave)
+      else ctx.lineTo(xx, yy + wave)
+    }
+    ctx.stroke()
   }
+
+  for (let i = 0; i < 7; i++) {
+    const rx = x + 48 + ((i * 71 + Math.sin(time * 0.5 + i) * 18) % 298)
+    const ry = y + 45 + ((i * 43) % 165)
+    const radius = 12 + ((Math.sin(time * 2.4 + i) + 1) * 7)
+    ctx.strokeStyle = `rgba(247, 241, 223, ${0.14 + (i % 3) * 0.05})`
+    ctx.lineWidth = 2
+    ctx.beginPath()
+    ctx.ellipse(rx, ry, radius * 1.8, radius * 0.72, 0, 0, Math.PI * 2)
+    ctx.stroke()
+  }
+
+  for (let i = 0; i < 12; i++) {
+    const padX = x + 28 + ((i * 59) % 324) + Math.sin(time * 1.3 + i) * 4
+    const padY = y + 36 + ((i * 37) % 178) + Math.cos(time * 1.1 + i) * 2
+    ctx.fillStyle = i % 3 === 0 ? '#8ecf5f' : '#4f8a58'
+    ctx.fillRect(padX, padY, 34, 11)
+    ctx.fillRect(padX + 7, padY - 6, 20, 9)
+    if (i % 4 === 0) {
+      ctx.fillStyle = '#ffd1ef'
+      ctx.fillRect(padX + 12, padY - 11, 8, 8)
+      ctx.fillStyle = '#f2c866'
+      ctx.fillRect(padX + 15, padY - 8, 3, 3)
+    }
+  }
+  ctx.restore()
 }
 
 function drawBuildings(ctx: CanvasRenderingContext2D, time: number, completedIds: Set<number>, assets: TemplePlayAssets) {
@@ -1299,6 +1398,13 @@ function drawEnvironmentProps(ctx: CanvasRenderingContext2D, time: number, asset
   drawProp(ctx, assets, 'vineCornerB', 2580, 960, 88, 88)
   drawProp(ctx, assets, 'vineCornerC', 88, 1770, 88, 88)
 
+  for (let i = 0; i < 34; i++) {
+    const x = 120 + ((i * 293) % (WORLD.width - 240))
+    const y = 140 + ((i * 211) % (WORLD.height - 280))
+    if (isNearMainPlaySpace(x, y) && i % 3 !== 0) continue
+    drawFlowerPatch(ctx, x, y, i, time)
+  }
+
   for (let i = 0; i < 76; i++) {
     const x = 90 + ((i * 257) % (WORLD.width - 180))
     const y = 120 + ((i * 181) % (WORLD.height - 240))
@@ -1311,7 +1417,52 @@ function drawEnvironmentProps(ctx: CanvasRenderingContext2D, time: number, asset
     ctx.fillRect(x + 7 + sway, y - 7, 24, 27)
     ctx.fillStyle = '#2b4f35'
     ctx.fillRect(x + 4 + sway, y + 23, 28, 14)
+    if (i % 5 === 0) {
+      ctx.fillStyle = 'rgba(185, 255, 102, .85)'
+      ctx.fillRect(x + 13 + sway, y + 2, 7, 7)
+      ctx.fillRect(x + 25 + sway, y + 16, 6, 6)
+    }
   }
+
+  drawFloatingLeaves(ctx, time)
+}
+
+function drawFlowerPatch(ctx: CanvasRenderingContext2D, x: number, y: number, seed: number, time: number) {
+  ctx.save()
+  ctx.translate(x, y)
+  const colors = ['#ff7ad9', '#f2c866', '#b9ff66', '#f7f1df', '#78ecff']
+  for (let i = 0; i < 5; i++) {
+    const px = ((i * 17 + seed * 9) % 42) - 18
+    const py = ((i * 13 + seed * 7) % 30) - 12
+    const bob = Math.sin(time * 1.7 + seed + i) * 1.1
+    ctx.fillStyle = '#386b34'
+    ctx.fillRect(px - 2, py + 5, 4, 12)
+    ctx.fillStyle = colors[(seed + i) % colors.length]
+    ctx.fillRect(px - 6, py + bob, 5, 5)
+    ctx.fillRect(px + 1, py + bob, 5, 5)
+    ctx.fillRect(px - 2, py - 3 + bob, 5, 5)
+    ctx.fillStyle = '#f7f1df'
+    ctx.fillRect(px, py + 1 + bob, 2, 2)
+  }
+  ctx.restore()
+}
+
+function drawFloatingLeaves(ctx: CanvasRenderingContext2D, time: number) {
+  ctx.save()
+  for (let i = 0; i < 42; i++) {
+    const drift = Math.sin(time * 0.8 + i * 1.9) * 18
+    const x = (i * 197 + time * (14 + (i % 4) * 5) + drift) % WORLD.width
+    const y = (i * 113 + time * (8 + (i % 3) * 4)) % WORLD.height
+    const size = 6 + (i % 4) * 2
+    ctx.save()
+    ctx.translate(x, y)
+    ctx.rotate(Math.sin(time * 1.2 + i) * 0.7)
+    ctx.fillStyle = i % 3 === 0 ? 'rgba(185, 255, 102, .46)' : i % 3 === 1 ? 'rgba(87, 227, 159, .42)' : 'rgba(242, 200, 102, .36)'
+    ctx.fillRect(-size / 2, -size / 3, size, Math.max(3, size / 2))
+    ctx.fillRect(0, -size / 2, Math.max(2, size / 3), size)
+    ctx.restore()
+  }
+  ctx.restore()
 }
 
 function isNearMainPlaySpace(x: number, y: number) {
@@ -1358,35 +1509,34 @@ function drawActors(
   const actors: Array<{ y: number; draw: () => void }> = []
 
   AMBIENT_NPCS.forEach((npc, index) => {
-    const idleY = Math.sin(time * 1.15 + index * 0.91) * 0.9
-    const directionCycle: Array<PlayerState['dir']> = ['down', 'right', 'down', 'left']
-    const direction = directionCycle[Math.floor(time / 5 + index) % directionCycle.length]
+    const motion = ambientNpcMotion(npc, index, time)
     actors.push({
-      y: npc.y + idleY,
+      y: motion.y,
       draw: () => drawSpriteActor(ctx, assets, {
         sprite: npc.sprite,
-        x: npc.x,
-        y: npc.y + idleY,
+        x: motion.x,
+        y: motion.y,
         name: npc.name,
         tone: npc.color,
         accent: npc.accent,
         time,
         seed: index * 0.73,
         compact: true,
-        moving: false,
-        direction,
+        moving: motion.moving,
+        direction: motion.direction,
       }),
     })
   })
 
   QUESTS.forEach((quest) => {
     const completed = completedIds.has(quest.quizId)
+    const action = questNpcMotion(quest, time)
     actors.push({
-      y: quest.y,
+      y: action.y,
       draw: () => drawSpriteActor(ctx, assets, {
         sprite: quest.sprite,
-        x: quest.x,
-        y: quest.y,
+        x: action.x,
+        y: action.y,
         name: completed ? `${quest.npc} OK` : quest.npc,
         tone: quest.color,
         accent: quest.accent,
@@ -1394,7 +1544,8 @@ function drawActors(
         seed: quest.id * 0.48,
         near: nearNpcId === quest.id,
         completed,
-        direction: 'down',
+        moving: action.moving,
+        direction: action.direction,
       }),
     })
   })
@@ -1417,6 +1568,61 @@ function drawActors(
   })
 
   actors.sort((a, b) => a.y - b.y).forEach((actor) => actor.draw())
+}
+
+function ambientNpcMotion(npc: AmbientNpc, index: number, time: number) {
+  const mode = index % 4
+  if (mode === 0) {
+    const phase = time * 0.62 + index
+    const x = npc.x + Math.sin(phase) * 62
+    const y = npc.y + Math.cos(phase * 0.65) * 18
+    const direction: PlayerState['dir'] = Math.cos(phase) > 0 ? 'right' : 'left'
+    return { x, y, moving: true, direction }
+  }
+  if (mode === 1) {
+    const step = Math.floor(time * 1.8 + index) % 4
+    const direction: PlayerState['dir'] = step === 0 ? 'down' : step === 1 ? 'right' : step === 2 ? 'up' : 'left'
+    return { x: npc.x, y: npc.y + Math.sin(time * 3.2 + index) * 3, moving: false, direction }
+  }
+  if (mode === 2) {
+    const phase = time * 0.42 + index * 1.7
+    const x = npc.x + Math.sin(phase) * 24
+    const y = npc.y + Math.sin(phase * 1.5) * 38
+    const direction: PlayerState['dir'] = Math.sin(phase * 1.5) > 0 ? 'down' : 'up'
+    return { x, y, moving: true, direction }
+  }
+  return {
+    x: npc.x + Math.sin(time * 1.5 + index) * 5,
+    y: npc.y + Math.sin(time * 2.4 + index) * 4,
+    moving: false,
+    direction: 'down' as PlayerState['dir'],
+  }
+}
+
+function questNpcMotion(quest: QuestNpc, time: number) {
+  const phase = time + quest.id * 0.83
+  if (quest.id % 3 === 0) {
+    return {
+      x: quest.x + Math.sin(phase * 1.5) * 5,
+      y: quest.y + Math.sin(phase * 3.2) * 3,
+      moving: false,
+      direction: Math.sin(phase * 1.5) > 0 ? 'right' as const : 'left' as const,
+    }
+  }
+  if (quest.id % 3 === 1) {
+    return {
+      x: quest.x + Math.sin(phase * 0.72) * 16,
+      y: quest.y,
+      moving: true,
+      direction: Math.cos(phase * 0.72) > 0 ? 'right' as const : 'left' as const,
+    }
+  }
+  return {
+    x: quest.x,
+    y: quest.y + Math.sin(phase * 2.2) * 4,
+    moving: false,
+    direction: 'down' as const,
+  }
 }
 
 function drawSpriteActor(
@@ -1535,13 +1741,13 @@ function frameForDirection(direction: PlayerState['dir']) {
   return 0
 }
 
-function drawPixelNameTag(ctx: CanvasRenderingContext2D, x: number, y: number, text: string, color: string, compact = false, border = '#f2c866') {
+function drawPixelNameTag(ctx: CanvasRenderingContext2D, x: number, y: number, text: string, color: string, compact = false, border = '#f2c866', filled = false) {
   const fontSize = compact ? 11 : 12
   ctx.font = `900 ${fontSize}px monospace`
   const width = Math.ceil(ctx.measureText(text).width) + 16
-  ctx.fillStyle = 'rgba(7, 16, 12, .9)'
+  ctx.fillStyle = filled ? border : 'rgba(7, 16, 12, .9)'
   ctx.fillRect(Math.round(x - width / 2), Math.round(y), width, compact ? 20 : 22)
-  ctx.strokeStyle = border
+  ctx.strokeStyle = filled ? '#07100c' : border
   ctx.lineWidth = 1
   ctx.strokeRect(Math.round(x - width / 2) + 0.5, Math.round(y) + 0.5, width - 1, (compact ? 20 : 22) - 1)
   ctx.fillStyle = color
@@ -1552,20 +1758,45 @@ function drawWeather(ctx: CanvasRenderingContext2D, camera: { x: number; y: numb
   ctx.save()
   ctx.translate(camera.x, camera.y)
   for (let i = 0; i < 16; i++) {
-    const x = ((i * 190 + time * 22) % (width + 260)) - 150
-    const y = 30 + (i * 47) % Math.max(120, height * 0.46)
-    ctx.fillStyle = 'rgba(247,241,223,.16)'
-    ctx.fillRect(x, y, 96, 18)
-    ctx.fillRect(x + 24, y - 12, 58, 18)
+    const x = ((i * 190 + time * (18 + (i % 3) * 6)) % (width + 300)) - 170
+    const y = 28 + (i * 47 + Math.sin(time * 0.4 + i) * 18) % Math.max(120, height * 0.46)
+    ctx.fillStyle = 'rgba(247,241,223,.13)'
+    ctx.fillRect(x, y, 104, 18)
+    ctx.fillRect(x + 22, y - 12, 66, 18)
+    ctx.fillRect(x + 52, y + 11, 46, 12)
   }
-  ctx.strokeStyle = 'rgba(210,232,255,.28)'
+  const wind = Math.sin(time * 0.47) * 22
+  for (let layer = 0; layer < 2; layer++) {
+    ctx.strokeStyle = layer === 0 ? 'rgba(210,232,255,.22)' : 'rgba(247,241,223,.18)'
+    ctx.lineWidth = layer === 0 ? 2 : 1
+    const count = layer === 0 ? 58 : 42
+    for (let i = 0; i < count; i++) {
+      const speed = layer === 0 ? 310 : 220
+      const x = (i * 73 + time * (speed + (i % 5) * 12) + wind * 5) % (width + 140) - 70
+      const y = (i * 97 + time * (410 + (i % 4) * 30)) % (height + 190) - 40
+      const slant = -10 + wind * 0.28 + Math.sin(time + i) * 4
+      const length = layer === 0 ? 34 + (i % 3) * 8 : 21 + (i % 4) * 5
+      ctx.beginPath()
+      ctx.moveTo(x, y)
+      ctx.lineTo(x + slant, y + length)
+      ctx.stroke()
+    }
+  }
+
+  for (let i = 0; i < 18; i++) {
+    const x = (i * 131 + time * 70) % (width + 80) - 40
+    const y = (i * 73 + time * 46) % (height + 120) - 20
+    ctx.fillStyle = i % 2 === 0 ? 'rgba(185,255,102,.34)' : 'rgba(87,227,159,.28)'
+    ctx.fillRect(x + Math.sin(time + i) * 7, y, 9, 5)
+  }
+
+  ctx.strokeStyle = 'rgba(210, 251, 255, .3)'
   ctx.lineWidth = 2
-  for (let i = 0; i < 54; i++) {
-    const x = (i * 73 + time * 230) % (width + 80)
-    const y = (i * 97 + time * 350) % (height + 160)
+  for (let i = 0; i < 10; i++) {
+    const x = 1580 - camera.x + 35 + ((i * 43 + time * 34) % 320)
+    const y = 850 - camera.y + 35 + ((i * 29) % 180)
     ctx.beginPath()
-    ctx.moveTo(x, y)
-    ctx.lineTo(x - 12, y + 32)
+    ctx.ellipse(x, y, 12 + Math.sin(time * 3 + i) * 4, 5, 0, 0, Math.PI * 2)
     ctx.stroke()
   }
   ctx.restore()
