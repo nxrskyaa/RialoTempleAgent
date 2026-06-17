@@ -39,21 +39,22 @@ type AmbientNpc = {
   accent: string
   line: string
   activity: AmbientActivity
+  persona?: NpcPersona
+  pair?: string
 }
 
 type AmbientActivity =
-  | 'garden'
-  | 'guide'
-  | 'inspect'
-  | 'deliver'
-  | 'chant'
-  | 'privacy'
-  | 'signal'
-  | 'build'
+  | 'wander'
+  | 'fish'
   | 'dance'
-  | 'scribe'
-  | 'portal'
-  | 'greet'
+  | 'gather'
+  | 'stroll'
+  | 'meditate'
+  | 'sit'
+  | 'tend'
+  | 'couple'
+
+type NpcPersona = 'homebody' | 'wanderer' | 'pacer'
 
 type NpcMotion = {
   x: number
@@ -83,11 +84,41 @@ type SpriteKey =
   | 'npcAlchemist'
 
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000' as const
-const WORLD = { width: 3400, height: 2050 }
+const MAP_W = 50
+const MAP_H = 40
+const TILE_SIZE = 32
+const WORLD = { width: MAP_W * TILE_SIZE, height: MAP_H * TILE_SIZE }
+const CENTER_HUB = { tx: 25, ty: 20 }
+const HUBS = [
+  [13, 9],
+  [12, 26],
+  [40, 11],
+  [38, 30],
+] as const
+const POND = { tx: 5, ty: 24, tw: 8, th: 6 }
+const POND_RECT = {
+  x: POND.tx * TILE_SIZE,
+  y: POND.ty * TILE_SIZE,
+  w: POND.tw * TILE_SIZE,
+  h: POND.th * TILE_SIZE,
+}
+const T = {
+  GRASS: 0,
+  GRASS2: 1,
+  PATH: 2,
+  WATER: 3,
+  SAND: 4,
+  MYSTIC: 5,
+  COAST: 6,
+  FLOWER: 7,
+  SAND2: 8,
+  MYSTIC2: 9,
+} as const
+type TileType = (typeof T)[keyof typeof T]
 const PLAYER_SPEED = 245
-const DESKTOP_CAMERA_ZOOM = 0.42
-const TABLET_CAMERA_ZOOM = 0.44
-const MOBILE_CAMERA_ZOOM = 0.38
+const DESKTOP_CAMERA_ZOOM = 1.5
+const TABLET_CAMERA_ZOOM = 1.25
+const MOBILE_CAMERA_ZOOM = 0.92
 
 type SpriteSheet = {
   src: string
@@ -174,8 +205,8 @@ const QUESTS: QuestNpc[] = [
     npc: 'NXR',
     role: 'Builder Guide',
     sprite: 'nxr',
-    x: 520,
-    y: 600,
+    x: 800,
+    y: 710,
     color: '#f2c866',
     accent: '#57e39f',
     reward: 50,
@@ -209,8 +240,8 @@ const QUESTS: QuestNpc[] = [
     npc: 'Vault Keeper Mino',
     role: 'Asset Guardian',
     sprite: 'npcHerbalist',
-    x: 2170,
-    y: 650,
+    x: 1278,
+    y: 410,
     color: '#ffad72',
     accent: '#f2c866',
     reward: 75,
@@ -244,8 +275,8 @@ const QUESTS: QuestNpc[] = [
     npc: 'Scout Luma',
     role: 'Agent Coordinator',
     sprite: 'npcShadowAgent',
-    x: 1320,
-    y: 1480,
+    x: 430,
+    y: 900,
     color: '#78ecff',
     accent: '#c886ff',
     reward: 75,
@@ -279,8 +310,8 @@ const QUESTS: QuestNpc[] = [
     npc: 'Zap Tiko',
     role: 'Signal Runner',
     sprite: 'npcNavigator',
-    x: 2320,
-    y: 1520,
+    x: 1220,
+    y: 978,
     color: '#b9ff66',
     accent: '#78ecff',
     reward: 80,
@@ -314,8 +345,8 @@ const QUESTS: QuestNpc[] = [
     npc: 'Professor Rune',
     role: 'SCALE Engineer',
     sprite: 'npcAlchemist',
-    x: 720,
-    y: 1770,
+    x: 420,
+    y: 360,
     color: '#c886ff',
     accent: '#57e39f',
     reward: 100,
@@ -351,18 +382,18 @@ const QUESTS: QuestNpc[] = [
 ]
 
 const AMBIENT_NPCS: AmbientNpc[] = [
-  { name: 'Boba Byte', sprite: 'npcSage', x: 300, y: 1040, color: '#ff7ad9', accent: '#f2c866', line: 'Rain makes the data spring louder.', activity: 'garden' },
-  { name: 'Mossy Dex', sprite: 'npcForestGuide', x: 690, y: 700, color: '#57e39f', accent: '#78ecff', line: 'Follow the gold arrow, then tap the quest guide.', activity: 'guide' },
-  { name: 'Peeko Bond', sprite: 'npcHerbalist', x: 1160, y: 430, color: '#f2c866', accent: '#ffad72', line: 'RWA vaults like clean verification stamps.', activity: 'inspect' },
-  { name: 'Firo Mail', sprite: 'npcCaptain', x: 1560, y: 650, color: '#78ecff', accent: '#ff7ad9', line: 'Bridge Gate scrolls carry API messages out and back.', activity: 'deliver' },
-  { name: 'Jade Numi', sprite: 'npcAlchemist', x: 2490, y: 620, color: '#b9ff66', accent: '#57e39f', line: 'Temple Energy returns when the daily ritual cools down.', activity: 'chant' },
-  { name: 'Pixel Kora', sprite: 'npcOracle', x: 360, y: 1700, color: '#c886ff', accent: '#f2c866', line: 'Privacy chambers turn plain scrolls into protected ones.', activity: 'privacy' },
-  { name: 'Tama Tick', sprite: 'npcNavigator', x: 1640, y: 1360, color: '#ffad72', accent: '#78ecff', line: 'Signals are tiny real-world updates with big consequences.', activity: 'signal' },
-  { name: 'Orb Nalo', sprite: 'npcBuilder', x: 2460, y: 1600, color: '#57e39f', accent: '#c886ff', line: 'Every badge is better when the ledger can verify it.', activity: 'build' },
-  { name: 'Rune Pika', sprite: 'npcShadowAgent', x: 920, y: 1270, color: '#ffe36e', accent: '#57e39f', line: 'Quest boards like brave learners.', activity: 'dance' },
-  { name: 'Minty Mox', sprite: 'npcSage', x: 1900, y: 1690, color: '#67ffc0', accent: '#f2c866', line: 'The map gets brighter when badges are claimed.', activity: 'scribe' },
-  { name: 'Sera API', sprite: 'npcCaptain', x: 2470, y: 280, color: '#88d7ff', accent: '#ff8066', line: 'A response scroll always comes back through Bridge Gate.', activity: 'portal' },
-  { name: 'Candi Dot', sprite: 'npcForestGuide', x: 1500, y: 290, color: '#b9ff66', accent: '#f2c866', line: 'The temple is friendlier when every system can talk.', activity: 'greet' },
+  { name: 'Boba Byte', sprite: 'npcSage', x: 240, y: 675, color: '#ff7ad9', accent: '#f2c866', line: 'Rain makes the data spring louder.', activity: 'fish', persona: 'homebody' },
+  { name: 'Mossy Dex', sprite: 'npcForestGuide', x: 360, y: 260, color: '#57e39f', accent: '#78ecff', line: 'Forest paths are quiet, but data never sleeps.', activity: 'wander', persona: 'wanderer' },
+  { name: 'Peeko Bond', sprite: 'npcHerbalist', x: 1165, y: 350, color: '#f2c866', accent: '#ffad72', line: 'RWA vaults like clean verification stamps.', activity: 'gather', persona: 'homebody' },
+  { name: 'Firo Mail', sprite: 'npcCaptain', x: 1060, y: 510, color: '#78ecff', accent: '#ff7ad9', line: 'Bridge Gate scrolls carry API messages out and back.', activity: 'stroll', persona: 'wanderer' },
+  { name: 'Jade Numi', sprite: 'npcAlchemist', x: 1410, y: 460, color: '#b9ff66', accent: '#57e39f', line: 'Temple Energy returns when the daily ritual cools down.', activity: 'meditate', persona: 'homebody' },
+  { name: 'Pixel Kora', sprite: 'npcOracle', x: 230, y: 1030, color: '#c886ff', accent: '#f2c866', line: 'Privacy chambers turn plain scrolls into protected ones.', activity: 'sit', persona: 'homebody' },
+  { name: 'Tama Tick', sprite: 'npcNavigator', x: 1040, y: 905, color: '#ffad72', accent: '#78ecff', line: 'Signals are tiny real-world updates with big consequences.', activity: 'stroll', persona: 'pacer' },
+  { name: 'Orb Nalo', sprite: 'npcBuilder', x: 1345, y: 1038, color: '#57e39f', accent: '#c886ff', line: 'Every badge is better when the ledger can verify it.', activity: 'wander', persona: 'pacer' },
+  { name: 'Rune Pika', sprite: 'npcShadowAgent', x: 620, y: 745, color: '#ffe36e', accent: '#57e39f', line: 'Quest boards like brave learners.', activity: 'dance', persona: 'homebody' },
+  { name: 'Minty Mox', sprite: 'npcSage', x: 560, y: 1010, color: '#67ffc0', accent: '#f2c866', line: 'The map gets brighter when badges are claimed.', activity: 'tend', persona: 'homebody' },
+  { name: 'Sera API', sprite: 'npcCaptain', x: 990, y: 300, color: '#88d7ff', accent: '#ff8066', line: 'A response scroll always comes back through Bridge Gate.', activity: 'wander', persona: 'wanderer' },
+  { name: 'Candi Dot', sprite: 'npcForestGuide', x: 1188, y: 300, color: '#b9ff66', accent: '#f2c866', line: 'The temple is friendlier when every system can talk.', activity: 'couple', persona: 'homebody', pair: 'Peeko Bond' },
 ]
 
 const NPC_INTERACTIONS = [
@@ -370,21 +401,36 @@ const NPC_INTERACTIONS = [
   { from: 3, to: 10, label: 'api', color: '#78ecff' },
   { from: 6, to: 9, label: 'signal', color: '#ffad72' },
   { from: 7, to: 4, label: 'energy', color: '#57e39f' },
-  { from: 0, to: 5, label: 'garden', color: '#ff7ad9' },
+  { from: 0, to: 5, label: 'pond', color: '#ff7ad9' },
 ]
 
-const BUILDING_COLLIDERS = [
-  { x: 230, y: 220, w: 300, h: 300 },
-  { x: 1160, y: 300, w: 330, h: 310 },
-  { x: 1940, y: 250, w: 370, h: 360 },
-  { x: 1000, y: 1010, w: 440, h: 390 },
-  { x: 2130, y: 1060, w: 360, h: 390 },
-  { x: 470, y: 1260, w: 390, h: 380 },
-  { x: 120, y: 1410, w: 360, h: 330 },
-  { x: 1570, y: 1510, w: 280, h: 230 },
-  { x: 2420, y: 1620, w: 270, h: 230 },
-  { x: 2880, y: 700, w: 330, h: 310 },
-  { x: 3040, y: 1350, w: 280, h: 260 },
+type BuildingSpec = {
+  key: PropKey
+  x: number
+  y: number
+  w: number
+  h: number
+  label: string
+  color: string
+}
+
+const BUILDINGS: BuildingSpec[] = [
+  { key: 'balineseTemple', x: 800, y: 630, w: 235, h: 298, label: 'NXR Temple', color: '#f2c866' },
+  { key: 'buildingScaleDojo', x: 395, y: 332, w: 250, h: 282, label: 'SCALE Lab', color: '#c886ff' },
+  { key: 'buildingStoneVault', x: 1290, y: 370, w: 258, h: 306, label: 'RWA Vault', color: '#f2c866' },
+  { key: 'buildingTempleLodge', x: 440, y: 870, w: 318, h: 268, label: 'Agent Camp', color: '#78ecff' },
+  { key: 'buildingMarketHall', x: 1218, y: 946, w: 278, h: 266, label: 'Signal Tower', color: '#b9ff66' },
+  { key: 'buildingGreenhouseInn', x: 245, y: 1112, w: 230, h: 296, label: 'Privacy Grove', color: '#ff7ad9' },
+  { key: 'buildingOracleHouse', x: 1035, y: 535, w: 248, h: 276, label: 'Bridge Gate', color: '#57e39f' },
+  { key: 'buildingWoodenCabin', x: 610, y: 1020, w: 198, h: 184, label: 'Rest Stop', color: '#ffad72' },
+  { key: 'buildingOrangeCottage', x: 1390, y: 1080, w: 206, h: 210, label: 'Quest Hut', color: '#f2c866' },
+  { key: 'buildingGuildHouse', x: 1345, y: 620, w: 248, h: 236, label: 'Guild Hall', color: '#78ecff' },
+]
+
+const BUILDING_COLLIDERS = BUILDINGS.map((building) => buildingCollider(building))
+const WORLD_BLOCKERS = [
+  ...BUILDING_COLLIDERS,
+  { x: POND_RECT.x + 10, y: POND_RECT.y + 8, w: POND_RECT.w - 20, h: POND_RECT.h - 16 },
 ]
 
 export default function TemplePlay() {
@@ -657,11 +703,11 @@ function TemplePlayCanvas({
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const wrapRef = useRef<HTMLDivElement | null>(null)
   const keys = useRef(new Set<string>())
-  const player = useRef<PlayerState>({ x: 570, y: 570, dir: 'down', moving: false })
+  const player = useRef<PlayerState>({ x: 800, y: 720, dir: 'down', moving: false })
   const nearId = useRef<number | null>(null)
   const completedLatest = useRef(completedIds)
   const assetsRef = useRef<TemplePlayAssets | null>(null)
-  const tapTarget = useRef<{ x: number; y: number } | null>(null)
+  const tapTarget = useRef<{ x: number; y: number; questId?: number } | null>(null)
   const cameraRef = useRef({ x: 0, y: 0, zoom: DESKTOP_CAMERA_ZOOM })
 
   useEffect(() => {
@@ -745,8 +791,16 @@ function TemplePlayCanvas({
         const dy = tapTarget.current.y - current.y
         const distance = Math.hypot(dx, dy)
         if (distance < 10) {
+          const arrivedQuest = tapTarget.current.questId
           tapTarget.current = null
           input = { x: 0, y: 0 }
+          if (arrivedQuest) {
+            const quest = QUESTS.find((item) => item.id === arrivedQuest)
+            if (quest && Math.hypot(current.x - quest.x, current.y - quest.y) < 105) {
+              playTempleSfx('talk')
+              onOpenQuest(quest)
+            }
+          }
         } else {
           input = { x: dx / distance, y: dy / distance }
         }
@@ -777,9 +831,14 @@ function TemplePlayCanvas({
 
       const zoom = cameraZoom(rect.width)
       const viewport = { width: rect.width / zoom, height: rect.height / zoom }
-      const camera = {
+      const targetCamera = {
         x: clamp(current.x - viewport.width / 2, 0, Math.max(0, WORLD.width - viewport.width)),
         y: clamp(current.y - viewport.height / 2, 0, Math.max(0, WORLD.height - viewport.height)),
+      }
+      const previousCamera = cameraRef.current
+      const camera = {
+        x: previousCamera.x + (targetCamera.x - previousCamera.x) * 0.12,
+        y: previousCamera.y + (targetCamera.y - previousCamera.y) * 0.12,
       }
       cameraRef.current = { ...camera, zoom }
 
@@ -810,7 +869,11 @@ function TemplePlayCanvas({
             x: clamp((event.clientX - rect.left) / camera.zoom + camera.x, 90, WORLD.width - 90),
             y: clamp((event.clientY - rect.top) / camera.zoom + camera.y, 90, WORLD.height - 90),
           }
-          tapTarget.current = isMovementBlocked(target.x, target.y) ? null : target
+          const tappedQuest = QUESTS.find((quest) => Math.hypot(target.x - quest.x, target.y - quest.y) < 70)
+          const walkTarget = tappedQuest
+            ? approachPoint(player.current, tappedQuest, 76)
+            : target
+          tapTarget.current = isMovementBlocked(walkTarget.x, walkTarget.y) ? null : { ...walkTarget, questId: tappedQuest?.id }
           playTempleSfx('tap')
         }}
       />
@@ -1051,7 +1114,60 @@ function nearestQuest(player: PlayerState) {
 }
 
 function isMovementBlocked(x: number, y: number) {
-  return BUILDING_COLLIDERS.some((rect) => x > rect.x && x < rect.x + rect.w && y > rect.y && y < rect.y + rect.h)
+  return WORLD_BLOCKERS.some((rect) => pointInRect(x, y, rect))
+}
+
+function pointInRect(x: number, y: number, rect: { x: number; y: number; w: number; h: number }) {
+  return x > rect.x && x < rect.x + rect.w && y > rect.y && y < rect.y + rect.h
+}
+
+function buildingCollider(building: BuildingSpec) {
+  const w = building.w * 0.72
+  const h = building.h * 0.35
+  return {
+    x: building.x - w / 2,
+    y: building.y - h,
+    w,
+    h,
+  }
+}
+
+function pathBlocked(ax: number, ay: number, bx: number, by: number) {
+  return WORLD_BLOCKERS.some((rect) => lineIntersectsRect(ax, ay, bx, by, rect))
+}
+
+function lineIntersectsRect(ax: number, ay: number, bx: number, by: number, rect: { x: number; y: number; w: number; h: number }) {
+  if (pointInRect(ax, ay, rect) || pointInRect(bx, by, rect)) return true
+  const x1 = rect.x
+  const y1 = rect.y
+  const x2 = rect.x + rect.w
+  const y2 = rect.y + rect.h
+  return segmentsIntersect(ax, ay, bx, by, x1, y1, x2, y1)
+    || segmentsIntersect(ax, ay, bx, by, x2, y1, x2, y2)
+    || segmentsIntersect(ax, ay, bx, by, x2, y2, x1, y2)
+    || segmentsIntersect(ax, ay, bx, by, x1, y2, x1, y1)
+}
+
+function segmentsIntersect(ax: number, ay: number, bx: number, by: number, cx: number, cy: number, dx: number, dy: number) {
+  const d1 = direction(cx, cy, dx, dy, ax, ay)
+  const d2 = direction(cx, cy, dx, dy, bx, by)
+  const d3 = direction(ax, ay, bx, by, cx, cy)
+  const d4 = direction(ax, ay, bx, by, dx, dy)
+  return ((d1 > 0 && d2 < 0) || (d1 < 0 && d2 > 0)) && ((d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0))
+}
+
+function direction(ax: number, ay: number, bx: number, by: number, cx: number, cy: number) {
+  return (cx - ax) * (by - ay) - (cy - ay) * (bx - ax)
+}
+
+function approachPoint(player: PlayerState, quest: QuestNpc, distance: number) {
+  const dx = player.x - quest.x
+  const dy = player.y - quest.y
+  const len = Math.hypot(dx, dy) || 1
+  return {
+    x: clamp(quest.x + (dx / len) * distance, 90, WORLD.width - 90),
+    y: clamp(quest.y + (dy / len) * distance, 90, WORLD.height - 90),
+  }
 }
 
 function drawWorld(
@@ -1078,11 +1194,11 @@ function drawWorld(
   drawPaths(ctx, time)
   drawWater(ctx, time)
   drawEnvironmentProps(ctx, time, assets)
-  drawBuildings(ctx, time, completedIds, assets)
   drawTapTarget(ctx, time, target)
   drawQuestDirection(ctx, time, player, nextQuest, nearNpcId)
   drawActors(ctx, time, completedIds, nearNpcId, player, assets)
   drawWeather(ctx, camera, viewportWidth, viewportHeight, time)
+  drawShootingStar(ctx, camera, viewportWidth, viewportHeight, time)
   ctx.restore()
   drawScanlines(ctx, width, height)
 }
@@ -1165,208 +1281,263 @@ function drawQuestDirection(
   drawPixelNameTag(ctx, quest.x, quest.y - 170, close ? 'Tap Talk' : `Next: ${quest.zone}`, '#07100c', false, '#f2c866', true)
 }
 
-function drawGround(ctx: CanvasRenderingContext2D, time: number, assets: TemplePlayAssets) {
-  ctx.fillStyle = '#315f43'
-  ctx.fillRect(0, 0, WORLD.width, WORLD.height)
-  for (let y = 0; y < WORLD.height; y += 64) {
-    for (let x = 0; x < WORLD.width; x += 64) {
-      const grove = x > 1880 && y > 980
-      const spring = x < 720 && y > 940
-      const garden = x > 110 && x < 540 && y > 900 && y < 1400
-      const tone = (x / 64 + y / 64) % 4
-      ctx.fillStyle = grove
-        ? tone % 2 === 0 ? '#455c55' : '#52685b'
-        : spring
-          ? tone % 2 === 0 ? '#2f8c78' : '#327f73'
-          : garden
-            ? tone % 2 === 0 ? '#5f8b48' : '#6b944d'
-            : tone === 0 ? '#5d9a3f' : tone === 1 ? '#67a64a' : tone === 2 ? '#568f3d' : '#70ad50'
-      ctx.fillRect(x, y, 64, 64)
-      ctx.fillStyle = 'rgba(247, 241, 223, .1)'
-      ctx.fillRect(x + 18, y + 18, 6, 6)
-      ctx.fillRect(x + 42, y + 38, 5, 5)
-      if (!garden && (x + y) % 256 === 0) {
-        ctx.fillStyle = '#7bc66d'
-        ctx.fillRect(x + 18, y + 20 + Math.sin(time + x) * 1.5, 6, 18)
-        ctx.fillRect(x + 42, y + 36, 5, 14)
+const WORLD_TILES = buildWorldTiles()
+
+function buildWorldTiles(): TileType[][] {
+  const tiles = Array.from({ length: MAP_H }, () => Array<TileType>(MAP_W).fill(T.GRASS))
+  const pathTiles = buildPathSet()
+
+  for (let ty = 0; ty < MAP_H; ty++) {
+    for (let tx = 0; tx < MAP_W; tx++) {
+      const dx = tx - CENTER_HUB.tx
+      const dy = ty - CENTER_HUB.ty
+      const seamWarpX = valueNoise(tx * 0.16, ty * 0.16, 11) * 6 - 3
+      const seamWarpY = valueNoise(tx * 0.15, ty * 0.15, 23) * 6 - 3
+      const variety = valueNoise(tx * 0.38, ty * 0.38, 47)
+      const distCenter = Math.hypot(dx, dy)
+      let tile: TileType
+
+      if (distCenter <= 5.2) {
+        tile = T.PATH
+      } else if (tx < CENTER_HUB.tx + seamWarpX && ty < CENTER_HUB.ty + seamWarpY) {
+        tile = variety > 0.74 ? T.FLOWER : variety > 0.42 ? T.GRASS2 : T.GRASS
+      } else if (tx < CENTER_HUB.tx + seamWarpX && ty >= CENTER_HUB.ty + seamWarpY) {
+        tile = variety > 0.68 ? T.COAST : variety > 0.55 ? T.SAND : T.COAST
+      } else if (tx >= CENTER_HUB.tx + seamWarpX && ty < CENTER_HUB.ty + seamWarpY) {
+        tile = variety > 0.6 ? T.SAND2 : T.SAND
+      } else {
+        tile = variety > 0.54 ? T.MYSTIC2 : T.MYSTIC
       }
-      if ((x * 3 + y) % 448 === 0) {
-        ctx.fillStyle = '#d576ff'
-        ctx.fillRect(x + 12, y + 11, 11, 11)
-        ctx.fillStyle = '#dbc9d7'
-        ctx.fillRect(x + 44, y + 42, 12, 10)
+
+      if (tx >= POND.tx - 1 && tx < POND.tx + POND.tw + 1 && ty >= POND.ty - 1 && ty < POND.ty + POND.th + 1) {
+        tile = T.SAND
+      }
+      if (tx >= POND.tx && tx < POND.tx + POND.tw && ty >= POND.ty && ty < POND.ty + POND.th) {
+        tile = T.WATER
+      }
+      if (pathTiles.has(tileKey(tx, ty)) && !insidePond(tx, ty)) {
+        tile = T.PATH
+      }
+      tiles[ty][tx] = tile
+    }
+  }
+  return tiles
+}
+
+function buildPathSet() {
+  const set = new Set<string>()
+  const center = CENTER_HUB
+  for (const [hubX, hubY] of HUBS) {
+    const vx = hubX - center.tx
+    const vy = hubY - center.ty
+    const length = Math.hypot(vx, vy) || 1
+    const px = -vy / length
+    const py = vx / length
+    for (let i = 0; i <= 120; i++) {
+      const t = i / 120
+      const wobble = (valueNoise(t * 7, hubX * 0.2 + hubY * 0.13, 91) - 0.5) * 4
+      const tx = Math.round(center.tx + vx * t + px * wobble)
+      const ty = Math.round(center.ty + vy * t + py * wobble)
+      for (let ox = -1; ox <= 1; ox++) {
+        for (let oy = -1; oy <= 1; oy++) {
+          if (Math.abs(ox) + Math.abs(oy) > 1) continue
+          const nx = tx + ox
+          const ny = ty + oy
+          if (nx < 0 || nx >= MAP_W || ny < 0 || ny >= MAP_H || insidePond(nx, ny)) continue
+          set.add(tileKey(nx, ny))
+        }
       }
     }
   }
+  return set
+}
 
-  for (let y = 960; y <= 1320; y += 110) {
-    for (let x = 145; x <= 470; x += 112) {
-      drawProp(ctx, assets, 'soilTile', x, y, 82, 82)
+function drawTile(ctx: CanvasRenderingContext2D, tx: number, ty: number, tile: TileType, time: number) {
+  const x = tx * TILE_SIZE
+  const y = ty * TILE_SIZE
+  const palette: Record<TileType, string> = {
+    [T.GRASS]: '#2f7d46',
+    [T.GRASS2]: '#357f4c',
+    [T.PATH]: '#c9a36a',
+    [T.WATER]: '#2b6cb0',
+    [T.SAND]: '#e2c98a',
+    [T.MYSTIC]: '#4a3b78',
+    [T.COAST]: '#2f8f6a',
+    [T.FLOWER]: '#2f7d46',
+    [T.SAND2]: '#d8bc7c',
+    [T.MYSTIC2]: '#413567',
+  }
+  ctx.fillStyle = palette[tile]
+  ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE)
+
+  const dither = hash2(tx, ty) > 0.5
+  ctx.fillStyle = dither ? 'rgba(247,241,223,.1)' : 'rgba(7,16,12,.1)'
+  ctx.fillRect(x + 6 + ((tx * 3) % 14), y + 7 + ((ty * 5) % 12), 4, 3)
+  ctx.fillRect(x + 19 + ((ty * 2) % 7), y + 22 + ((tx * 2) % 6), 5, 3)
+
+  if (tile === T.PATH) {
+    ctx.fillStyle = 'rgba(105,75,41,.18)'
+    ctx.fillRect(x + 5, y + 9, 9, 4)
+    ctx.fillRect(x + 20, y + 21, 7, 4)
+  } else if (tile === T.FLOWER || (tile === T.GRASS2 && hash2(tx + 8, ty + 13) > 0.78)) {
+    const bob = Math.sin(time * 1.6 + tx + ty) * 1
+    ctx.fillStyle = '#7edb6e'
+    ctx.fillRect(x + 12, y + 13, 3, 12)
+    ctx.fillStyle = ['#ff7ad9', '#f2c866', '#b9ff66'][Math.floor(hash2(tx, ty + 9) * 3)]
+    ctx.fillRect(x + 9, y + 10 + bob, 5, 5)
+    ctx.fillRect(x + 14, y + 9 + bob, 5, 5)
+  } else if (tile === T.MYSTIC || tile === T.MYSTIC2) {
+    ctx.fillStyle = 'rgba(200,134,255,.18)'
+    ctx.fillRect(x + 11, y + 11, 10, 10)
+  }
+}
+
+function drawCobblePulse(ctx: CanvasRenderingContext2D, time: number) {
+  ctx.save()
+  const pulseTile = Math.floor(time * 7) % 120
+  let seen = 0
+  for (let ty = 0; ty < MAP_H; ty++) {
+    for (let tx = 0; tx < MAP_W; tx++) {
+      if (WORLD_TILES[ty][tx] !== T.PATH) continue
+      if (seen % 120 === pulseTile) {
+        ctx.fillStyle = 'rgba(242,200,102,.32)'
+        ctx.fillRect(tx * TILE_SIZE + 10, ty * TILE_SIZE + 10, 12, 12)
+      }
+      seen++
+    }
+  }
+  ctx.restore()
+}
+
+function insidePond(tx: number, ty: number) {
+  return tx >= POND.tx && tx < POND.tx + POND.tw && ty >= POND.ty && ty < POND.ty + POND.th
+}
+
+function tileKey(tx: number, ty: number) {
+  return `${tx}:${ty}`
+}
+
+function valueNoise(x: number, y: number, seed = 0) {
+  const x0 = Math.floor(x)
+  const y0 = Math.floor(y)
+  const x1 = x0 + 1
+  const y1 = y0 + 1
+  const sx = smoothstep(x - x0)
+  const sy = smoothstep(y - y0)
+  const n0 = lerp(hash2(x0 + seed, y0 - seed), hash2(x1 + seed, y0 - seed), sx)
+  const n1 = lerp(hash2(x0 + seed, y1 - seed), hash2(x1 + seed, y1 - seed), sx)
+  return lerp(n0, n1, sy)
+}
+
+function hash2(x: number, y: number) {
+  const s = Math.sin(x * 127.1 + y * 311.7) * 43758.5453123
+  return s - Math.floor(s)
+}
+
+function smoothstep(t: number) {
+  return t * t * (3 - 2 * t)
+}
+
+function lerp(a: number, b: number, t: number) {
+  return a + (b - a) * t
+}
+
+function roundedRectPath(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, radius: number) {
+  const r = Math.min(radius, w / 2, h / 2)
+  ctx.beginPath()
+  ctx.moveTo(x + r, y)
+  ctx.lineTo(x + w - r, y)
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r)
+  ctx.lineTo(x + w, y + h - r)
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h)
+  ctx.lineTo(x + r, y + h)
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r)
+  ctx.lineTo(x, y + r)
+  ctx.quadraticCurveTo(x, y, x + r, y)
+}
+
+function drawGround(ctx: CanvasRenderingContext2D, time: number, assets: TemplePlayAssets) {
+  for (let ty = 0; ty < MAP_H; ty++) {
+    for (let tx = 0; tx < MAP_W; tx++) {
+      drawTile(ctx, tx, ty, WORLD_TILES[ty][tx], time)
+    }
+  }
+
+  for (let y = 950; y <= 1090; y += 70) {
+    for (let x = 505; x <= 675; x += 70) {
+      drawProp(ctx, assets, 'soilTile', x, y, 54, 54)
       const plant: PropKey = (x + y) % 3 === 0 ? 'pepperCluster' : (x + y) % 3 === 1 ? 'pepperPlant' : 'leafPlant'
-      drawProp(ctx, assets, plant, x + 12, y + 4 + Math.sin(time * 1.5 + x) * 2, 58, 64)
+      drawProp(ctx, assets, plant, x + 4, y - 6 + Math.sin(time * 1.5 + x) * 2, 42, 48)
     }
   }
 }
 
 function drawPaths(ctx: CanvasRenderingContext2D, time: number) {
-  drawOrganicPath(ctx, [
-    [190, 680], [430, 430], [760, 560], [1070, 590], [1320, 450],
-    [1650, 220], [1900, 330], [2210, 420], [2660, 330], [3280, 440],
-  ], 122, time)
-  drawOrganicPath(ctx, [
-    [520, 520], [430, 780], [650, 1020], [850, 1260], [820, 1610],
-    [1010, 1830], [1420, 1800], [1820, 1740], [2260, 1780], [2780, 1720], [3290, 1640],
-  ], 136, time)
-  drawOrganicPath(ctx, [
-    [1500, 1760], [1490, 1390], [1600, 1140], [1880, 1000],
-    [2260, 980], [2640, 1120], [3080, 1200], [3340, 1420],
-  ], 124, time)
-  drawOrganicPlaza(ctx, 440, 520, 310, 230, time)
-  drawOrganicPlaza(ctx, 1120, 1180, 380, 260, time)
-  drawOrganicPlaza(ctx, 2080, 470, 430, 250, time)
-  drawOrganicPlaza(ctx, 2290, 1320, 300, 260, time)
-  drawOrganicPlaza(ctx, 610, 1540, 360, 260, time)
-}
-
-function drawOrganicPath(ctx: CanvasRenderingContext2D, points: Array<[number, number]>, width: number, time: number) {
   ctx.save()
-  ctx.lineCap = 'round'
-  ctx.lineJoin = 'round'
-  ctx.strokeStyle = '#4c842c'
-  ctx.lineWidth = width + 28
-  drawSmoothLine(ctx, points)
-  ctx.stroke()
-  ctx.strokeStyle = '#b7cb48'
-  ctx.lineWidth = width + 12
-  drawSmoothLine(ctx, points)
-  ctx.stroke()
-  ctx.strokeStyle = '#e8bd76'
-  ctx.lineWidth = width
-  drawSmoothLine(ctx, points)
-  ctx.stroke()
-  ctx.strokeStyle = 'rgba(129, 92, 45, .2)'
-  ctx.lineWidth = 4
-  ctx.setLineDash([8, 34])
-  ctx.lineDashOffset = -time * 10
-  drawSmoothLine(ctx, points)
-  ctx.stroke()
+  ctx.globalAlpha = 0.58
+  ctx.fillStyle = 'rgba(104, 76, 42, .16)'
+  for (let i = 0; i < 70; i++) {
+    const x = ((i * 173) % WORLD.width)
+    const y = ((i * 109) % WORLD.height)
+    if (WORLD_TILES[Math.floor(y / TILE_SIZE)]?.[Math.floor(x / TILE_SIZE)] === T.PATH) {
+      ctx.fillRect(x + ((i * 7) % 19), y + ((i * 11) % 17), 8, 4)
+    }
+  }
   ctx.restore()
-}
-
-function drawSmoothLine(ctx: CanvasRenderingContext2D, points: Array<[number, number]>) {
-  ctx.beginPath()
-  ctx.moveTo(points[0][0], points[0][1])
-  for (let i = 1; i < points.length - 1; i++) {
-    const [x, y] = points[i]
-    const [nextX, nextY] = points[i + 1]
-    ctx.quadraticCurveTo(x, y, (x + nextX) / 2, (y + nextY) / 2)
-  }
-  const last = points[points.length - 1]
-  ctx.lineTo(last[0], last[1])
-}
-
-function drawOrganicPlaza(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, time: number) {
-  ctx.save()
-  ctx.translate(x, y)
-  ctx.fillStyle = '#b7cb48'
-  ctx.beginPath()
-  for (let i = 0; i < 18; i++) {
-    const angle = (Math.PI * 2 * i) / 18
-    const wobble = 0.92 + Math.sin(time * 0.35 + i * 1.7) * 0.035
-    const px = Math.cos(angle) * w * 0.5 * wobble
-    const py = Math.sin(angle) * h * 0.5 * wobble
-    if (i === 0) ctx.moveTo(px, py)
-    else ctx.lineTo(px, py)
-  }
-  ctx.closePath()
-  ctx.fill()
-  ctx.fillStyle = '#e8bd76'
-  ctx.beginPath()
-  for (let i = 0; i < 18; i++) {
-    const angle = (Math.PI * 2 * i) / 18
-    const wobble = 0.88 + Math.sin(time * 0.35 + i * 1.7) * 0.03
-    const px = Math.cos(angle) * w * 0.5 * wobble
-    const py = Math.sin(angle) * h * 0.5 * wobble
-    if (i === 0) ctx.moveTo(px, py)
-    else ctx.lineTo(px, py)
-  }
-  ctx.closePath()
-  ctx.fill()
-  ctx.fillStyle = 'rgba(129,92,45,.2)'
-  for (let i = 0; i < 18; i++) ctx.fillRect(-w * 0.4 + ((i * 47) % w), -h * 0.34 + ((i * 31) % h), 12, 5)
-  ctx.restore()
+  drawCobblePulse(ctx, time)
 }
 
 function drawWater(ctx: CanvasRenderingContext2D, time: number) {
-  const x = 1580
-  const y = 850
-  const w = 390
-  const h = 260
+  const x = POND_RECT.x
+  const y = POND_RECT.y
+  const w = POND_RECT.w
+  const h = POND_RECT.h
 
   ctx.save()
-  ctx.fillStyle = '#438a8f'
-  ctx.fillRect(x - 12, y - 12, w + 24, h + 24)
-  ctx.fillStyle = '#55b9c8'
-  ctx.fillRect(x, y, w, h)
-  ctx.fillStyle = '#367ea3'
-  ctx.fillRect(x + 18, y + 18, w - 36, h - 36)
-  ctx.fillStyle = '#4fc7d8'
-  ctx.fillRect(x + 34, y + 34, w - 68, h - 68)
+  roundedRectPath(ctx, x - 10, y - 10, w + 20, h + 20, 26)
+  ctx.fillStyle = '#e2c98a'
+  ctx.fill()
 
-  ctx.strokeStyle = 'rgba(214, 251, 255, .48)'
-  ctx.lineWidth = 4
-  for (let row = 0; row < 6; row++) {
-    const yy = y + 44 + row * 34
+  roundedRectPath(ctx, x, y, w, h, 22)
+  ctx.clip()
+  const gradient = ctx.createLinearGradient(x, y, x + w, y + h)
+  gradient.addColorStop(0, '#2b6cb0')
+  gradient.addColorStop(0.55, '#2f91b8')
+  gradient.addColorStop(1, '#48c1d3')
+  ctx.fillStyle = gradient
+  ctx.fillRect(x, y, w, h)
+
+  ctx.strokeStyle = 'rgba(214, 251, 255, .58)'
+  ctx.lineWidth = 3
+  for (let row = 0; row < 7; row++) {
+    const yy = y + 20 + row * 27
     ctx.beginPath()
-    for (let i = 0; i <= 10; i++) {
-      const xx = x + 34 + i * 32
-      const wave = Math.sin(time * 2.2 + row * 0.8 + i * 0.74) * 7
+    for (let i = 0; i <= 11; i++) {
+      const xx = x + 12 + i * 24
+      const wave = Math.sin(time * 2.9 + row * 0.8 + i * 0.74) * 5
       if (i === 0) ctx.moveTo(xx, yy + wave)
       else ctx.lineTo(xx, yy + wave)
     }
     ctx.stroke()
   }
 
-  for (let i = 0; i < 7; i++) {
-    const rx = x + 48 + ((i * 71 + Math.sin(time * 0.5 + i) * 18) % 298)
-    const ry = y + 45 + ((i * 43) % 165)
-    const radius = 12 + ((Math.sin(time * 2.4 + i) + 1) * 7)
-    ctx.strokeStyle = `rgba(247, 241, 223, ${0.14 + (i % 3) * 0.05})`
-    ctx.lineWidth = 2
-    ctx.beginPath()
-    ctx.ellipse(rx, ry, radius * 1.8, radius * 0.72, 0, 0, Math.PI * 2)
-    ctx.stroke()
-  }
-
-  for (let i = 0; i < 12; i++) {
-    const padX = x + 28 + ((i * 59) % 324) + Math.sin(time * 1.3 + i) * 4
-    const padY = y + 36 + ((i * 37) % 178) + Math.cos(time * 1.1 + i) * 2
+  for (let i = 0; i < 8; i++) {
+    const padX = x + 20 + ((i * 43) % (w - 58)) + Math.sin(time * 1.3 + i) * 3
+    const padY = y + 20 + ((i * 31) % (h - 48)) + Math.cos(time * 1.1 + i) * 2
     ctx.fillStyle = i % 3 === 0 ? '#8ecf5f' : '#4f8a58'
-    ctx.fillRect(padX, padY, 34, 11)
-    ctx.fillRect(padX + 7, padY - 6, 20, 9)
+    ctx.fillRect(padX, padY, 28, 9)
+    ctx.fillRect(padX + 6, padY - 5, 16, 7)
     if (i % 4 === 0) {
       ctx.fillStyle = '#ffd1ef'
-      ctx.fillRect(padX + 12, padY - 11, 8, 8)
+      ctx.fillRect(padX + 10, padY - 10, 7, 7)
       ctx.fillStyle = '#f2c866'
-      ctx.fillRect(padX + 15, padY - 8, 3, 3)
+      ctx.fillRect(padX + 13, padY - 7, 2, 2)
     }
   }
   ctx.restore()
 }
 
-function drawBuildings(ctx: CanvasRenderingContext2D, time: number, completedIds: Set<number>, assets: TemplePlayAssets) {
-  drawBuildingAsset(ctx, assets, 'balineseTemple', 255, 170, 250, 318, 'NXR Temple', '#f2c866', time)
-  drawBuildingAsset(ctx, assets, 'buildingOracleHouse', 1170, 250, 305, 340, 'Bridge Gate', '#57e39f', time)
-  drawBuildingAsset(ctx, assets, 'buildingStoneVault', 1985, 210, 315, 374, 'RWA Vault', '#f2c866', time)
-  drawBuildingAsset(ctx, assets, 'buildingTempleLodge', 1010, 970, 420, 354, 'Agent Camp', '#78ecff', time)
-  drawBuildingAsset(ctx, assets, 'buildingMarketHall', 2120, 1040, 350, 334, 'Signal Tower', '#b9ff66', time)
-  drawBuildingAsset(ctx, assets, 'buildingScaleDojo', 500, 1240, 340, 384, 'SCALE Lab', '#c886ff', time)
-  drawBuildingAsset(ctx, assets, 'buildingGreenhouseInn', 140, 1395, 300, 386, 'Privacy Grove', '#ff7ad9', time)
-  drawBuildingAsset(ctx, assets, 'buildingWoodenCabin', 1580, 1500, 260, 240, 'Rest Stop', '#ffad72', time)
-  drawBuildingAsset(ctx, assets, 'buildingOrangeCottage', 2430, 1605, 250, 254, 'Quest Hut', '#f2c866', time)
-  drawBuildingAsset(ctx, assets, 'buildingGuildHouse', 2890, 655, 320, 305, 'Guild Hall', '#78ecff', time)
-  drawBuildingAsset(ctx, assets, 'buildingOrangeCottage', 3050, 1320, 270, 274, 'Farm Hut', '#f2c866', time)
-
+function drawCompletedBadges(ctx: CanvasRenderingContext2D, time: number, completedIds: Set<number>) {
   QUESTS.forEach((quest) => {
     if (!completedIds.has(quest.quizId)) return
     ctx.save()
@@ -1392,42 +1563,35 @@ function drawBuildings(ctx: CanvasRenderingContext2D, time: number, completedIds
 function drawBuildingAsset(
   ctx: CanvasRenderingContext2D,
   assets: TemplePlayAssets,
-  key: PropKey,
-  x: number,
-  y: number,
-  w: number,
-  h: number,
-  label: string,
-  color: string,
-  time: number,
+  building: BuildingSpec,
 ) {
-  const bob = Math.sin(time * 1.1 + x * 0.01) * 1.2
+  const { key, x, y, w, h, label, color } = building
   ctx.fillStyle = 'rgba(0,0,0,.24)'
-  ctx.fillRect(x + 18, y + h - 14, w - 22, 26)
-  drawProp(ctx, assets, key, x, y + bob, w, h)
-  drawBuildingLabel(ctx, x + 18, y + h + 10, label, color)
+  ctx.fillRect(Math.round(x - w * 0.36), Math.round(y - 16), Math.round(w * 0.72), 26)
+  drawPropBottomCenter(ctx, assets, key, x, y, w, h)
+  drawBuildingLabel(ctx, x, y + 12, label, color)
 }
 
 function drawBuildingLabel(ctx: CanvasRenderingContext2D, x: number, y: number, label: string, color: string) {
   const width = Math.max(118, label.length * 11 + 24)
   ctx.fillStyle = '#07100c'
-  ctx.fillRect(x, y, width, 30)
+  ctx.fillRect(Math.round(x - width / 2), y, width, 30)
   ctx.strokeStyle = color
   ctx.lineWidth = 2
-  ctx.strokeRect(x + 1, y + 1, width - 2, 28)
+  ctx.strokeRect(Math.round(x - width / 2) + 1, y + 1, width - 2, 28)
   ctx.fillStyle = color
   ctx.font = '900 16px monospace'
-  ctx.fillText(label, x + 12, y + 21)
+  ctx.fillText(label, Math.round(x - width / 2 + 12), y + 21)
 }
 
 function drawEnvironmentProps(ctx: CanvasRenderingContext2D, time: number, assets: TemplePlayAssets) {
-  drawProp(ctx, assets, 'sunflower', 116, 850 + Math.sin(time * 1.4) * 2, 50, 58)
-  drawProp(ctx, assets, 'pepperCluster', 528, 1090 + Math.sin(time * 1.2) * 2, 58, 62)
-  drawProp(ctx, assets, 'guardianStatue', 1180, 386, 82, 104)
-  drawProp(ctx, assets, 'guardianStatue', 1608, 386, 82, 104)
-  drawProp(ctx, assets, 'vineCornerA', 2050, 1540, 88, 88)
-  drawProp(ctx, assets, 'vineCornerB', 2580, 960, 88, 88)
-  drawProp(ctx, assets, 'vineCornerC', 88, 1770, 88, 88)
+  drawProp(ctx, assets, 'sunflower', 116, 690 + Math.sin(time * 1.4) * 2, 50, 58)
+  drawProp(ctx, assets, 'pepperCluster', 632, 1040 + Math.sin(time * 1.2) * 2, 58, 62)
+  drawPropBottomCenter(ctx, assets, 'guardianStatue', 690, 674, 70, 88)
+  drawPropBottomCenter(ctx, assets, 'guardianStatue', 910, 674, 70, 88)
+  drawProp(ctx, assets, 'vineCornerA', 148, 1064, 72, 72)
+  drawProp(ctx, assets, 'vineCornerB', 1380, 820, 72, 72)
+  drawProp(ctx, assets, 'vineCornerC', 80, 1130, 72, 72)
 
   for (let i = 0; i < 34; i++) {
     const x = 120 + ((i * 293) % (WORLD.width - 240))
@@ -1498,19 +1662,12 @@ function drawFloatingLeaves(ctx: CanvasRenderingContext2D, time: number) {
 
 function isNearMainPlaySpace(x: number, y: number) {
   const blockedRects = [
-    [120, 120, 720, 760],
-    [1040, 180, 1640, 680],
-    [1850, 120, 2380, 760],
-    [950, 900, 1500, 1580],
-    [2030, 960, 2570, 1640],
-    [400, 1160, 950, 1840],
-    [80, 1320, 540, 1870],
-    [1450, 1420, 1900, 1780],
-    [2380, 1540, 2720, 1900],
-    [2840, 600, 3260, 1060],
-    [3000, 1260, 3350, 1660],
-    [240, 500, 2680, 760],
-    [580, 1650, 2760, 1980],
+    [250, 200, 560, 430],
+    [1080, 180, 1450, 500],
+    [680, 490, 930, 760],
+    [300, 760, 720, 1100],
+    [1040, 820, 1450, 1130],
+    [POND_RECT.x - 80, POND_RECT.y - 80, POND_RECT.x + POND_RECT.w + 80, POND_RECT.y + POND_RECT.h + 80],
   ]
   return blockedRects.some(([left, top, right, bottom]) => x > left && x < right && y > top && y < bottom)
 }
@@ -1529,6 +1686,20 @@ function drawProp(
   ctx.drawImage(image, Math.round(x), Math.round(y), Math.round(w), Math.round(h))
 }
 
+function drawPropBottomCenter(
+  ctx: CanvasRenderingContext2D,
+  assets: TemplePlayAssets,
+  key: PropKey,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+) {
+  const image = assets.props[key]
+  if (!image) return
+  ctx.drawImage(image, Math.round(x - w / 2), Math.round(y - h), Math.round(w), Math.round(h))
+}
+
 function drawActors(
   ctx: CanvasRenderingContext2D,
   time: number,
@@ -1537,7 +1708,10 @@ function drawActors(
   player: PlayerState,
   assets: TemplePlayAssets,
 ) {
-  const actors: Array<{ y: number; draw: () => void }> = []
+  const actors: Array<{ y: number; draw: () => void }> = BUILDINGS.map((building) => ({
+    y: building.y,
+    draw: () => drawBuildingAsset(ctx, assets, building),
+  }))
   const ambientMotions = AMBIENT_NPCS.map((npc, index) => ambientNpcMotion(npc, index, time))
 
   drawAmbientInteractions(ctx, time, ambientMotions)
@@ -1610,37 +1784,75 @@ function drawActors(
   })
 
   actors.sort((a, b) => a.y - b.y).forEach((actor) => actor.draw())
+  drawCompletedBadges(ctx, time, completedIds)
+  drawNpcEventLayer(ctx, time, ambientMotions)
 }
 
 function ambientNpcMotion(npc: AmbientNpc, index: number, time: number): NpcMotion {
-  const mode = index % 4
   const activityPulse = (Math.sin(time * 1.8 + index * 0.77) + 1) / 2
-  if (mode === 0) {
-    const phase = time * 0.62 + index
-    const x = npc.x + Math.sin(phase) * 62
-    const y = npc.y + Math.cos(phase * 0.65) * 18
-    const direction: PlayerState['dir'] = Math.cos(phase) > 0 ? 'right' : 'left'
-    return { x, y, moving: true, direction, activityPulse }
+  const persona = npc.persona ?? (index % 3 === 0 ? 'homebody' : index % 3 === 1 ? 'wanderer' : 'pacer')
+  if (npc.activity === 'wander') {
+    const radius = persona === 'wanderer' ? 110 : persona === 'pacer' ? 40 : 70
+    const phase = time * (persona === 'pacer' ? 1.45 : 0.56) + index * 1.3
+    const target = {
+      x: npc.x + Math.sin(phase) * radius,
+      y: npc.y + Math.cos(phase * 0.72) * radius * 0.55,
+    }
+    const safe = safeNpcTarget(npc.x, npc.y, target.x, target.y)
+    const direction: PlayerState['dir'] = safe.x > npc.x ? 'right' : safe.x < npc.x ? 'left' : 'down'
+    const idleChance = persona === 'homebody' ? 0.6 : persona === 'wanderer' ? 0.3 : 0.18
+    const idling = activityPulse < idleChance
+    return { x: idling ? npc.x : safe.x, y: idling ? npc.y : safe.y, moving: !idling, direction, activityPulse }
   }
-  if (mode === 1) {
-    const step = Math.floor(time * 1.8 + index) % 4
+  if (npc.activity === 'stroll') {
+    const route = [
+      { x: npc.x, y: npc.y },
+      { x: 800, y: 670 },
+      { x: index % 2 === 0 ? 1260 : 410, y: index % 2 === 0 ? 940 : 350 },
+      { x: npc.x, y: npc.y },
+    ]
+    const segment = Math.floor(time * 0.16 + index) % (route.length - 1)
+    const t = (time * 0.16 + index) % 1
+    const from = route[segment]
+    const to = route[segment + 1]
+    const target = { x: lerp(from.x, to.x, t), y: lerp(from.y, to.y, t) }
+    const safe = safeNpcTarget(from.x, from.y, target.x, target.y)
+    return { x: safe.x, y: safe.y, moving: true, direction: to.x > from.x ? 'right' : 'left', activityPulse }
+  }
+  if (npc.activity === 'gather') {
+    const phase = time * 0.55 + index
+    const x = npc.x + Math.sin(phase) * 22
+    const y = npc.y + Math.cos(phase * 1.2) * 12
+    return { x, y, moving: activityPulse > 0.5, direction: 'right', activityPulse }
+  }
+  if (npc.activity === 'couple') {
+    const partner = AMBIENT_NPCS.find((item) => item.name === npc.pair)
+    const direction: PlayerState['dir'] = partner && partner.x < npc.x ? 'left' : 'right'
+    return { x: npc.x, y: npc.y + Math.sin(time * 1.4 + index) * 2, moving: false, direction, activityPulse }
+  }
+  if (npc.activity === 'dance') {
+    const step = Math.floor(time * 3 + index) % 4
     const direction: PlayerState['dir'] = step === 0 ? 'down' : step === 1 ? 'right' : step === 2 ? 'up' : 'left'
-    return { x: npc.x, y: npc.y + Math.sin(time * 3.2 + index) * 3, moving: false, direction, activityPulse }
+    return { x: npc.x + Math.sin(time * 5 + index) * 6, y: npc.y + Math.sin(time * 7 + index) * 4, moving: false, direction, activityPulse }
   }
-  if (mode === 2) {
-    const phase = time * 0.42 + index * 1.7
-    const x = npc.x + Math.sin(phase) * 24
-    const y = npc.y + Math.sin(phase * 1.5) * 38
-    const direction: PlayerState['dir'] = Math.sin(phase * 1.5) > 0 ? 'down' : 'up'
-    return { x, y, moving: true, direction, activityPulse }
+  if (npc.activity === 'fish' || npc.activity === 'meditate' || npc.activity === 'sit' || npc.activity === 'tend') {
+    const direction: PlayerState['dir'] = npc.activity === 'fish' ? 'right' : npc.activity === 'tend' ? 'down' : 'left'
+    return { x: npc.x, y: npc.y + Math.sin(time * 1.6 + index) * 2, moving: false, direction, activityPulse }
   }
   return {
-    x: npc.x + Math.sin(time * 1.5 + index) * 5,
-    y: npc.y + Math.sin(time * 2.4 + index) * 4,
+    x: npc.x,
+    y: npc.y,
     moving: false,
     direction: 'down' as PlayerState['dir'],
     activityPulse,
   }
+}
+
+function safeNpcTarget(homeX: number, homeY: number, targetX: number, targetY: number) {
+  const x = clamp(targetX, 70, WORLD.width - 70)
+  const y = clamp(targetY, 70, WORLD.height - 70)
+  if (isMovementBlocked(x, y) || pathBlocked(homeX, homeY, x, y)) return { x: homeX, y: homeY }
+  return { x, y }
 }
 
 function drawAmbientInteractions(ctx: CanvasRenderingContext2D, time: number, motions: NpcMotion[]) {
@@ -1677,6 +1889,77 @@ function drawAmbientInteractions(ctx: CanvasRenderingContext2D, time: number, mo
   })
 }
 
+function drawNpcEventLayer(ctx: CanvasRenderingContext2D, time: number, motions: NpcMotion[]) {
+  const randomTexts = ['LOL', 'GG', 'WAGMI', '?!', 'ser', 'gm']
+  const eventWindow = time % 9
+  if (eventWindow < 1.35) {
+    const index = Math.floor(time / 9) % motions.length
+    const motion = motions[index]
+    if (motion) {
+      const lift = Math.sin((eventWindow / 1.35) * Math.PI) * 14
+      drawMiniBubble(ctx, motion.x, motion.y - 148 - lift, randomTexts[index % randomTexts.length], '#f2c866')
+      ctx.save()
+      ctx.translate(motion.x, motion.y - 72 - lift)
+      ctx.rotate((eventWindow / 1.35) * Math.PI * 2)
+      ctx.strokeStyle = '#f2c866'
+      ctx.lineWidth = 3
+      ctx.strokeRect(-12, -12, 24, 24)
+      ctx.restore()
+    }
+  }
+
+  const socialWindow = time % 4.5
+  if (socialWindow < 3.75) {
+    const pair = nearestSocialPair(motions)
+    if (pair) {
+      const emotes = ['!', 'note', 'spark', '~', '?']
+      const turn = Math.floor(socialWindow / 0.75)
+      const active = turn % 2 === 0 ? pair.a : pair.b
+      drawMiniBubble(ctx, active.x, active.y - 142, emotes[turn % emotes.length], '#57e39f')
+      ctx.save()
+      ctx.strokeStyle = 'rgba(87,227,159,.48)'
+      ctx.lineWidth = 3
+      ctx.setLineDash([5, 8])
+      ctx.beginPath()
+      ctx.moveTo(pair.a.x, pair.a.y - 82)
+      ctx.lineTo(pair.b.x, pair.b.y - 82)
+      ctx.stroke()
+      ctx.restore()
+    }
+  }
+
+  const greetWindow = time % 3.2
+  if (greetWindow < 1.3) {
+    const greeters = [1, 8, 11]
+    const index = greeters[Math.floor(time / 3.2) % greeters.length]
+    const motion = motions[index]
+    if (!motion) return
+    const scale = easeOutBack(Math.min(1, greetWindow / 0.3))
+    ctx.save()
+    ctx.translate(motion.x, motion.y - 154)
+    ctx.scale(scale, scale)
+    drawMiniBubble(ctx, 0, 0, 'Gritual!', '#ffad72')
+    ctx.restore()
+  }
+}
+
+function nearestSocialPair(motions: NpcMotion[]) {
+  for (let i = 0; i < motions.length; i++) {
+    for (let j = i + 1; j < motions.length; j++) {
+      const a = motions[i]
+      const b = motions[j]
+      if (Math.hypot(a.x - b.x, a.y - b.y) < 130) return { a, b }
+    }
+  }
+  return null
+}
+
+function easeOutBack(t: number) {
+  const c1 = 1.70158
+  const c3 = c1 + 1
+  return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2)
+}
+
 function drawNpcActivity(
   ctx: CanvasRenderingContext2D,
   npc: AmbientNpc,
@@ -1690,63 +1973,57 @@ function drawNpcActivity(
   const pulse = motion.activityPulse
 
   if (layer === 'behind') {
-    if (npc.activity === 'chant' || npc.activity === 'privacy' || npc.activity === 'portal') {
+    if (npc.activity === 'meditate' || npc.activity === 'sit') {
       drawRuneCircle(ctx, x, y - 4, npc.accent, time + index)
     }
-    if (npc.activity === 'build') {
+    if (npc.activity === 'wander' && npc.persona === 'pacer') {
       drawWorkBench(ctx, x - 52, y - 24, npc.accent, time)
     }
-    if (npc.activity === 'garden') {
+    if (npc.activity === 'tend') {
       drawWateringTrail(ctx, x, y, npc.accent, time + index)
     }
-    if (npc.activity === 'guide' || npc.activity === 'greet') {
+    if (npc.activity === 'fish') {
+      drawFishingRig(ctx, x, y, time)
+    }
+    if (npc.activity === 'gather' || npc.activity === 'couple') {
       drawGuidePing(ctx, x, y - 70, npc.accent, time + index)
     }
     return
   }
 
   switch (npc.activity) {
-    case 'garden':
+    case 'tend':
       drawTinyTool(ctx, x + 30, y - 48, 'watering', npc.accent, time)
       if (pulse > 0.72) drawMiniBubble(ctx, x, y - 136, 'grow', npc.accent)
       break
-    case 'guide':
-      drawTinySign(ctx, x + 34, y - 58, 'GO', npc.accent)
-      if (pulse > 0.78) drawMiniBubble(ctx, x, y - 136, 'this way', npc.accent)
-      break
-    case 'inspect':
+    case 'gather':
       drawTinyTool(ctx, x - 34, y - 54, 'stamp', npc.accent, time)
-      if (pulse > 0.68) drawMiniBubble(ctx, x, y - 136, 'checked', npc.accent)
+      if (pulse > 0.68) drawMiniBubble(ctx, x, y - 136, 'verified', npc.accent)
       break
-    case 'deliver':
-      drawTinyScroll(ctx, x + 34 + Math.sin(time * 4) * 4, y - 68, npc.accent, time)
-      if (pulse > 0.75) drawMiniBubble(ctx, x, y - 136, 'sent', npc.accent)
-      break
-    case 'chant':
+    case 'meditate':
       drawFloatingOrb(ctx, x + 28, y - 94, npc.accent, time)
+      if (pulse > 0.75) drawMiniBubble(ctx, x, y - 136, 'spark', npc.accent)
       break
-    case 'privacy':
+    case 'sit':
       drawShieldSpark(ctx, x + 34, y - 78, npc.accent, time)
+      drawWaveMarks(ctx, x - 38, y - 96, npc.accent, time)
       break
-    case 'signal':
+    case 'stroll':
       drawSignalTicks(ctx, x + 34, y - 90, npc.accent, time)
       if (pulse > 0.78) drawMiniBubble(ctx, x, y - 136, 'ping', npc.accent)
-      break
-    case 'build':
-      drawHammerSwing(ctx, x + 30, y - 58, npc.accent, time)
       break
     case 'dance':
       drawDanceNotes(ctx, x, y - 112, npc.accent, time)
       break
-    case 'scribe':
+    case 'wander':
       drawTinyScroll(ctx, x - 32, y - 62, npc.accent, time)
-      if (pulse > 0.74) drawMiniBubble(ctx, x, y - 136, 'logged', npc.accent)
+      if (pulse > 0.84) drawMiniBubble(ctx, x, y - 136, npc.persona === 'pacer' ? 'busy' : 'gm', npc.accent)
       break
-    case 'portal':
-      drawPortalGlyph(ctx, x + 36, y - 76, npc.accent, time)
+    case 'fish':
+      if (pulse > 0.78) drawMiniBubble(ctx, x + 48, y - 110, '!', npc.accent)
       break
-    case 'greet':
-      drawWaveMarks(ctx, x + 34, y - 96, npc.accent, time)
+    case 'couple':
+      drawHearts(ctx, x, y - 118, npc.accent, time)
       break
   }
 }
@@ -1981,6 +2258,40 @@ function drawWaveMarks(ctx: CanvasRenderingContext2D, x: number, y: number, colo
   ctx.restore()
 }
 
+function drawFishingRig(ctx: CanvasRenderingContext2D, x: number, y: number, time: number) {
+  const bobX = POND_RECT.x + POND_RECT.w - 36
+  const bobY = POND_RECT.y + 72 + Math.sin(time * 3) * 5
+  ctx.save()
+  ctx.strokeStyle = 'rgba(247,241,223,.72)'
+  ctx.lineWidth = 2
+  ctx.beginPath()
+  ctx.moveTo(x + 22, y - 54)
+  ctx.quadraticCurveTo((x + bobX) / 2, y - 94, bobX, bobY)
+  ctx.stroke()
+  ctx.fillStyle = '#ff8066'
+  ctx.fillRect(bobX - 4, bobY - 4, 8, 8)
+  if (Math.sin(time * 1.2) > 0.78) {
+    ctx.fillStyle = '#f2c866'
+    ctx.fillRect(bobX + 10, bobY - 22, 7, 7)
+    ctx.fillStyle = '#f7f1df'
+    ctx.fillRect(bobX + 22, bobY - 33, 9, 9)
+  }
+  ctx.restore()
+}
+
+function drawHearts(ctx: CanvasRenderingContext2D, x: number, y: number, color: string, time: number) {
+  ctx.save()
+  for (let i = 0; i < 3; i++) {
+    const yy = y - ((time * 22 + i * 18) % 48)
+    const xx = x + Math.sin(time * 2 + i) * 12
+    ctx.fillStyle = i % 2 === 0 ? '#ff7ad9' : color
+    ctx.fillRect(xx - 4, yy, 8, 8)
+    ctx.fillRect(xx + 2, yy - 4, 8, 8)
+    ctx.fillRect(xx - 1, yy + 6, 7, 7)
+  }
+  ctx.restore()
+}
+
 function questNpcMotion(quest: QuestNpc, time: number) {
   const phase = time + quest.id * 0.83
   if (quest.id % 3 === 0) {
@@ -2076,11 +2387,14 @@ function drawSpriteActor(
   const sheet = SPRITES[sprite]
   const image = assets.sprites[sprite]
   const frame = chooseSpriteFrame(sprite, sheet.frames, time, seed, moving, near, completed, player, direction)
-  const breathe = moving ? 0 : Math.sin(time * 1.8 + seed) * 0.75
+  const walkPhase = Math.sin(time * 12 + seed)
+  const bodyOffset = player
+    ? moving ? -Math.abs(walkPhase) * 5 : -Math.abs(Math.sin(time * 3.2 + seed)) * 1.6
+    : moving ? -Math.abs(walkPhase) * 2.6 : -Math.abs(Math.sin(time * 4 + seed)) * 2.6
+  const facingDir = direction === 'left' ? -1 : direction === 'right' ? 1 : 0.35
+  const rotation = player && moving ? walkPhase * 0.06 * facingDir : 0
   const drawW = player ? sheet.drawW * 1.04 : sheet.drawW
   const drawH = player ? sheet.drawH * 1.04 : sheet.drawH
-  const dx = Math.round(x - drawW / 2)
-  const dy = Math.round(y - drawH + breathe)
 
   ctx.fillStyle = 'rgba(0,0,0,.34)'
   ctx.fillRect(Math.round(x - drawW * 0.28), Math.round(y - 10), Math.round(drawW * 0.56), 12)
@@ -2098,17 +2412,21 @@ function drawSpriteActor(
     ctx.fill()
   }
 
+  ctx.save()
+  ctx.translate(Math.round(x), Math.round(y))
+  ctx.rotate(rotation)
   ctx.drawImage(
     image,
     frame * sheet.frameW,
     0,
     sheet.frameW,
     sheet.frameH,
-    dx,
-    dy,
+    Math.round(-drawW / 2),
+    Math.round(-drawH + bodyOffset),
     drawW,
     drawH,
   )
+  ctx.restore()
 
   if (completed) {
     ctx.fillStyle = accent
@@ -2206,12 +2524,35 @@ function drawWeather(ctx: CanvasRenderingContext2D, camera: { x: number; y: numb
   ctx.strokeStyle = 'rgba(210, 251, 255, .3)'
   ctx.lineWidth = 2
   for (let i = 0; i < 10; i++) {
-    const x = 1580 - camera.x + 35 + ((i * 43 + time * 34) % 320)
-    const y = 850 - camera.y + 35 + ((i * 29) % 180)
+    const x = POND_RECT.x - camera.x + 24 + ((i * 31 + time * 30) % Math.max(40, POND_RECT.w - 48))
+    const y = POND_RECT.y - camera.y + 24 + ((i * 23) % Math.max(40, POND_RECT.h - 48))
     ctx.beginPath()
     ctx.ellipse(x, y, 12 + Math.sin(time * 3 + i) * 4, 5, 0, 0, Math.PI * 2)
     ctx.stroke()
   }
+  ctx.restore()
+}
+
+function drawShootingStar(ctx: CanvasRenderingContext2D, camera: { x: number; y: number }, width: number, height: number, time: number) {
+  const cycle = Math.floor(time / 14)
+  if (hash2(cycle, 77) < 0.5) return
+  const local = time % 14
+  if (local > 0.9) return
+  const progress = local / 0.9
+  const sx = camera.x + 90 + hash2(cycle, 13) * Math.max(120, width - 280)
+  const sy = camera.y + 70 + hash2(cycle, 29) * Math.max(80, height * 0.38)
+  const x = sx + 260 * progress
+  const y = sy + 120 * progress
+  ctx.save()
+  ctx.globalAlpha = progress < 0.55 ? 1 : 1 - (progress - 0.55) / 0.45
+  ctx.strokeStyle = 'rgba(247,241,223,.78)'
+  ctx.lineWidth = 3
+  ctx.beginPath()
+  ctx.moveTo(x - 54, y - 25)
+  ctx.lineTo(x, y)
+  ctx.stroke()
+  ctx.fillStyle = '#f2c866'
+  ctx.fillRect(x - 4, y - 4, 8, 8)
   ctx.restore()
 }
 
