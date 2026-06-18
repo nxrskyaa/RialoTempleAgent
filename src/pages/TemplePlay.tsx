@@ -1882,10 +1882,11 @@ function ambientNpcMotion(npc: AmbientNpc, index: number, time: number): NpcMoti
       y: npc.y + Math.cos(phase * 0.72) * radius * 0.55,
     }
     const safe = safeNpcTarget(npc.x, npc.y, target.x, target.y)
-    const direction: PlayerState['dir'] = safe.x > npc.x ? 'right' : safe.x < npc.x ? 'left' : 'down'
+    const direction: PlayerState['dir'] = safe.x > npc.x + 1 ? 'right' : safe.x < npc.x - 1 ? 'left' : 'down'
     const idleChance = persona === 'homebody' ? 0.6 : persona === 'wanderer' ? 0.3 : 0.18
     const idling = activityPulse < idleChance
-    return { x: idling ? npc.x : safe.x, y: idling ? npc.y : safe.y, moving: !idling, direction, activityPulse }
+    // keep position continuous (no teleport home); idle only stops the walk bob
+    return { x: safe.x, y: safe.y, moving: !idling, direction, activityPulse }
   }
   if (npc.activity === 'stroll') {
     const route = [
@@ -1934,8 +1935,15 @@ function ambientNpcMotion(npc: AmbientNpc, index: number, time: number): NpcMoti
 function safeNpcTarget(homeX: number, homeY: number, targetX: number, targetY: number) {
   const x = clamp(targetX, 70, WORLD.width - 70)
   const y = clamp(targetY, 70, WORLD.height - 70)
-  if (isMovementBlocked(x, y) || pathBlocked(homeX, homeY, x, y)) return { x: homeX, y: homeY }
-  return { x, y }
+  if (!isMovementBlocked(x, y) && !pathBlocked(homeX, homeY, x, y)) return { x, y }
+  // step back along home->target and return the furthest reachable point, so the
+  // NPC stops smoothly at the obstacle edge instead of teleporting home
+  for (let s = 0.85; s > 0; s -= 0.15) {
+    const sx = lerp(homeX, x, s)
+    const sy = lerp(homeY, y, s)
+    if (!isMovementBlocked(sx, sy) && !pathBlocked(homeX, homeY, sx, sy)) return { x: sx, y: sy }
+  }
+  return { x: homeX, y: homeY }
 }
 
 function drawAmbientInteractions(ctx: CanvasRenderingContext2D, time: number, motions: NpcMotion[]) {
@@ -1972,52 +1980,57 @@ function drawAmbientInteractions(ctx: CanvasRenderingContext2D, time: number, mo
   })
 }
 
+// Single scheduler so only ONE ambient event ever runs at a time, each followed
+// by a calm gap (state returns to normal). Prevents overlapping / stuck bubbles.
+const EVENT_SLOT = 5
 function drawNpcEventLayer(ctx: CanvasRenderingContext2D, time: number, motions: NpcMotion[]) {
-  const randomTexts = ['LOL', 'GG', 'WAGMI', '?!', 'ser', 'gm']
-  const eventWindow = time % 9
-  if (eventWindow < 1.35) {
-    const index = Math.floor(time / 9) % motions.length
-    const motion = motions[index]
-    if (motion) {
-      const lift = Math.sin((eventWindow / 1.35) * Math.PI) * 14
-      drawMiniBubble(ctx, motion.x, motion.y - 148 - lift, randomTexts[index % randomTexts.length], '#f2c866')
-      ctx.save()
-      ctx.translate(motion.x, motion.y - 72 - lift)
-      ctx.rotate((eventWindow / 1.35) * Math.PI * 2)
-      ctx.strokeStyle = '#f2c866'
-      ctx.lineWidth = 3
-      ctx.strokeRect(-12, -12, 24, 24)
-      ctx.restore()
-    }
-  }
+  if (motions.length === 0) return
+  const slot = Math.floor(time / EVENT_SLOT)
+  const local = time % EVENT_SLOT
+  const kind = slot % 3
 
-  const socialWindow = time % 4.5
-  if (socialWindow < 3.75) {
-    const pair = nearestSocialPair(motions)
-    if (pair) {
-      const emotes = ['!', 'note', 'spark', '~', '?']
-      const turn = Math.floor(socialWindow / 0.75)
-      const active = turn % 2 === 0 ? pair.a : pair.b
-      drawMiniBubble(ctx, active.x, active.y - 142, emotes[turn % emotes.length], '#57e39f')
-      ctx.save()
-      ctx.strokeStyle = 'rgba(87,227,159,.48)'
-      ctx.lineWidth = 3
-      ctx.setLineDash([5, 8])
-      ctx.beginPath()
-      ctx.moveTo(pair.a.x, pair.a.y - 82)
-      ctx.lineTo(pair.b.x, pair.b.y - 82)
-      ctx.stroke()
-      ctx.restore()
-    }
-  }
-
-  const greetWindow = time % 3.2
-  if (greetWindow < 1.3) {
-    const greeters = [1, 8, 11]
-    const index = greeters[Math.floor(time / 3.2) % greeters.length]
+  if (kind === 0 && local < 1.35) {
+    const randomTexts = ['LOL', 'GG', 'WAGMI', '?!', 'ser', 'gm']
+    const index = slot % motions.length
     const motion = motions[index]
     if (!motion) return
-    const scale = easeOutBack(Math.min(1, greetWindow / 0.3))
+    const lift = Math.sin((local / 1.35) * Math.PI) * 14
+    drawMiniBubble(ctx, motion.x, motion.y - 148 - lift, randomTexts[index % randomTexts.length], '#f2c866')
+    ctx.save()
+    ctx.translate(motion.x, motion.y - 72 - lift)
+    ctx.rotate((local / 1.35) * Math.PI * 2)
+    ctx.strokeStyle = '#f2c866'
+    ctx.lineWidth = 3
+    ctx.strokeRect(-12, -12, 24, 24)
+    ctx.restore()
+    return
+  }
+
+  if (kind === 1 && local < 3) {
+    const pair = nearestSocialPair(motions)
+    if (!pair) return
+    const emotes = ['!', 'note', 'spark', '~', '?']
+    const turn = Math.floor(local / 0.75)
+    const active = turn % 2 === 0 ? pair.a : pair.b
+    drawMiniBubble(ctx, active.x, active.y - 142, emotes[turn % emotes.length], '#57e39f')
+    ctx.save()
+    ctx.strokeStyle = 'rgba(87,227,159,.48)'
+    ctx.lineWidth = 3
+    ctx.setLineDash([5, 8])
+    ctx.beginPath()
+    ctx.moveTo(pair.a.x, pair.a.y - 82)
+    ctx.lineTo(pair.b.x, pair.b.y - 82)
+    ctx.stroke()
+    ctx.restore()
+    return
+  }
+
+  if (kind === 2 && local < 1.3) {
+    const greeters = [1, 8, 11]
+    const index = greeters[slot % greeters.length]
+    const motion = motions[index]
+    if (!motion) return
+    const scale = easeOutBack(Math.min(1, local / 0.3))
     ctx.save()
     ctx.translate(motion.x, motion.y - 154)
     ctx.scale(scale, scale)
