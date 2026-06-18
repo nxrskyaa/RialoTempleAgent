@@ -3,7 +3,9 @@ import re
 src = open('src/pages/TemplePlay.tsx').read()
 buildings = {
     k: (int(x), int(y), int(w), int(h))
-    for k, x, y, w, h in re.findall(r"key: '(\w+)', x: (\d+), y: (\d+), w: (\d+), h: (\d+)", src)
+    for k, x, y, w, h in re.findall(
+        r"key: '(building\w+|balineseTemple)', x: (\d+), y: (\d+), w: (\d+), h: (\d+)", src
+    )
 }
 pond = (160, 768, 256, 192)
 box = lambda b: (b[0] - b[2] / 2, b[1] - b[3], b[0] + b[2] / 2, b[1])

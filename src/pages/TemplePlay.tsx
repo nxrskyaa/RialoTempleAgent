@@ -136,19 +136,46 @@ type TemplePlayAssets = {
 }
 
 type PropKey =
+  // tileable ground textures (drawn as repeating patterns)
+  | 'groundGrass'
+  | 'groundRoad'
+  | 'groundSoil'
+  // nature + decor
+  | 'tree'
+  | 'lamp'
+  | 'pond'
+  | 'grass1'
+  | 'grass2'
+  | 'grass3'
+  | 'flowerBlue'
+  | 'flowerAmber'
+  | 'flowerCream'
+  | 'flowerYellow'
+  | 'flowerRed'
+  | 'flowerOrange'
+  | 'flowerPink'
+  | 'flowerPurple'
+  // garden crops (growth stages)
+  | 'cropLeafy0'
+  | 'cropLeafy1'
+  | 'cropLeafy2'
+  | 'cropLeafy3'
+  | 'cropRoot0'
+  | 'cropRoot1'
+  | 'cropRoot2'
+  | 'cropRoot3'
+  // park set
+  | 'parkBench'
+  | 'parkLantern'
+  | 'parkBush'
+  | 'parkPlanter'
+  // fishing set
+  | 'fishingRod'
+  | 'fishingBobber'
+  | 'fishingBucket'
+  | 'fishingNet'
+  // buildings (10 slots reuse 3 cozy-village designs)
   | 'balineseTemple'
-  | 'guardianStatue'
-  | 'gardenTile'
-  | 'soilTile'
-  | 'soilCross'
-  | 'vineCornerA'
-  | 'vineCornerB'
-  | 'vineCornerC'
-  | 'leafPlant'
-  | 'pepperPlant'
-  | 'pepperCluster'
-  | 'sunflower'
-  | 'smallPepper'
   | 'buildingMarketHall'
   | 'buildingWoodenCabin'
   | 'buildingOracleHouse'
@@ -173,28 +200,50 @@ const SPRITES: Record<SpriteKey, SpriteSheet> = {
 }
 
 const PROPS: Record<PropKey, string> = {
-  balineseTemple: '/temple-play/buildings/japanese-shrine.png',
-  guardianStatue: '/temple-play/sprites/stone-lantern.png',
-  gardenTile: '/temple-play/sprites/garden-tile.png',
-  soilTile: '/temple-play/sprites/soil-tile.png',
-  soilCross: '/temple-play/sprites/soil-cross.png',
-  vineCornerA: '/temple-play/sprites/bamboo-cluster.png',
-  vineCornerB: '/temple-play/sprites/maple-tree.png',
-  vineCornerC: '/temple-play/sprites/garden-rock.png',
-  leafPlant: '/temple-play/sprites/bonsai.png',
-  pepperPlant: '/temple-play/sprites/koi-lily.png',
-  pepperCluster: '/temple-play/sprites/sakura-bush.png',
-  sunflower: '/temple-play/sprites/torii-mini.png',
-  smallPepper: '/temple-play/sprites/shrine-offering.png',
-  buildingMarketHall: '/temple-play/buildings/signal-tower.png',
-  buildingWoodenCabin: '/temple-play/buildings/rest-stop.png',
-  buildingOracleHouse: '/temple-play/buildings/bridge-gate.png',
-  buildingGuildHouse: '/temple-play/buildings/guild-house.png',
-  buildingTempleLodge: '/temple-play/buildings/agent-camp.png',
-  buildingStoneVault: '/temple-play/buildings/rwa-vault.png',
-  buildingScaleDojo: '/temple-play/buildings/scale-dojo.png',
-  buildingGreenhouseInn: '/temple-play/buildings/privacy-grove.png',
-  buildingOrangeCottage: '/temple-play/buildings/quest-hut.png',
+  groundGrass: '/temple-play/world/tile/ground-grass.png',
+  groundRoad: '/temple-play/world/tile/ground-road.png',
+  groundSoil: '/temple-play/world/tile/ground-soil.png',
+  tree: '/temple-play/world/tree/tree.png',
+  lamp: '/temple-play/world/lamp/lamp.png',
+  pond: '/temple-play/world/pond/pond.png',
+  grass1: '/temple-play/world/grass/grass-1.png',
+  grass2: '/temple-play/world/grass/grass-2.png',
+  grass3: '/temple-play/world/grass/grass-3.png',
+  flowerBlue: '/temple-play/world/flower/flower-blue.png',
+  flowerAmber: '/temple-play/world/flower/flower-amber.png',
+  flowerCream: '/temple-play/world/flower/flower-cream.png',
+  flowerYellow: '/temple-play/world/flower/flower-yellow.png',
+  flowerRed: '/temple-play/world/flower/flower-red.png',
+  flowerOrange: '/temple-play/world/flower/flower-orange.png',
+  flowerPink: '/temple-play/world/flower/flower-pink.png',
+  flowerPurple: '/temple-play/world/flower/flower-purple.png',
+  cropLeafy0: '/temple-play/world/crop/crop-leafy-0.png',
+  cropLeafy1: '/temple-play/world/crop/crop-leafy-1.png',
+  cropLeafy2: '/temple-play/world/crop/crop-leafy-2.png',
+  cropLeafy3: '/temple-play/world/crop/crop-leafy-3.png',
+  cropRoot0: '/temple-play/world/crop/crop-root-0.png',
+  cropRoot1: '/temple-play/world/crop/crop-root-1.png',
+  cropRoot2: '/temple-play/world/crop/crop-root-2.png',
+  cropRoot3: '/temple-play/world/crop/crop-root-3.png',
+  parkBench: '/temple-play/world/park/park-bench.png',
+  parkLantern: '/temple-play/world/park/park-lantern.png',
+  parkBush: '/temple-play/world/park/park-bush.png',
+  parkPlanter: '/temple-play/world/park/park-planter.png',
+  fishingRod: '/temple-play/world/fishing/fishing-rod.png',
+  fishingBobber: '/temple-play/world/fishing/fishing-bobber.png',
+  fishingBucket: '/temple-play/world/fishing/fishing-bucket.png',
+  fishingNet: '/temple-play/world/fishing/fishing-net.png',
+  // 10 building slots reuse 3 designs (aspect-matched to minimise distortion)
+  balineseTemple: '/temple-play/world/building/building-3.png',
+  buildingScaleDojo: '/temple-play/world/building/building-1.png',
+  buildingStoneVault: '/temple-play/world/building/building-1.png',
+  buildingTempleLodge: '/temple-play/world/building/building-2.png',
+  buildingMarketHall: '/temple-play/world/building/building-2.png',
+  buildingGreenhouseInn: '/temple-play/world/building/building-3.png',
+  buildingOracleHouse: '/temple-play/world/building/building-1.png',
+  buildingWoodenCabin: '/temple-play/world/building/building-2.png',
+  buildingOrangeCottage: '/temple-play/world/building/building-1.png',
+  buildingGuildHouse: '/temple-play/world/building/building-2.png',
 }
 
 const QUESTS: QuestNpc[] = [
@@ -428,8 +477,47 @@ const BUILDINGS: BuildingSpec[] = [
 ]
 
 const BUILDING_COLLIDERS = BUILDINGS.map((building) => buildingCollider(building))
+
+// Tall scenery that must y-sort with actors (occludes things behind it).
+// Drawn bottom-center anchored at (x, y). `solid` adds a small base collider.
+type ScenerySpec = { key: PropKey; x: number; y: number; w: number; h: number; solid?: boolean }
+const SCENERY: ScenerySpec[] = [
+  // trees ringing the world + filling open gaps (off paths & buildings)
+  { key: 'tree', x: 140, y: 200, w: 132, h: 144, solid: true },
+  { key: 'tree', x: 700, y: 180, w: 132, h: 144, solid: true },
+  { key: 'tree', x: 860, y: 190, w: 120, h: 132, solid: true },
+  { key: 'tree', x: 1540, y: 210, w: 132, h: 144, solid: true },
+  { key: 'tree', x: 90, y: 470, w: 120, h: 132, solid: true },
+  { key: 'tree', x: 300, y: 660, w: 132, h: 144, solid: true },
+  { key: 'tree', x: 110, y: 1010, w: 132, h: 144, solid: true },
+  { key: 'tree', x: 500, y: 1250, w: 120, h: 132, solid: true },
+  { key: 'tree', x: 1000, y: 1255, w: 132, h: 144, solid: true },
+  { key: 'tree', x: 1560, y: 1250, w: 132, h: 144, solid: true },
+  { key: 'tree', x: 1560, y: 780, w: 120, h: 132, solid: true },
+  { key: 'tree', x: 380, y: 520, w: 132, h: 144, solid: true },
+  // lamp posts framing the central plaza + main paths
+  { key: 'lamp', x: 620, y: 560, w: 78, h: 160, solid: true },
+  { key: 'lamp', x: 980, y: 560, w: 78, h: 160, solid: true },
+  { key: 'lamp', x: 620, y: 770, w: 78, h: 160, solid: true },
+  { key: 'lamp', x: 980, y: 770, w: 78, h: 160, solid: true },
+  { key: 'lamp', x: 430, y: 560, w: 78, h: 160, solid: true },
+  { key: 'lamp', x: 250, y: 760, w: 78, h: 160, solid: true },
+  // park nook in the open pocket between temple / oracle / market / guild
+  { key: 'parkBench', x: 1000, y: 640, w: 104, h: 78, solid: true },
+  { key: 'parkLantern', x: 1180, y: 650, w: 86, h: 104, solid: true },
+  { key: 'parkBush', x: 1000, y: 760, w: 104, h: 100 },
+  { key: 'parkPlanter', x: 1180, y: 762, w: 104, h: 101 },
+]
+
+function sceneryCollider(s: ScenerySpec) {
+  const w = s.w * 0.34
+  const h = 12
+  return { x: s.x - w / 2, y: s.y - h, w, h }
+}
+
 const WORLD_BLOCKERS = [
   ...BUILDING_COLLIDERS,
+  ...SCENERY.filter((s) => s.solid).map(sceneryCollider),
   { x: POND_RECT.x + 10, y: POND_RECT.y + 8, w: POND_RECT.w - 20, h: POND_RECT.h - 16 },
 ]
 
@@ -1271,7 +1359,7 @@ function drawWorld(
   ctx.translate(-camera.x, -camera.y)
   drawGround(ctx, time, assets)
   drawPaths(ctx, time)
-  drawWater(ctx, time)
+  drawWater(ctx, assets)
   drawEnvironmentProps(ctx, time, assets)
   drawTapTarget(ctx, time, target)
   drawQuestDirection(ctx, time, player, nextQuest, nearNpcId)
@@ -1431,44 +1519,17 @@ function buildPathSet() {
   return set
 }
 
-function drawTile(ctx: CanvasRenderingContext2D, tx: number, ty: number, tile: TileType, time: number) {
-  const x = tx * TILE_SIZE
-  const y = ty * TILE_SIZE
-  const palette: Record<TileType, string> = {
-    [T.GRASS]: '#2d4a2d',
-    [T.GRASS2]: '#354f35',
-    [T.PATH]: '#5a5a6a',
-    [T.WATER]: '#2a6060',
-    [T.SAND]: '#c8b98a',
-    [T.MYSTIC]: '#3a3550',
-    [T.COAST]: '#3a6040',
-    [T.FLOWER]: '#2d4a2d',
-    [T.SAND2]: '#baa87a',
-    [T.MYSTIC2]: '#352f4a',
-  }
-  ctx.fillStyle = palette[tile]
-  ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE)
+// tilled garden plot (soil texture + crops), aligned to the tile grid
+const GARDEN = { x: 480, y: 928, w: 224, h: 160 }
 
-  const dither = hash2(tx, ty) > 0.5
-  ctx.fillStyle = dither ? 'rgba(247,241,223,.1)' : 'rgba(7,16,12,.1)'
-  ctx.fillRect(x + 6 + ((tx * 3) % 14), y + 7 + ((ty * 5) % 12), 4, 3)
-  ctx.fillRect(x + 19 + ((ty * 2) % 7), y + 22 + ((tx * 2) % 6), 5, 3)
-
-  if (tile === T.PATH) {
-    ctx.fillStyle = 'rgba(105,75,41,.18)'
-    ctx.fillRect(x + 5, y + 9, 9, 4)
-    ctx.fillRect(x + 20, y + 21, 7, 4)
-  } else if (tile === T.FLOWER || (tile === T.GRASS2 && hash2(tx + 8, ty + 13) > 0.78)) {
-    const bob = Math.sin(time * 1.6 + tx + ty) * 1
-    ctx.fillStyle = '#7edb6e'
-    ctx.fillRect(x + 12, y + 13, 3, 12)
-    ctx.fillStyle = ['#ff7ad9', '#f2c866', '#b9ff66'][Math.floor(hash2(tx, ty + 9) * 3)]
-    ctx.fillRect(x + 9, y + 10 + bob, 5, 5)
-    ctx.fillRect(x + 14, y + 9 + bob, 5, 5)
-  } else if (tile === T.MYSTIC || tile === T.MYSTIC2) {
-    ctx.fillStyle = 'rgba(200,134,255,.18)'
-    ctx.fillRect(x + 11, y + 11, 10, 10)
-  }
+const patternCache = new WeakMap<HTMLImageElement, CanvasPattern>()
+function tilePattern(ctx: CanvasRenderingContext2D, image: HTMLImageElement | undefined) {
+  if (!image) return null
+  const cached = patternCache.get(image)
+  if (cached) return cached
+  const pattern = ctx.createPattern(image, 'repeat')
+  if (pattern) patternCache.set(image, pattern)
+  return pattern
 }
 
 function drawCobblePulse(ctx: CanvasRenderingContext2D, time: number) {
@@ -1521,99 +1582,46 @@ function lerp(a: number, b: number, t: number) {
   return a + (b - a) * t
 }
 
-function roundedRectPath(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, radius: number) {
-  const r = Math.min(radius, w / 2, h / 2)
-  ctx.beginPath()
-  ctx.moveTo(x + r, y)
-  ctx.lineTo(x + w - r, y)
-  ctx.quadraticCurveTo(x + w, y, x + w, y + r)
-  ctx.lineTo(x + w, y + h - r)
-  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h)
-  ctx.lineTo(x + r, y + h)
-  ctx.quadraticCurveTo(x, y + h, x, y + h - r)
-  ctx.lineTo(x, y + r)
-  ctx.quadraticCurveTo(x, y, x + r, y)
-}
 
-function drawGround(ctx: CanvasRenderingContext2D, time: number, assets: TemplePlayAssets) {
-  for (let ty = 0; ty < MAP_H; ty++) {
-    for (let tx = 0; tx < MAP_W; tx++) {
-      drawTile(ctx, tx, ty, WORLD_TILES[ty][tx], time)
+function drawGround(ctx: CanvasRenderingContext2D, _time: number, assets: TemplePlayAssets) {
+  // grass base across the whole world
+  const grass = tilePattern(ctx, assets.props.groundGrass)
+  ctx.fillStyle = grass ?? '#2d4a2d'
+  ctx.fillRect(0, 0, WORLD.width, WORLD.height)
+
+  // stone road on path tiles (pattern is world-anchored, so cells stay seamless)
+  const road = tilePattern(ctx, assets.props.groundRoad)
+  if (road) {
+    ctx.fillStyle = road
+    for (let ty = 0; ty < MAP_H; ty++) {
+      for (let tx = 0; tx < MAP_W; tx++) {
+        if (WORLD_TILES[ty][tx] === T.PATH) {
+          ctx.fillRect(tx * TILE_SIZE, ty * TILE_SIZE, TILE_SIZE, TILE_SIZE)
+        }
+      }
     }
   }
 
-  for (let y = 950; y <= 1090; y += 70) {
-    for (let x = 505; x <= 675; x += 70) {
-      drawProp(ctx, assets, 'soilTile', x, y, 54, 54)
-      const plant: PropKey = (x + y) % 3 === 0 ? 'pepperCluster' : (x + y) % 3 === 1 ? 'pepperPlant' : 'leafPlant'
-      drawProp(ctx, assets, plant, x + 4, y - 6 + Math.sin(time * 1.5 + x) * 2, 42, 48)
-    }
+  // tilled garden soil plot
+  const soil = tilePattern(ctx, assets.props.groundSoil)
+  if (soil) {
+    ctx.fillStyle = soil
+    ctx.fillRect(GARDEN.x, GARDEN.y, GARDEN.w, GARDEN.h)
   }
 }
 
 function drawPaths(ctx: CanvasRenderingContext2D, time: number) {
-  ctx.save()
-  ctx.globalAlpha = 0.58
-  ctx.fillStyle = 'rgba(104, 76, 42, .16)'
-  for (let i = 0; i < 70; i++) {
-    const x = ((i * 173) % WORLD.width)
-    const y = ((i * 109) % WORLD.height)
-    if (WORLD_TILES[Math.floor(y / TILE_SIZE)]?.[Math.floor(x / TILE_SIZE)] === T.PATH) {
-      ctx.fillRect(x + ((i * 7) % 19), y + ((i * 11) % 17), 8, 4)
-    }
-  }
-  ctx.restore()
   drawCobblePulse(ctx, time)
 }
 
-function drawWater(ctx: CanvasRenderingContext2D, time: number) {
-  const x = POND_RECT.x
-  const y = POND_RECT.y
-  const w = POND_RECT.w
-  const h = POND_RECT.h
-
-  ctx.save()
-  roundedRectPath(ctx, x - 10, y - 10, w + 20, h + 20, 26)
-  ctx.fillStyle = '#e2c98a'
-  ctx.fill()
-
-  roundedRectPath(ctx, x, y, w, h, 22)
-  ctx.clip()
-  const gradient = ctx.createLinearGradient(x, y, x + w, y + h)
-  gradient.addColorStop(0, '#2b6cb0')
-  gradient.addColorStop(0.55, '#2f91b8')
-  gradient.addColorStop(1, '#48c1d3')
-  ctx.fillStyle = gradient
-  ctx.fillRect(x, y, w, h)
-
-  ctx.strokeStyle = 'rgba(214, 251, 255, .58)'
-  ctx.lineWidth = 3
-  for (let row = 0; row < 7; row++) {
-    const yy = y + 20 + row * 27
-    ctx.beginPath()
-    for (let i = 0; i <= 11; i++) {
-      const xx = x + 12 + i * 24
-      const wave = Math.sin(time * 2.9 + row * 0.8 + i * 0.74) * 5
-      if (i === 0) ctx.moveTo(xx, yy + wave)
-      else ctx.lineTo(xx, yy + wave)
-    }
-    ctx.stroke()
-  }
-
-  for (let i = 0; i < 8; i++) {
-    const padX = x + 20 + ((i * 43) % (w - 58)) + Math.sin(time * 1.3 + i) * 3
-    const padY = y + 20 + ((i * 31) % (h - 48)) + Math.cos(time * 1.1 + i) * 2
-    ctx.fillStyle = i % 3 === 0 ? '#8ecf5f' : '#4f8a58'
-    ctx.fillRect(padX, padY, 28, 9)
-    ctx.fillRect(padX + 6, padY - 5, 16, 7)
-    if (i % 4 === 0) {
-      ctx.fillStyle = '#ffd1ef'
-      ctx.fillRect(padX + 10, padY - 10, 7, 7)
-      ctx.fillStyle = '#f2c866'
-      ctx.fillRect(padX + 13, padY - 7, 2, 2)
-    }
-  }
-  ctx.restore()
+function drawWater(ctx: CanvasRenderingContext2D, assets: TemplePlayAssets) {
+  const img = assets.props.pond
+  if (!img) return
+  const cx = POND_RECT.x + POND_RECT.w / 2
+  const cy = POND_RECT.y + POND_RECT.h / 2
+  const w = POND_RECT.w + 96
+  const h = Math.round((w * img.height) / img.width)
+  ctx.drawImage(img, Math.round(cx - w / 2), Math.round(cy - h / 2), w, h)
 }
 
 function drawCompletedBadges(ctx: CanvasRenderingContext2D, time: number, completedIds: Set<number>) {
@@ -1663,71 +1671,48 @@ function drawBuildingLabel(ctx: CanvasRenderingContext2D, x: number, y: number, 
   ctx.fillText(label, Math.round(x - width / 2 + 12), y + 21)
 }
 
+const FLOWERS: PropKey[] = ['flowerBlue', 'flowerAmber', 'flowerCream', 'flowerYellow', 'flowerRed', 'flowerOrange', 'flowerPink', 'flowerPurple']
+const GRASSES: PropKey[] = ['grass1', 'grass2', 'grass3']
+const CROP_STAGES: PropKey[][] = [
+  ['cropLeafy0', 'cropLeafy1', 'cropLeafy2', 'cropLeafy3'],
+  ['cropRoot0', 'cropRoot1', 'cropRoot2', 'cropRoot3'],
+]
+
 function drawEnvironmentProps(ctx: CanvasRenderingContext2D, time: number, assets: TemplePlayAssets) {
-  drawProp(ctx, assets, 'sunflower', 116, 690 + Math.sin(time * 1.4) * 2, 50, 58)
-  drawProp(ctx, assets, 'pepperCluster', 632, 1040 + Math.sin(time * 1.2) * 2, 58, 62)
-  drawPropBottomCenter(ctx, assets, 'guardianStatue', 690, 674, 70, 88)
-  drawPropBottomCenter(ctx, assets, 'guardianStatue', 910, 674, 70, 88)
-  drawProp(ctx, assets, 'vineCornerA', 148, 1064, 72, 72)
-  drawProp(ctx, assets, 'vineCornerB', 1380, 820, 72, 72)
-  drawProp(ctx, assets, 'vineCornerC', 80, 1130, 72, 72)
-
-  const lanterns = [
-    [705, 704], [882, 704],
-    [506, 448], [312, 382],
-    [994, 590], [1138, 616],
-    [1120, 948], [1238, 1110],
-    [686, 1036], [846, 1240],
-  ]
-  lanterns.forEach(([x, y]) => drawPropBottomCenter(ctx, assets, 'guardianStatue', x, y, 48, 62))
-
-  for (let i = 0; i < 34; i++) {
-    const x = 120 + ((i * 293) % (WORLD.width - 240))
-    const y = 140 + ((i * 211) % (WORLD.height - 280))
-    if (isNearMainPlaySpace(x, y) && i % 3 !== 0) continue
-    drawFlowerPatch(ctx, x, y, i, time)
-  }
-
-  for (let i = 0; i < 76; i++) {
+  // grass tufts scattered across open ground
+  for (let i = 0; i < 90; i++) {
     const x = 90 + ((i * 257) % (WORLD.width - 180))
     const y = 120 + ((i * 181) % (WORLD.height - 240))
     if (isNearMainPlaySpace(x, y)) continue
-    const sway = Math.sin(time * 1.1 + i) * 1.8
-    ctx.fillStyle = '#4b3427'
-    ctx.fillRect(x + 10, y + 28, 16, 32)
-    ctx.fillStyle = i % 4 === 0 ? '#57e39f' : '#3d724b'
-    ctx.fillRect(x + sway, y + 6, 36, 32)
-    ctx.fillRect(x + 7 + sway, y - 7, 24, 27)
-    ctx.fillStyle = '#2b4f35'
-    ctx.fillRect(x + 4 + sway, y + 23, 28, 14)
-    if (i % 5 === 0) {
-      ctx.fillStyle = 'rgba(185, 255, 102, .85)'
-      ctx.fillRect(x + 13 + sway, y + 2, 7, 7)
-      ctx.fillRect(x + 25 + sway, y + 16, 6, 6)
+    drawProp(ctx, assets, GRASSES[i % GRASSES.length], x, y, 38, 30)
+  }
+
+  // wildflowers (8 colours) sprinkled around, denser off the play space
+  for (let i = 0; i < 46; i++) {
+    const x = 120 + ((i * 293) % (WORLD.width - 240))
+    const y = 140 + ((i * 211) % (WORLD.height - 280))
+    if (isNearMainPlaySpace(x, y) && i % 3 !== 0) continue
+    const bob = Math.sin(time * 1.7 + i) * 1.5
+    drawProp(ctx, assets, FLOWERS[i % FLOWERS.length], x, y + bob, 34, 33)
+  }
+
+  // garden crop rows on the tilled soil plot (varied growth stages)
+  for (let row = 0; row < 3; row++) {
+    for (let col = 0; col < 4; col++) {
+      const stages = CROP_STAGES[row % CROP_STAGES.length]
+      const key = stages[(col + row) % stages.length]
+      const x = GARDEN.x + 32 + col * 48
+      const y = GARDEN.y + 40 + row * 48
+      drawPropBottomCenter(ctx, assets, key, x, y, 40, 44)
     }
   }
 
-  drawFloatingLeaves(ctx, time)
-}
+  // fishing nook on the east bank of the pond
+  drawProp(ctx, assets, 'fishingBobber', 352, 884 + Math.sin(time * 1.6) * 2, 20, 24)
+  drawProp(ctx, assets, 'fishingNet', 506, 992, 50, 40)
+  drawPropBottomCenter(ctx, assets, 'fishingBucket', 466, 992, 40, 50)
 
-function drawFlowerPatch(ctx: CanvasRenderingContext2D, x: number, y: number, seed: number, time: number) {
-  ctx.save()
-  ctx.translate(x, y)
-  const colors = ['#ff7ad9', '#f2c866', '#b9ff66', '#f7f1df', '#78ecff']
-  for (let i = 0; i < 5; i++) {
-    const px = ((i * 17 + seed * 9) % 42) - 18
-    const py = ((i * 13 + seed * 7) % 30) - 12
-    const bob = Math.sin(time * 1.7 + seed + i) * 1.1
-    ctx.fillStyle = '#386b34'
-    ctx.fillRect(px - 2, py + 5, 4, 12)
-    ctx.fillStyle = colors[(seed + i) % colors.length]
-    ctx.fillRect(px - 6, py + bob, 5, 5)
-    ctx.fillRect(px + 1, py + bob, 5, 5)
-    ctx.fillRect(px - 2, py - 3 + bob, 5, 5)
-    ctx.fillStyle = '#f7f1df'
-    ctx.fillRect(px, py + 1 + bob, 2, 2)
-  }
-  ctx.restore()
+  drawFloatingLeaves(ctx, time)
 }
 
 function drawFloatingLeaves(ctx: CanvasRenderingContext2D, time: number) {
@@ -1800,6 +1785,16 @@ function drawActors(
     y: building.y,
     draw: () => drawBuildingAsset(ctx, assets, building),
   }))
+  SCENERY.forEach((s) => {
+    actors.push({
+      y: s.y,
+      draw: () => {
+        ctx.fillStyle = 'rgba(0,0,0,.22)'
+        ctx.fillRect(Math.round(s.x - s.w * 0.26), Math.round(s.y - 8), Math.round(s.w * 0.52), 9)
+        drawPropBottomCenter(ctx, assets, s.key, s.x, s.y, s.w, s.h)
+      },
+    })
+  })
   const ambientMotions = AMBIENT_NPCS.map((npc, index) => ambientNpcMotion(npc, index, time))
 
   drawAmbientInteractions(ctx, time, ambientMotions)
