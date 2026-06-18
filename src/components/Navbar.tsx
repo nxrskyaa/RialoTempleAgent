@@ -33,17 +33,17 @@ export default function Navbar() {
           <span className="temple-wordmark hidden text-lg font-black text-[var(--temple-text)] sm:inline">Rialo Temple</span>
         </Link>
 
-        {/* desktop inline nav */}
-        <div className="nav-bubble hidden items-center gap-1 rounded-full p-1 lg:flex">
+        {/* desktop inline nav: icon-only, label shown only for the active item */}
+        <div className="nav-bubble hidden items-center gap-0.5 rounded-full p-1 lg:flex">
           {NAV.map(item => {
             const active = location.pathname === item.path
             return (
-              <Link key={item.path} to={item.path}
-                className="nav-link relative flex items-center gap-1.5 rounded-full px-3 py-2 text-[11px] font-black transition-colors"
+              <Link key={item.path} to={item.path} title={item.label} aria-label={item.label}
+                className="nav-link relative flex items-center gap-1.5 rounded-full px-2.5 py-2 text-[11px] font-black transition-colors"
                 style={{ color: active ? '#06100c' : 'var(--temple-muted)' }}>
                 {active && <motion.div layoutId="nav" className="nav-active absolute inset-0 rounded-full" transition={{ type: 'spring', stiffness: 430, damping: 28 }} />}
-                <item.icon className="relative z-10 h-3.5 w-3.5" />
-                <span className="relative z-10">{item.label}</span>
+                <item.icon className="relative z-10 h-4 w-4" />
+                {active && <span className="relative z-10 whitespace-nowrap">{item.label}</span>}
               </Link>
             )
           })}
