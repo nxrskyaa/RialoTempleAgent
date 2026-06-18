@@ -116,9 +116,9 @@ const T = {
 } as const
 type TileType = (typeof T)[keyof typeof T]
 const PLAYER_SPEED = 245
-const DESKTOP_CAMERA_ZOOM = 1.5
-const TABLET_CAMERA_ZOOM = 1.25
-const MOBILE_CAMERA_ZOOM = 0.92
+const DESKTOP_CAMERA_ZOOM = 1.0
+const TABLET_CAMERA_ZOOM = 0.9
+const MOBILE_CAMERA_ZOOM = 0.7
 
 type SpriteSheet = {
   src: string
@@ -205,8 +205,8 @@ const QUESTS: QuestNpc[] = [
     npc: 'NXR',
     role: 'Builder Guide',
     sprite: 'nxr',
-    x: 800,
-    y: 710,
+    x: 792,
+    y: 700,
     color: '#f2c866',
     accent: '#57e39f',
     reward: 50,
@@ -240,8 +240,8 @@ const QUESTS: QuestNpc[] = [
     npc: 'Vault Keeper Mino',
     role: 'Asset Guardian',
     sprite: 'npcHerbalist',
-    x: 1278,
-    y: 410,
+    x: 1290,
+    y: 430,
     color: '#ffad72',
     accent: '#f2c866',
     reward: 75,
@@ -275,8 +275,8 @@ const QUESTS: QuestNpc[] = [
     npc: 'Scout Luma',
     role: 'Agent Coordinator',
     sprite: 'npcShadowAgent',
-    x: 430,
-    y: 900,
+    x: 580,
+    y: 985,
     color: '#78ecff',
     accent: '#c886ff',
     reward: 75,
@@ -310,8 +310,8 @@ const QUESTS: QuestNpc[] = [
     npc: 'Zap Tiko',
     role: 'Signal Runner',
     sprite: 'npcNavigator',
-    x: 1220,
-    y: 978,
+    x: 1180,
+    y: 1175,
     color: '#b9ff66',
     accent: '#78ecff',
     reward: 80,
@@ -345,8 +345,8 @@ const QUESTS: QuestNpc[] = [
     npc: 'Professor Rune',
     role: 'SCALE Engineer',
     sprite: 'npcAlchemist',
-    x: 420,
-    y: 360,
+    x: 395,
+    y: 400,
     color: '#c886ff',
     accent: '#57e39f',
     reward: 100,
@@ -382,18 +382,18 @@ const QUESTS: QuestNpc[] = [
 ]
 
 const AMBIENT_NPCS: AmbientNpc[] = [
-  { name: 'Boba Byte', sprite: 'npcSage', x: 240, y: 675, color: '#ff7ad9', accent: '#f2c866', line: 'Rain makes the data spring louder.', activity: 'fish', persona: 'homebody' },
-  { name: 'Mossy Dex', sprite: 'npcForestGuide', x: 360, y: 260, color: '#57e39f', accent: '#78ecff', line: 'Forest paths are quiet, but data never sleeps.', activity: 'wander', persona: 'wanderer' },
-  { name: 'Peeko Bond', sprite: 'npcHerbalist', x: 1165, y: 350, color: '#f2c866', accent: '#ffad72', line: 'RWA vaults like clean verification stamps.', activity: 'gather', persona: 'homebody' },
-  { name: 'Firo Mail', sprite: 'npcCaptain', x: 1060, y: 510, color: '#78ecff', accent: '#ff7ad9', line: 'Bridge Gate scrolls carry API messages out and back.', activity: 'stroll', persona: 'wanderer' },
-  { name: 'Jade Numi', sprite: 'npcAlchemist', x: 1410, y: 460, color: '#b9ff66', accent: '#57e39f', line: 'Temple Energy returns when the daily ritual cools down.', activity: 'meditate', persona: 'homebody' },
-  { name: 'Pixel Kora', sprite: 'npcOracle', x: 230, y: 1030, color: '#c886ff', accent: '#f2c866', line: 'Privacy chambers turn plain scrolls into protected ones.', activity: 'sit', persona: 'homebody' },
-  { name: 'Tama Tick', sprite: 'npcNavigator', x: 1040, y: 905, color: '#ffad72', accent: '#78ecff', line: 'Signals are tiny real-world updates with big consequences.', activity: 'stroll', persona: 'pacer' },
-  { name: 'Orb Nalo', sprite: 'npcBuilder', x: 1345, y: 1038, color: '#57e39f', accent: '#c886ff', line: 'Every badge is better when the ledger can verify it.', activity: 'wander', persona: 'pacer' },
-  { name: 'Rune Pika', sprite: 'npcShadowAgent', x: 620, y: 745, color: '#ffe36e', accent: '#57e39f', line: 'Quest boards like brave learners.', activity: 'dance', persona: 'homebody' },
+  { name: 'Boba Byte', sprite: 'npcSage', x: 300, y: 748, color: '#ff7ad9', accent: '#f2c866', line: 'Rain makes the data spring louder.', activity: 'fish', persona: 'homebody' },
+  { name: 'Mossy Dex', sprite: 'npcForestGuide', x: 180, y: 470, color: '#57e39f', accent: '#78ecff', line: 'Forest paths are quiet, but data never sleeps.', activity: 'wander', persona: 'wanderer' },
+  { name: 'Peeko Bond', sprite: 'npcHerbalist', x: 1300, y: 720, color: '#f2c866', accent: '#ffad72', line: 'RWA vaults like clean verification stamps.', activity: 'gather', persona: 'homebody' },
+  { name: 'Firo Mail', sprite: 'npcCaptain', x: 1000, y: 690, color: '#78ecff', accent: '#ff7ad9', line: 'Bridge Gate scrolls carry API messages out and back.', activity: 'stroll', persona: 'wanderer' },
+  { name: 'Jade Numi', sprite: 'npcAlchemist', x: 1505, y: 700, color: '#b9ff66', accent: '#57e39f', line: 'Temple Energy returns when the daily ritual cools down.', activity: 'meditate', persona: 'homebody' },
+  { name: 'Pixel Kora', sprite: 'npcOracle', x: 560, y: 1120, color: '#c886ff', accent: '#f2c866', line: 'Privacy chambers turn plain scrolls into protected ones.', activity: 'sit', persona: 'homebody' },
+  { name: 'Tama Tick', sprite: 'npcNavigator', x: 980, y: 950, color: '#ffad72', accent: '#78ecff', line: 'Signals are tiny real-world updates with big consequences.', activity: 'stroll', persona: 'pacer' },
+  { name: 'Orb Nalo', sprite: 'npcBuilder', x: 1000, y: 1185, color: '#57e39f', accent: '#c886ff', line: 'Every badge is better when the ledger can verify it.', activity: 'wander', persona: 'pacer' },
+  { name: 'Rune Pika', sprite: 'npcShadowAgent', x: 900, y: 800, color: '#ffe36e', accent: '#57e39f', line: 'Quest boards like brave learners.', activity: 'dance', persona: 'homebody' },
   { name: 'Minty Mox', sprite: 'npcSage', x: 560, y: 1010, color: '#67ffc0', accent: '#f2c866', line: 'The map gets brighter when badges are claimed.', activity: 'tend', persona: 'homebody' },
-  { name: 'Sera API', sprite: 'npcCaptain', x: 990, y: 300, color: '#88d7ff', accent: '#ff8066', line: 'A response scroll always comes back through Bridge Gate.', activity: 'wander', persona: 'wanderer' },
-  { name: 'Candi Dot', sprite: 'npcForestGuide', x: 1188, y: 300, color: '#b9ff66', accent: '#f2c866', line: 'The temple is friendlier when every system can talk.', activity: 'couple', persona: 'homebody', pair: 'Peeko Bond' },
+  { name: 'Sera API', sprite: 'npcCaptain', x: 760, y: 250, color: '#88d7ff', accent: '#ff8066', line: 'A response scroll always comes back through Bridge Gate.', activity: 'wander', persona: 'wanderer' },
+  { name: 'Candi Dot', sprite: 'npcForestGuide', x: 1345, y: 720, color: '#b9ff66', accent: '#f2c866', line: 'The temple is friendlier when every system can talk.', activity: 'couple', persona: 'homebody', pair: 'Peeko Bond' },
 ]
 
 const NPC_INTERACTIONS = [
@@ -415,16 +415,16 @@ type BuildingSpec = {
 }
 
 const BUILDINGS: BuildingSpec[] = [
-  { key: 'balineseTemple', x: 800, y: 630, w: 235, h: 298, label: 'NXR Temple', color: '#f2c866' },
+  { key: 'balineseTemple', x: 792, y: 630, w: 235, h: 298, label: 'NXR Temple', color: '#f2c866' },
   { key: 'buildingScaleDojo', x: 395, y: 332, w: 250, h: 282, label: 'SCALE Lab', color: '#c886ff' },
   { key: 'buildingStoneVault', x: 1290, y: 370, w: 258, h: 306, label: 'RWA Vault', color: '#f2c866' },
-  { key: 'buildingTempleLodge', x: 440, y: 870, w: 318, h: 268, label: 'Agent Camp', color: '#78ecff' },
-  { key: 'buildingMarketHall', x: 1218, y: 946, w: 278, h: 266, label: 'Signal Tower', color: '#b9ff66' },
-  { key: 'buildingGreenhouseInn', x: 245, y: 1112, w: 230, h: 296, label: 'Privacy Grove', color: '#ff7ad9' },
+  { key: 'buildingTempleLodge', x: 580, y: 900, w: 318, h: 268, label: 'Agent Camp', color: '#78ecff' },
+  { key: 'buildingMarketHall', x: 1180, y: 1050, w: 278, h: 266, label: 'Signal Tower', color: '#b9ff66' },
+  { key: 'buildingGreenhouseInn', x: 270, y: 1276, w: 230, h: 296, label: 'Privacy Grove', color: '#ff7ad9' },
   { key: 'buildingOracleHouse', x: 1035, y: 535, w: 248, h: 276, label: 'Bridge Gate', color: '#57e39f' },
-  { key: 'buildingWoodenCabin', x: 610, y: 1020, w: 198, h: 184, label: 'Rest Stop', color: '#ffad72' },
-  { key: 'buildingOrangeCottage', x: 1390, y: 1080, w: 206, h: 210, label: 'Quest Hut', color: '#f2c866' },
-  { key: 'buildingGuildHouse', x: 1345, y: 620, w: 248, h: 236, label: 'Guild Hall', color: '#78ecff' },
+  { key: 'buildingWoodenCabin', x: 850, y: 1150, w: 198, h: 184, label: 'Rest Stop', color: '#ffad72' },
+  { key: 'buildingOrangeCottage', x: 1430, y: 1150, w: 206, h: 210, label: 'Quest Hut', color: '#f2c866' },
+  { key: 'buildingGuildHouse', x: 1425, y: 620, w: 248, h: 236, label: 'Guild Hall', color: '#78ecff' },
 ]
 
 const BUILDING_COLLIDERS = BUILDINGS.map((building) => buildingCollider(building))
@@ -703,7 +703,7 @@ function TemplePlayCanvas({
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const wrapRef = useRef<HTMLDivElement | null>(null)
   const keys = useRef(new Set<string>())
-  const player = useRef<PlayerState>({ x: 800, y: 720, dir: 'down', moving: false })
+  const player = useRef<PlayerState>({ x: 792, y: 780, dir: 'down', moving: false })
   const nearId = useRef<number | null>(null)
   const completedLatest = useRef(completedIds)
   const assetsRef = useRef<TemplePlayAssets | null>(null)
@@ -1662,12 +1662,12 @@ function drawFloatingLeaves(ctx: CanvasRenderingContext2D, time: number) {
 
 function isNearMainPlaySpace(x: number, y: number) {
   const blockedRects = [
-    [250, 200, 560, 430],
-    [1080, 180, 1450, 500],
-    [680, 490, 930, 760],
-    [300, 760, 720, 1100],
-    [1040, 820, 1450, 1130],
-    [POND_RECT.x - 80, POND_RECT.y - 80, POND_RECT.x + POND_RECT.w + 80, POND_RECT.y + POND_RECT.h + 80],
+    [230, 40, 950, 660],
+    [900, 40, 1560, 660],
+    [400, 600, 960, 940],
+    [470, 940, 1010, 1210],
+    [1010, 760, 1560, 1190],
+    [POND_RECT.x - 90, POND_RECT.y - 90, POND_RECT.x + POND_RECT.w + 90, POND_RECT.y + POND_RECT.h + 320],
   ]
   return blockedRects.some(([left, top, right, bottom]) => x > left && x < right && y > top && y < bottom)
 }
