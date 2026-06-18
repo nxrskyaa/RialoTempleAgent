@@ -1,0 +1,254 @@
+[
+  {
+    "name": "building-1",
+    "file": "/temple-play/world/building/building-1.png",
+    "w": 290,
+    "h": 320,
+    "category": "building"
+  },
+  {
+    "name": "building-2",
+    "file": "/temple-play/world/building/building-2.png",
+    "w": 320,
+    "h": 302,
+    "category": "building"
+  },
+  {
+    "name": "building-3",
+    "file": "/temple-play/world/building/building-3.png",
+    "w": 196,
+    "h": 256,
+    "category": "building"
+  },
+  {
+    "name": "crop-leafy-0",
+    "file": "/temple-play/world/crop/crop-leafy-0.png",
+    "w": 52,
+    "h": 37,
+    "category": "crop"
+  },
+  {
+    "name": "crop-leafy-1",
+    "file": "/temple-play/world/crop/crop-leafy-1.png",
+    "w": 52,
+    "h": 37,
+    "category": "crop"
+  },
+  {
+    "name": "crop-leafy-2",
+    "file": "/temple-play/world/crop/crop-leafy-2.png",
+    "w": 52,
+    "h": 45,
+    "category": "crop"
+  },
+  {
+    "name": "crop-leafy-3",
+    "file": "/temple-play/world/crop/crop-leafy-3.png",
+    "w": 38,
+    "h": 52,
+    "category": "crop"
+  },
+  {
+    "name": "crop-root-0",
+    "file": "/temple-play/world/crop/crop-root-0.png",
+    "w": 52,
+    "h": 30,
+    "category": "crop"
+  },
+  {
+    "name": "crop-root-1",
+    "file": "/temple-play/world/crop/crop-root-1.png",
+    "w": 52,
+    "h": 39,
+    "category": "crop"
+  },
+  {
+    "name": "crop-root-2",
+    "file": "/temple-play/world/crop/crop-root-2.png",
+    "w": 52,
+    "h": 51,
+    "category": "crop"
+  },
+  {
+    "name": "crop-root-3",
+    "file": "/temple-play/world/crop/crop-root-3.png",
+    "w": 36,
+    "h": 52,
+    "category": "crop"
+  },
+  {
+    "name": "fishing-bobber",
+    "file": "/temple-play/world/fishing/fishing-bobber.png",
+    "w": 63,
+    "h": 88,
+    "category": "fishing"
+  },
+  {
+    "name": "fishing-bucket",
+    "file": "/temple-play/world/fishing/fishing-bucket.png",
+    "w": 68,
+    "h": 88,
+    "category": "fishing"
+  },
+  {
+    "name": "fishing-net",
+    "file": "/temple-play/world/fishing/fishing-net.png",
+    "w": 88,
+    "h": 68,
+    "category": "fishing"
+  },
+  {
+    "name": "fishing-rod",
+    "file": "/temple-play/world/fishing/fishing-rod.png",
+    "w": 88,
+    "h": 86,
+    "category": "fishing"
+  },
+  {
+    "name": "flower-amber",
+    "file": "/temple-play/world/flower/flower-amber.png",
+    "w": 56,
+    "h": 52,
+    "category": "flower"
+  },
+  {
+    "name": "flower-blue",
+    "file": "/temple-play/world/flower/flower-blue.png",
+    "w": 56,
+    "h": 54,
+    "category": "flower"
+  },
+  {
+    "name": "flower-cream",
+    "file": "/temple-play/world/flower/flower-cream.png",
+    "w": 56,
+    "h": 52,
+    "category": "flower"
+  },
+  {
+    "name": "flower-orange",
+    "file": "/temple-play/world/flower/flower-orange.png",
+    "w": 56,
+    "h": 54,
+    "category": "flower"
+  },
+  {
+    "name": "flower-pink",
+    "file": "/temple-play/world/flower/flower-pink.png",
+    "w": 56,
+    "h": 54,
+    "category": "flower"
+  },
+  {
+    "name": "flower-purple",
+    "file": "/temple-play/world/flower/flower-purple.png",
+    "w": 56,
+    "h": 54,
+    "category": "flower"
+  },
+  {
+    "name": "flower-red",
+    "file": "/temple-play/world/flower/flower-red.png",
+    "w": 56,
+    "h": 49,
+    "category": "flower"
+  },
+  {
+    "name": "flower-yellow",
+    "file": "/temple-play/world/flower/flower-yellow.png",
+    "w": 56,
+    "h": 54,
+    "category": "flower"
+  },
+  {
+    "name": "grass-1",
+    "file": "/temple-play/world/grass/grass-1.png",
+    "w": 44,
+    "h": 34,
+    "category": "grass"
+  },
+  {
+    "name": "grass-2",
+    "file": "/temple-play/world/grass/grass-2.png",
+    "w": 44,
+    "h": 27,
+    "category": "grass"
+  },
+  {
+    "name": "grass-3",
+    "file": "/temple-play/world/grass/grass-3.png",
+    "w": 44,
+    "h": 37,
+    "category": "grass"
+  },
+  {
+    "name": "lamp",
+    "file": "/temple-play/world/lamp/lamp.png",
+    "w": 79,
+    "h": 160,
+    "category": "lamp"
+  },
+  {
+    "name": "park-bench",
+    "file": "/temple-play/world/park/park-bench.png",
+    "w": 104,
+    "h": 78,
+    "category": "park"
+  },
+  {
+    "name": "park-bush",
+    "file": "/temple-play/world/park/park-bush.png",
+    "w": 100,
+    "h": 104,
+    "category": "park"
+  },
+  {
+    "name": "park-lantern",
+    "file": "/temple-play/world/park/park-lantern.png",
+    "w": 52,
+    "h": 104,
+    "category": "park"
+  },
+  {
+    "name": "park-planter",
+    "file": "/temple-play/world/park/park-planter.png",
+    "w": 98,
+    "h": 104,
+    "category": "park"
+  },
+  {
+    "name": "pond",
+    "file": "/temple-play/world/pond/pond.png",
+    "w": 288,
+    "h": 268,
+    "category": "pond"
+  },
+  {
+    "name": "ground-grass",
+    "file": "/temple-play/world/tile/ground-grass.png",
+    "w": 128,
+    "h": 128,
+    "category": "tile"
+  },
+  {
+    "name": "ground-road",
+    "file": "/temple-play/world/tile/ground-road.png",
+    "w": 128,
+    "h": 128,
+    "category": "tile"
+  },
+  {
+    "name": "ground-soil",
+    "file": "/temple-play/world/tile/ground-soil.png",
+    "w": 128,
+    "h": 128,
+    "category": "tile"
+  },
+  {
+    "name": "tree",
+    "file": "/temple-play/world/tree/tree.png",
+    "w": 132,
+    "h": 144,
+    "category": "tree"
+  }
+]
