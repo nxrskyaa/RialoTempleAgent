@@ -161,40 +161,40 @@ type PropKey =
 
 const SPRITES: Record<SpriteKey, SpriteSheet> = {
   nxr: { src: '/temple-play/sprites/nxr-v2.png', frameW: 210, frameH: 280, frames: 16, drawW: 70, drawH: 94 },
-  npcOracle: { src: '/temple-play/sprites/npc-oracle.png', frameW: 160, frameH: 220, frames: 4, drawW: 62, drawH: 86 },
-  npcForestGuide: { src: '/temple-play/sprites/npc-forest-guide.png', frameW: 160, frameH: 220, frames: 4, drawW: 62, drawH: 86 },
-  npcBuilder: { src: '/temple-play/sprites/npc-builder.png', frameW: 160, frameH: 220, frames: 4, drawW: 62, drawH: 86 },
-  npcCaptain: { src: '/temple-play/sprites/npc-captain.png', frameW: 160, frameH: 220, frames: 4, drawW: 62, drawH: 86 },
-  npcNavigator: { src: '/temple-play/sprites/npc-navigator.png', frameW: 160, frameH: 220, frames: 4, drawW: 62, drawH: 86 },
-  npcShadowAgent: { src: '/temple-play/sprites/npc-shadow-agent.png', frameW: 160, frameH: 220, frames: 4, drawW: 62, drawH: 86 },
-  npcSage: { src: '/temple-play/sprites/npc-sage.png', frameW: 160, frameH: 220, frames: 4, drawW: 62, drawH: 86 },
-  npcHerbalist: { src: '/temple-play/sprites/npc-herbalist.png', frameW: 160, frameH: 220, frames: 4, drawW: 62, drawH: 86 },
-  npcAlchemist: { src: '/temple-play/sprites/npc-alchemist.png', frameW: 160, frameH: 220, frames: 4, drawW: 62, drawH: 86 },
+  npcOracle: { src: '/temple-play/sprites/npc-shrine-maiden.png', frameW: 160, frameH: 220, frames: 4, drawW: 52, drawH: 72 },
+  npcForestGuide: { src: '/temple-play/sprites/npc-merchant.png', frameW: 160, frameH: 220, frames: 4, drawW: 52, drawH: 72 },
+  npcBuilder: { src: '/temple-play/sprites/npc-samurai.png', frameW: 160, frameH: 220, frames: 4, drawW: 52, drawH: 72 },
+  npcCaptain: { src: '/temple-play/sprites/npc-samurai.png', frameW: 160, frameH: 220, frames: 4, drawW: 52, drawH: 72 },
+  npcNavigator: { src: '/temple-play/sprites/npc-merchant.png', frameW: 160, frameH: 220, frames: 4, drawW: 52, drawH: 72 },
+  npcShadowAgent: { src: '/temple-play/sprites/npc-ninja.png', frameW: 160, frameH: 220, frames: 4, drawW: 52, drawH: 72 },
+  npcSage: { src: '/temple-play/sprites/npc-shrine-maiden.png', frameW: 160, frameH: 220, frames: 4, drawW: 52, drawH: 72 },
+  npcHerbalist: { src: '/temple-play/sprites/npc-herbalist-jp.png', frameW: 160, frameH: 220, frames: 4, drawW: 52, drawH: 72 },
+  npcAlchemist: { src: '/temple-play/sprites/npc-alchemist-jp.png', frameW: 160, frameH: 220, frames: 4, drawW: 52, drawH: 72 },
 }
 
 const PROPS: Record<PropKey, string> = {
-  balineseTemple: '/temple-play/sprites/balinese-temple.png',
-  guardianStatue: '/temple-play/sprites/guardian-statue.png',
+  balineseTemple: '/temple-play/buildings/japanese-shrine.png',
+  guardianStatue: '/temple-play/sprites/stone-lantern.png',
   gardenTile: '/temple-play/sprites/garden-tile.png',
   soilTile: '/temple-play/sprites/soil-tile.png',
   soilCross: '/temple-play/sprites/soil-cross.png',
-  vineCornerA: '/temple-play/sprites/vine-corner-a.png',
-  vineCornerB: '/temple-play/sprites/vine-corner-b.png',
-  vineCornerC: '/temple-play/sprites/vine-corner-c.png',
-  leafPlant: '/temple-play/sprites/leaf-plant.png',
-  pepperPlant: '/temple-play/sprites/pepper-plant.png',
-  pepperCluster: '/temple-play/sprites/pepper-cluster.png',
-  sunflower: '/temple-play/sprites/sunflower.png',
-  smallPepper: '/temple-play/sprites/small-pepper.png',
-  buildingMarketHall: '/temple-play/buildings/market-hall.png',
-  buildingWoodenCabin: '/temple-play/buildings/wooden-cabin.png',
-  buildingOracleHouse: '/temple-play/buildings/oracle-house.png',
+  vineCornerA: '/temple-play/sprites/bamboo-cluster.png',
+  vineCornerB: '/temple-play/sprites/maple-tree.png',
+  vineCornerC: '/temple-play/sprites/garden-rock.png',
+  leafPlant: '/temple-play/sprites/bonsai.png',
+  pepperPlant: '/temple-play/sprites/koi-lily.png',
+  pepperCluster: '/temple-play/sprites/sakura-bush.png',
+  sunflower: '/temple-play/sprites/torii-mini.png',
+  smallPepper: '/temple-play/sprites/shrine-offering.png',
+  buildingMarketHall: '/temple-play/buildings/signal-tower.png',
+  buildingWoodenCabin: '/temple-play/buildings/rest-stop.png',
+  buildingOracleHouse: '/temple-play/buildings/bridge-gate.png',
   buildingGuildHouse: '/temple-play/buildings/guild-house.png',
-  buildingTempleLodge: '/temple-play/buildings/temple-lodge.png',
-  buildingStoneVault: '/temple-play/buildings/stone-vault.png',
+  buildingTempleLodge: '/temple-play/buildings/agent-camp.png',
+  buildingStoneVault: '/temple-play/buildings/rwa-vault.png',
   buildingScaleDojo: '/temple-play/buildings/scale-dojo.png',
-  buildingGreenhouseInn: '/temple-play/buildings/greenhouse-inn.png',
-  buildingOrangeCottage: '/temple-play/buildings/orange-cottage.png',
+  buildingGreenhouseInn: '/temple-play/buildings/privacy-grove.png',
+  buildingOrangeCottage: '/temple-play/buildings/quest-hut.png',
 }
 
 const QUESTS: QuestNpc[] = [
@@ -382,18 +382,18 @@ const QUESTS: QuestNpc[] = [
 ]
 
 const AMBIENT_NPCS: AmbientNpc[] = [
-  { name: 'Boba Byte', sprite: 'npcSage', x: 300, y: 748, color: '#ff7ad9', accent: '#f2c866', line: 'Rain makes the data spring louder.', activity: 'fish', persona: 'homebody' },
-  { name: 'Mossy Dex', sprite: 'npcForestGuide', x: 180, y: 470, color: '#57e39f', accent: '#78ecff', line: 'Forest paths are quiet, but data never sleeps.', activity: 'wander', persona: 'wanderer' },
-  { name: 'Peeko Bond', sprite: 'npcHerbalist', x: 1300, y: 720, color: '#f2c866', accent: '#ffad72', line: 'RWA vaults like clean verification stamps.', activity: 'gather', persona: 'homebody' },
-  { name: 'Firo Mail', sprite: 'npcCaptain', x: 1000, y: 690, color: '#78ecff', accent: '#ff7ad9', line: 'Bridge Gate scrolls carry API messages out and back.', activity: 'stroll', persona: 'wanderer' },
-  { name: 'Jade Numi', sprite: 'npcAlchemist', x: 1505, y: 700, color: '#b9ff66', accent: '#57e39f', line: 'Temple Energy returns when the daily ritual cools down.', activity: 'meditate', persona: 'homebody' },
-  { name: 'Pixel Kora', sprite: 'npcOracle', x: 560, y: 1120, color: '#c886ff', accent: '#f2c866', line: 'Privacy chambers turn plain scrolls into protected ones.', activity: 'sit', persona: 'homebody' },
-  { name: 'Tama Tick', sprite: 'npcNavigator', x: 980, y: 950, color: '#ffad72', accent: '#78ecff', line: 'Signals are tiny real-world updates with big consequences.', activity: 'stroll', persona: 'pacer' },
-  { name: 'Orb Nalo', sprite: 'npcBuilder', x: 1000, y: 1185, color: '#57e39f', accent: '#c886ff', line: 'Every badge is better when the ledger can verify it.', activity: 'wander', persona: 'pacer' },
-  { name: 'Rune Pika', sprite: 'npcShadowAgent', x: 900, y: 800, color: '#ffe36e', accent: '#57e39f', line: 'Quest boards like brave learners.', activity: 'dance', persona: 'homebody' },
-  { name: 'Minty Mox', sprite: 'npcSage', x: 560, y: 1010, color: '#67ffc0', accent: '#f2c866', line: 'The map gets brighter when badges are claimed.', activity: 'tend', persona: 'homebody' },
-  { name: 'Sera API', sprite: 'npcCaptain', x: 760, y: 250, color: '#88d7ff', accent: '#ff8066', line: 'A response scroll always comes back through Bridge Gate.', activity: 'wander', persona: 'wanderer' },
-  { name: 'Candi Dot', sprite: 'npcForestGuide', x: 1345, y: 720, color: '#b9ff66', accent: '#f2c866', line: 'The temple is friendlier when every system can talk.', activity: 'couple', persona: 'homebody', pair: 'Peeko Bond' },
+  { name: 'Boba Byte', sprite: 'npcSage', x: 430, y: 955, color: '#ff7ad9', accent: '#f2c866', line: 'Rain makes the data spring louder.', activity: 'fish', persona: 'homebody' },
+  { name: 'Mossy Dex', sprite: 'npcForestGuide', x: 250, y: 360, color: '#57e39f', accent: '#78ecff', line: 'Forest paths are quiet, but data never sleeps.', activity: 'wander', persona: 'wanderer' },
+  { name: 'Peeko Bond', sprite: 'npcHerbalist', x: 1185, y: 450, color: '#f2c866', accent: '#ffad72', line: 'RWA vaults like clean verification stamps.', activity: 'gather', persona: 'homebody' },
+  { name: 'Firo Mail', sprite: 'npcCaptain', x: 930, y: 590, color: '#78ecff', accent: '#ff7ad9', line: 'Bridge Gate scrolls carry API messages out and back.', activity: 'stroll', persona: 'wanderer' },
+  { name: 'Jade Numi', sprite: 'npcAlchemist', x: 1290, y: 650, color: '#b9ff66', accent: '#57e39f', line: 'Temple Energy returns when the daily ritual cools down.', activity: 'meditate', persona: 'homebody' },
+  { name: 'Pixel Kora', sprite: 'npcOracle', x: 440, y: 1120, color: '#c886ff', accent: '#f2c866', line: 'Privacy chambers turn plain scrolls into protected ones.', activity: 'sit', persona: 'homebody' },
+  { name: 'Tama Tick', sprite: 'npcNavigator', x: 1010, y: 1000, color: '#ffad72', accent: '#78ecff', line: 'Signals are tiny real-world updates with big consequences.', activity: 'stroll', persona: 'pacer' },
+  { name: 'Orb Nalo', sprite: 'npcBuilder', x: 1250, y: 1160, color: '#57e39f', accent: '#c886ff', line: 'Every badge is better when the ledger can verify it.', activity: 'wander', persona: 'pacer' },
+  { name: 'Rune Pika', sprite: 'npcShadowAgent', x: 790, y: 815, color: '#ffe36e', accent: '#57e39f', line: 'Quest boards like brave learners.', activity: 'dance', persona: 'homebody' },
+  { name: 'Minty Mox', sprite: 'npcSage', x: 530, y: 1110, color: '#67ffc0', accent: '#f2c866', line: 'The map gets brighter when badges are claimed.', activity: 'tend', persona: 'homebody' },
+  { name: 'Sera API', sprite: 'npcCaptain', x: 1000, y: 245, color: '#88d7ff', accent: '#ff8066', line: 'A response scroll always comes back through Bridge Gate.', activity: 'wander', persona: 'wanderer' },
+  { name: 'Candi Dot', sprite: 'npcForestGuide', x: 1210, y: 420, color: '#b9ff66', accent: '#f2c866', line: 'The temple is friendlier when every system can talk.', activity: 'couple', persona: 'homebody', pair: 'Peeko Bond' },
 ]
 
 const NPC_INTERACTIONS = [
@@ -448,6 +448,16 @@ function TemplePlayInner() {
   const [claimingQuest, setClaimingQuest] = useState<QuestNpc | null>(null)
   const completedRef = useRef<Set<number>>(new Set())
   const openQuestRef = useRef<(quest: QuestNpc) => void>(() => undefined)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
+  const lofiStarted = useRef(false)
+  const [lofiMuted, setLofiMuted] = useState(() => (typeof window === 'undefined' ? false : localStorage.getItem('temple-lofi-mute') === 'true'))
+  const [lofiVolume, setLofiVolume] = useState(() => {
+    if (typeof window === 'undefined') return 0.4
+    const stored = Number(localStorage.getItem('temple-lofi-vol') ?? 0.4)
+    return Number.isFinite(stored) ? stored : 0.4
+  })
+  const initialLofiMuted = useRef(lofiMuted)
+  const initialLofiVolume = useRef(lofiVolume)
 
   const userQuery = useReadContract({
     address: RIALO_TEMPLE_ADDRESS,
@@ -508,6 +518,32 @@ function TemplePlayInner() {
   useEffect(() => {
     completedRef.current = completedIds
   }, [completedIds])
+
+  useEffect(() => {
+    // Audio source: OpenGameArt "Chill Lofi Inspired" by RubberDucky, CC0.
+    const audio = new Audio('/temple-play/audio/lofi-loop.mp3')
+    audio.loop = true
+    audio.volume = initialLofiVolume.current
+    audio.muted = initialLofiMuted.current
+    audioRef.current = audio
+
+    const start = () => {
+      if (!lofiStarted.current) {
+        lofiStarted.current = true
+        void audio.play().catch(() => undefined)
+      }
+    }
+
+    window.addEventListener('click', start, { once: true })
+    window.addEventListener('keydown', start, { once: true })
+
+    return () => {
+      window.removeEventListener('click', start)
+      window.removeEventListener('keydown', start)
+      audio.pause()
+      audio.src = ''
+    }
+  }, [])
 
   const activeStatus = activeQuest ? questStatus.find((status) => status.quizId === activeQuest.quizId) : undefined
   const answeredCount = activeQuest ? activeQuest.questions.filter((_, index) => answers[index] !== undefined).length : 0
@@ -625,6 +661,49 @@ function TemplePlayInner() {
             onNearQuestChange={setNearNpcId}
             onOpenQuest={(quest) => openQuestRef.current(quest)}
           />
+
+          <div style={{
+            position: 'absolute',
+            bottom: 48,
+            left: 12,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            background: 'rgba(7,16,12,.88)',
+            border: '1px solid #f2c866',
+            padding: '4px 10px',
+            borderRadius: 4,
+            zIndex: 10,
+          }}>
+            <button
+              type="button"
+              aria-label={lofiMuted ? 'Unmute lofi music' : 'Mute lofi music'}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#f2c866', fontSize: 12, fontWeight: 900 }}
+              onClick={() => {
+                const muted = !lofiMuted
+                setLofiMuted(muted)
+                localStorage.setItem('temple-lofi-mute', String(muted))
+                if (audioRef.current) audioRef.current.muted = muted
+              }}
+            >
+              {lofiMuted ? 'MUTE' : 'LOFI'}
+            </button>
+            <input
+              type="range"
+              min={0}
+              max={1}
+              step={0.05}
+              value={lofiVolume}
+              aria-label="Temple lofi volume"
+              style={{ width: 72, accentColor: '#f2c866' }}
+              onChange={(event) => {
+                const volume = Number(event.target.value)
+                setLofiVolume(volume)
+                localStorage.setItem('temple-lofi-vol', String(volume))
+                if (audioRef.current) audioRef.current.volume = volume
+              }}
+            />
+          </div>
 
           <div className="temple-play-hud">
             <span><Gamepad2 className="h-4 w-4" /> Click / tap map to move</span>
@@ -1356,16 +1435,16 @@ function drawTile(ctx: CanvasRenderingContext2D, tx: number, ty: number, tile: T
   const x = tx * TILE_SIZE
   const y = ty * TILE_SIZE
   const palette: Record<TileType, string> = {
-    [T.GRASS]: '#2f7d46',
-    [T.GRASS2]: '#357f4c',
-    [T.PATH]: '#c9a36a',
-    [T.WATER]: '#2b6cb0',
-    [T.SAND]: '#e2c98a',
-    [T.MYSTIC]: '#4a3b78',
-    [T.COAST]: '#2f8f6a',
-    [T.FLOWER]: '#2f7d46',
-    [T.SAND2]: '#d8bc7c',
-    [T.MYSTIC2]: '#413567',
+    [T.GRASS]: '#2d4a2d',
+    [T.GRASS2]: '#354f35',
+    [T.PATH]: '#5a5a6a',
+    [T.WATER]: '#2a6060',
+    [T.SAND]: '#c8b98a',
+    [T.MYSTIC]: '#3a3550',
+    [T.COAST]: '#3a6040',
+    [T.FLOWER]: '#2d4a2d',
+    [T.SAND2]: '#baa87a',
+    [T.MYSTIC2]: '#352f4a',
   }
   ctx.fillStyle = palette[tile]
   ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE)
@@ -1592,6 +1671,15 @@ function drawEnvironmentProps(ctx: CanvasRenderingContext2D, time: number, asset
   drawProp(ctx, assets, 'vineCornerA', 148, 1064, 72, 72)
   drawProp(ctx, assets, 'vineCornerB', 1380, 820, 72, 72)
   drawProp(ctx, assets, 'vineCornerC', 80, 1130, 72, 72)
+
+  const lanterns = [
+    [705, 704], [882, 704],
+    [506, 448], [312, 382],
+    [994, 590], [1138, 616],
+    [1120, 948], [1238, 1110],
+    [686, 1036], [846, 1240],
+  ]
+  lanterns.forEach(([x, y]) => drawPropBottomCenter(ctx, assets, 'guardianStatue', x, y, 48, 62))
 
   for (let i = 0; i < 34; i++) {
     const x = 120 + ((i * 293) % (WORLD.width - 240))
