@@ -61,7 +61,6 @@ type NpcMotion = {
   y: number
   moving: boolean
   direction: PlayerState['dir']
-  activityPulse: number
 }
 
 type PlayerState = {
@@ -443,14 +442,6 @@ const AMBIENT_NPCS: AmbientNpc[] = [
   { name: 'Minty Mox', sprite: 'npcSage', x: 530, y: 1110, color: '#67ffc0', accent: '#f2c866', line: 'The map gets brighter when badges are claimed.', activity: 'tend', persona: 'homebody' },
   { name: 'Sera API', sprite: 'npcCaptain', x: 1000, y: 245, color: '#88d7ff', accent: '#ff8066', line: 'A response scroll always comes back through Bridge Gate.', activity: 'wander', persona: 'wanderer' },
   { name: 'Candi Dot', sprite: 'npcForestGuide', x: 1210, y: 420, color: '#b9ff66', accent: '#f2c866', line: 'The temple is friendlier when every system can talk.', activity: 'couple', persona: 'homebody', pair: 'Peeko Bond' },
-]
-
-const NPC_INTERACTIONS = [
-  { from: 2, to: 11, label: 'verify', color: '#f2c866' },
-  { from: 3, to: 10, label: 'api', color: '#78ecff' },
-  { from: 6, to: 9, label: 'signal', color: '#ffad72' },
-  { from: 7, to: 4, label: 'energy', color: '#57e39f' },
-  { from: 0, to: 5, label: 'pond', color: '#ff7ad9' },
 ]
 
 type BuildingSpec = {
@@ -947,6 +938,8 @@ function TemplePlayCanvas({
         window.requestAnimationFrame(tick)
         return
       }
+
+      updateAmbientNpcs(dt)
 
       let input = movementFromInput(keys.current)
       const current = player.current
@@ -1795,16 +1788,13 @@ function drawActors(
       },
     })
   })
-  const ambientMotions = AMBIENT_NPCS.map((npc, index) => ambientNpcMotion(npc, index, time))
-
-  drawAmbientInteractions(ctx, time, ambientMotions)
+  const ambientMotions: NpcMotion[] = npcRuntime.map((r) => ({ x: r.x, y: r.y, moving: r.moving, direction: r.dir }))
 
   AMBIENT_NPCS.forEach((npc, index) => {
     const motion = ambientMotions[index]
     actors.push({
       y: motion.y,
       draw: () => {
-        drawNpcActivity(ctx, npc, motion, index, time, 'behind')
         drawSpriteActor(ctx, assets, {
           sprite: npc.sprite,
           x: motion.x,
@@ -1818,7 +1808,6 @@ function drawActors(
           moving: motion.moving,
           direction: motion.direction,
         })
-        drawNpcActivity(ctx, npc, motion, index, time, 'front')
       },
     })
   })
@@ -1829,7 +1818,6 @@ function drawActors(
     actors.push({
       y: action.y,
       draw: () => {
-        drawQuestStationActivity(ctx, quest, action, time, 'behind')
         drawSpriteActor(ctx, assets, {
           sprite: quest.sprite,
           x: action.x,
@@ -1844,7 +1832,6 @@ function drawActors(
           moving: action.moving,
           direction: action.direction,
         })
-        drawQuestStationActivity(ctx, quest, action, time, 'front')
       },
     })
   })
@@ -1871,113 +1858,73 @@ function drawActors(
   drawNpcEventLayer(ctx, time, ambientMotions)
 }
 
-function ambientNpcMotion(npc: AmbientNpc, index: number, time: number): NpcMotion {
-  const activityPulse = (Math.sin(time * 1.8 + index * 0.77) + 1) / 2
-  const persona = npc.persona ?? (index % 3 === 0 ? 'homebody' : index % 3 === 1 ? 'wanderer' : 'pacer')
-  if (npc.activity === 'wander') {
-    const radius = persona === 'wanderer' ? 110 : persona === 'pacer' ? 40 : 70
-    const phase = time * (persona === 'pacer' ? 1.45 : 0.56) + index * 1.3
-    const target = {
-      x: npc.x + Math.sin(phase) * radius,
-      y: npc.y + Math.cos(phase * 0.72) * radius * 0.55,
-    }
-    const safe = safeNpcTarget(npc.x, npc.y, target.x, target.y)
-    const direction: PlayerState['dir'] = safe.x > npc.x + 1 ? 'right' : safe.x < npc.x - 1 ? 'left' : 'down'
-    const idleChance = persona === 'homebody' ? 0.6 : persona === 'wanderer' ? 0.3 : 0.18
-    const idling = activityPulse < idleChance
-    // keep position continuous (no teleport home); idle only stops the walk bob
-    return { x: safe.x, y: safe.y, moving: !idling, direction, activityPulse }
-  }
-  if (npc.activity === 'stroll') {
-    const route = [
-      { x: npc.x, y: npc.y },
-      { x: 800, y: 670 },
-      { x: index % 2 === 0 ? 1260 : 410, y: index % 2 === 0 ? 940 : 350 },
-      { x: npc.x, y: npc.y },
-    ]
-    const segment = Math.floor(time * 0.16 + index) % (route.length - 1)
-    const t = (time * 0.16 + index) % 1
-    const from = route[segment]
-    const to = route[segment + 1]
-    const target = { x: lerp(from.x, to.x, t), y: lerp(from.y, to.y, t) }
-    const safe = safeNpcTarget(from.x, from.y, target.x, target.y)
-    return { x: safe.x, y: safe.y, moving: true, direction: to.x > from.x ? 'right' : 'left', activityPulse }
-  }
-  if (npc.activity === 'gather') {
-    const phase = time * 0.55 + index
-    const x = npc.x + Math.sin(phase) * 22
-    const y = npc.y + Math.cos(phase * 1.2) * 12
-    return { x, y, moving: activityPulse > 0.5, direction: 'right', activityPulse }
-  }
-  if (npc.activity === 'couple') {
-    const partner = AMBIENT_NPCS.find((item) => item.name === npc.pair)
-    const direction: PlayerState['dir'] = partner && partner.x < npc.x ? 'left' : 'right'
-    return { x: npc.x, y: npc.y + Math.sin(time * 1.4 + index) * 2, moving: false, direction, activityPulse }
-  }
-  if (npc.activity === 'dance') {
-    const step = Math.floor(time * 3 + index) % 4
-    const direction: PlayerState['dir'] = step === 0 ? 'down' : step === 1 ? 'right' : step === 2 ? 'up' : 'left'
-    return { x: npc.x + Math.sin(time * 5 + index) * 6, y: npc.y + Math.sin(time * 7 + index) * 4, moving: false, direction, activityPulse }
-  }
-  if (npc.activity === 'fish' || npc.activity === 'meditate' || npc.activity === 'sit' || npc.activity === 'tend') {
-    const direction: PlayerState['dir'] = npc.activity === 'fish' ? 'right' : npc.activity === 'tend' ? 'down' : 'left'
-    return { x: npc.x, y: npc.y + Math.sin(time * 1.6 + index) * 2, moving: false, direction, activityPulse }
-  }
-  return {
-    x: npc.x,
-    y: npc.y,
-    moving: false,
-    direction: 'down' as PlayerState['dir'],
-    activityPulse,
-  }
+// Stateful ambient NPC controller: roamers walk to a random nearby point, pause,
+// then pick a new one (with collision). Stationary personas stay at their spot.
+type NpcRuntime = {
+  home: { x: number; y: number }
+  x: number
+  y: number
+  dir: PlayerState['dir']
+  moving: boolean
+  target: { x: number; y: number } | null
+  pause: number
+  roams: boolean
 }
 
-function safeNpcTarget(homeX: number, homeY: number, targetX: number, targetY: number) {
-  const x = clamp(targetX, 70, WORLD.width - 70)
-  const y = clamp(targetY, 70, WORLD.height - 70)
-  if (!isMovementBlocked(x, y) && !pathBlocked(homeX, homeY, x, y)) return { x, y }
-  // step back along home->target and return the furthest reachable point, so the
-  // NPC stops smoothly at the obstacle edge instead of teleporting home
-  for (let s = 0.85; s > 0; s -= 0.15) {
-    const sx = lerp(homeX, x, s)
-    const sy = lerp(homeY, y, s)
-    if (!isMovementBlocked(sx, sy) && !pathBlocked(homeX, homeY, sx, sy)) return { x: sx, y: sy }
+const ROAM_ACTIVITIES = new Set<AmbientActivity>(['wander', 'stroll'])
+const NPC_SPEED = 48
+const NPC_ROAM_RADIUS = 130
+
+const npcRuntime: NpcRuntime[] = AMBIENT_NPCS.map((npc) => ({
+  home: { x: npc.x, y: npc.y },
+  x: npc.x,
+  y: npc.y,
+  dir: npc.activity === 'fish' ? 'left' : 'down',
+  moving: false,
+  target: null,
+  pause: Math.random() * 2.5,
+  roams: ROAM_ACTIVITIES.has(npc.activity),
+}))
+
+function pickNpcTarget(r: NpcRuntime) {
+  for (let tries = 0; tries < 14; tries++) {
+    const angle = Math.random() * Math.PI * 2
+    const radius = 30 + Math.random() * NPC_ROAM_RADIUS
+    const x = clamp(r.home.x + Math.cos(angle) * radius, 80, WORLD.width - 80)
+    const y = clamp(r.home.y + Math.sin(angle) * radius, 80, WORLD.height - 80)
+    if (!isMovementBlocked(x, y) && !pathBlocked(r.x, r.y, x, y)) return { x, y }
   }
-  return { x: homeX, y: homeY }
+  return null
 }
 
-function drawAmbientInteractions(ctx: CanvasRenderingContext2D, time: number, motions: NpcMotion[]) {
-  NPC_INTERACTIONS.forEach((link, index) => {
-    const from = motions[link.from]
-    const to = motions[link.to]
-    if (!from || !to) return
-    const phase = (time * (0.22 + index * 0.025)) % 1
-    const sx = from.x
-    const sy = from.y - 86
-    const ex = to.x
-    const ey = to.y - 86
-    const cx = sx + (ex - sx) * phase
-    const cy = sy + (ey - sy) * phase + Math.sin(phase * Math.PI) * -38
-
-    ctx.save()
-    ctx.globalAlpha = 0.42
-    ctx.strokeStyle = link.color
-    ctx.lineWidth = 3
-    ctx.setLineDash([8, 18])
-    ctx.lineDashOffset = -time * 14
-    ctx.beginPath()
-    ctx.moveTo(sx, sy)
-    ctx.quadraticCurveTo((sx + ex) / 2, Math.min(sy, ey) - 52, ex, ey)
-    ctx.stroke()
-    ctx.setLineDash([])
-
-    ctx.globalAlpha = 0.96
-    drawTinyScroll(ctx, cx, cy, link.color, time + index)
-    if (Math.sin(time * 0.8 + index) > 0.72) {
-      drawMiniBubble(ctx, (sx + ex) / 2, Math.min(sy, ey) - 70, link.label, link.color)
+function updateAmbientNpcs(dt: number) {
+  for (const r of npcRuntime) {
+    if (!r.roams) { r.moving = false; continue }
+    if (r.pause > 0) { r.pause -= dt; r.moving = false; continue }
+    if (!r.target) {
+      r.target = pickNpcTarget(r)
+      if (!r.target) { r.pause = 0.6; continue }
     }
-    ctx.restore()
-  })
+    const dx = r.target.x - r.x
+    const dy = r.target.y - r.y
+    const dist = Math.hypot(dx, dy)
+    if (dist < 3) {
+      r.target = null
+      r.pause = 1.4 + Math.random() * 2.6
+      r.moving = false
+      continue
+    }
+    const step = Math.min(dist, NPC_SPEED * dt)
+    const nx = r.x + (dx / dist) * step
+    const ny = r.y + (dy / dist) * step
+    let moved = false
+    if (!isMovementBlocked(nx, r.y)) { r.x = nx; moved = true }
+    if (!isMovementBlocked(r.x, ny)) { r.y = ny; moved = true }
+    if (!moved) { r.target = null; r.pause = 0.4 + Math.random() }
+    r.moving = moved
+    if (Math.abs(dx) > Math.abs(dy)) r.dir = dx < 0 ? 'left' : 'right'
+    else r.dir = dy < 0 ? 'up' : 'down'
+  }
 }
 
 // Single scheduler so only ONE ambient event ever runs at a time, each followed
@@ -1996,13 +1943,6 @@ function drawNpcEventLayer(ctx: CanvasRenderingContext2D, time: number, motions:
     if (!motion) return
     const lift = Math.sin((local / 1.35) * Math.PI) * 14
     drawMiniBubble(ctx, motion.x, motion.y - 148 - lift, randomTexts[index % randomTexts.length], '#f2c866')
-    ctx.save()
-    ctx.translate(motion.x, motion.y - 72 - lift)
-    ctx.rotate((local / 1.35) * Math.PI * 2)
-    ctx.strokeStyle = '#f2c866'
-    ctx.lineWidth = 3
-    ctx.strokeRect(-12, -12, 24, 24)
-    ctx.restore()
     return
   }
 
@@ -2056,89 +1996,6 @@ function easeOutBack(t: number) {
   return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2)
 }
 
-function drawNpcActivity(
-  ctx: CanvasRenderingContext2D,
-  npc: AmbientNpc,
-  motion: NpcMotion,
-  index: number,
-  time: number,
-  layer: 'behind' | 'front',
-) {
-  const x = motion.x
-  const y = motion.y
-  const pulse = motion.activityPulse
-
-  if (layer === 'behind') {
-    if (npc.activity === 'meditate' || npc.activity === 'sit') {
-      drawRuneCircle(ctx, x, y - 4, npc.accent, time + index)
-    }
-    if (npc.activity === 'wander' && npc.persona === 'pacer') {
-      drawWorkBench(ctx, x - 52, y - 24, npc.accent, time)
-    }
-    if (npc.activity === 'tend') {
-      drawWateringTrail(ctx, x, y, npc.accent, time + index)
-    }
-    if (npc.activity === 'fish') {
-      drawFishingRig(ctx, x, y, time)
-    }
-    if (npc.activity === 'gather' || npc.activity === 'couple') {
-      drawGuidePing(ctx, x, y - 70, npc.accent, time + index)
-    }
-    return
-  }
-
-  switch (npc.activity) {
-    case 'tend':
-      drawTinyTool(ctx, x + 30, y - 48, 'watering', npc.accent, time)
-      if (pulse > 0.72) drawMiniBubble(ctx, x, y - 136, 'grow', npc.accent)
-      break
-    case 'gather':
-      drawTinyTool(ctx, x - 34, y - 54, 'stamp', npc.accent, time)
-      if (pulse > 0.68) drawMiniBubble(ctx, x, y - 136, 'verified', npc.accent)
-      break
-    case 'meditate':
-      drawFloatingOrb(ctx, x + 28, y - 94, npc.accent, time)
-      if (pulse > 0.75) drawMiniBubble(ctx, x, y - 136, 'spark', npc.accent)
-      break
-    case 'sit':
-      drawShieldSpark(ctx, x + 34, y - 78, npc.accent, time)
-      drawWaveMarks(ctx, x - 38, y - 96, npc.accent, time)
-      break
-    case 'stroll':
-      drawSignalTicks(ctx, x + 34, y - 90, npc.accent, time)
-      if (pulse > 0.78) drawMiniBubble(ctx, x, y - 136, 'ping', npc.accent)
-      break
-    case 'dance':
-      drawDanceNotes(ctx, x, y - 112, npc.accent, time)
-      break
-    case 'wander':
-      drawTinyScroll(ctx, x - 32, y - 62, npc.accent, time)
-      if (pulse > 0.84) drawMiniBubble(ctx, x, y - 136, npc.persona === 'pacer' ? 'busy' : 'gm', npc.accent)
-      break
-    case 'fish':
-      if (pulse > 0.78) drawMiniBubble(ctx, x + 48, y - 110, '!', npc.accent)
-      break
-    case 'couple':
-      drawHearts(ctx, x, y - 118, npc.accent, time)
-      break
-  }
-}
-
-function drawTinyScroll(ctx: CanvasRenderingContext2D, x: number, y: number, color: string, time: number) {
-  ctx.save()
-  ctx.translate(Math.round(x), Math.round(y + Math.sin(time * 4) * 2))
-  ctx.rotate(Math.sin(time * 2.2) * 0.08)
-  ctx.fillStyle = '#f7f1df'
-  ctx.strokeStyle = '#07100c'
-  ctx.lineWidth = 2
-  ctx.fillRect(-13, -8, 26, 16)
-  ctx.strokeRect(-13, -8, 26, 16)
-  ctx.fillStyle = color
-  ctx.fillRect(-8, -3, 16, 3)
-  ctx.fillRect(-8, 3, 10, 3)
-  ctx.restore()
-}
-
 function drawMiniBubble(ctx: CanvasRenderingContext2D, x: number, y: number, text: string, color: string) {
   ctx.save()
   ctx.font = '900 11px monospace'
@@ -2152,239 +2009,6 @@ function drawMiniBubble(ctx: CanvasRenderingContext2D, x: number, y: number, tex
   ctx.fillText(text, Math.round(x - width / 2 + 8), Math.round(y + 15))
   ctx.fillStyle = color
   ctx.fillRect(Math.round(x - 4), Math.round(y + 21), 8, 5)
-  ctx.restore()
-}
-
-function drawRuneCircle(ctx: CanvasRenderingContext2D, x: number, y: number, color: string, time: number) {
-  const radius = 28 + Math.sin(time * 2) * 3
-  ctx.save()
-  ctx.translate(x, y)
-  ctx.rotate(time * 0.35)
-  ctx.strokeStyle = color
-  ctx.globalAlpha = 0.56
-  ctx.lineWidth = 3
-  ctx.beginPath()
-  ctx.ellipse(0, 0, radius, 13, 0, 0, Math.PI * 2)
-  ctx.stroke()
-  ctx.globalAlpha = 0.78
-  for (let i = 0; i < 6; i++) {
-    const angle = (Math.PI * 2 * i) / 6
-    ctx.fillStyle = i % 2 === 0 ? color : '#f2c866'
-    ctx.fillRect(Math.cos(angle) * radius - 3, Math.sin(angle) * 13 - 3, 6, 6)
-  }
-  ctx.restore()
-}
-
-function drawWorkBench(ctx: CanvasRenderingContext2D, x: number, y: number, color: string, time: number) {
-  ctx.save()
-  ctx.fillStyle = 'rgba(7, 16, 12, .36)'
-  ctx.fillRect(x - 4, y + 22, 80, 10)
-  ctx.fillStyle = '#7b4a2b'
-  ctx.fillRect(x, y, 70, 20)
-  ctx.fillStyle = '#3d2619'
-  ctx.fillRect(x + 8, y + 20, 8, 22)
-  ctx.fillRect(x + 54, y + 20, 8, 22)
-  ctx.fillStyle = color
-  ctx.fillRect(x + 20 + Math.sin(time * 4) * 4, y - 8, 12, 10)
-  ctx.restore()
-}
-
-function drawWateringTrail(ctx: CanvasRenderingContext2D, x: number, y: number, color: string, time: number) {
-  ctx.save()
-  for (let i = 0; i < 7; i++) {
-    const dx = 24 + i * 8
-    const dy = -44 + ((time * 42 + i * 13) % 42)
-    ctx.fillStyle = i % 2 === 0 ? color : '#78ecff'
-    ctx.globalAlpha = 0.62
-    ctx.fillRect(x + dx, y + dy, 4, 7)
-  }
-  ctx.restore()
-}
-
-function drawGuidePing(ctx: CanvasRenderingContext2D, x: number, y: number, color: string, time: number) {
-  ctx.save()
-  ctx.translate(x, y)
-  const pulse = 1 + ((time * 1.8) % 1) * 0.6
-  ctx.strokeStyle = color
-  ctx.globalAlpha = 0.5 * (2 - pulse)
-  ctx.lineWidth = 3
-  ctx.beginPath()
-  ctx.ellipse(0, 0, 22 * pulse, 10 * pulse, 0, 0, Math.PI * 2)
-  ctx.stroke()
-  ctx.restore()
-}
-
-function drawTinyTool(ctx: CanvasRenderingContext2D, x: number, y: number, kind: 'watering' | 'stamp', color: string, time: number) {
-  ctx.save()
-  ctx.translate(x, y)
-  ctx.rotate(kind === 'stamp' ? Math.sin(time * 4) * 0.18 : -0.25)
-  ctx.fillStyle = '#7b4a2b'
-  ctx.fillRect(-3, -17, 6, 28)
-  ctx.fillStyle = color
-  if (kind === 'stamp') {
-    const stampY = 8 + Math.sin(time * 5) * 3
-    ctx.fillRect(-12, stampY, 24, 10)
-    ctx.strokeStyle = '#07100c'
-    ctx.lineWidth = 2
-    ctx.strokeRect(-12, stampY, 24, 10)
-  } else {
-    ctx.fillRect(-14, -3, 25, 16)
-    ctx.fillRect(8, -8, 14, 6)
-    ctx.strokeStyle = '#07100c'
-    ctx.lineWidth = 2
-    ctx.strokeRect(-14, -3, 25, 16)
-  }
-  ctx.restore()
-}
-
-function drawTinySign(ctx: CanvasRenderingContext2D, x: number, y: number, text: string, color: string) {
-  ctx.save()
-  ctx.fillStyle = '#4b3427'
-  ctx.fillRect(x - 3, y + 14, 6, 24)
-  ctx.fillStyle = color
-  ctx.strokeStyle = '#07100c'
-  ctx.lineWidth = 2
-  ctx.fillRect(x - 18, y, 36, 18)
-  ctx.strokeRect(x - 18, y, 36, 18)
-  ctx.fillStyle = '#07100c'
-  ctx.font = '900 10px monospace'
-  ctx.fillText(text, x - 9, y + 13)
-  ctx.restore()
-}
-
-function drawFloatingOrb(ctx: CanvasRenderingContext2D, x: number, y: number, color: string, time: number) {
-  ctx.save()
-  ctx.translate(x, y + Math.sin(time * 2.4) * 5)
-  ctx.fillStyle = color
-  ctx.globalAlpha = 0.82
-  ctx.fillRect(-9, -9, 18, 18)
-  ctx.fillStyle = '#f7f1df'
-  ctx.fillRect(-3, -3, 6, 6)
-  ctx.restore()
-}
-
-function drawShieldSpark(ctx: CanvasRenderingContext2D, x: number, y: number, color: string, time: number) {
-  ctx.save()
-  ctx.translate(x, y)
-  ctx.strokeStyle = color
-  ctx.fillStyle = 'rgba(7, 16, 12, .38)'
-  ctx.lineWidth = 3
-  ctx.beginPath()
-  ctx.moveTo(0, -18)
-  ctx.lineTo(17, -7)
-  ctx.lineTo(11, 16)
-  ctx.lineTo(0, 24)
-  ctx.lineTo(-11, 16)
-  ctx.lineTo(-17, -7)
-  ctx.closePath()
-  ctx.fill()
-  ctx.stroke()
-  for (let i = 0; i < 4; i++) {
-    const a = time * 2 + i * 1.57
-    ctx.fillStyle = color
-    ctx.fillRect(Math.cos(a) * 27, Math.sin(a) * 18, 5, 5)
-  }
-  ctx.restore()
-}
-
-function drawSignalTicks(ctx: CanvasRenderingContext2D, x: number, y: number, color: string, time: number) {
-  ctx.save()
-  ctx.strokeStyle = color
-  ctx.lineWidth = 3
-  for (let i = 0; i < 3; i++) {
-    const radius = 10 + i * 12 + Math.sin(time * 4 + i) * 2
-    ctx.globalAlpha = 0.35 + i * 0.16
-    ctx.beginPath()
-    ctx.arc(x, y, radius, -0.9, 0.9)
-    ctx.stroke()
-  }
-  ctx.restore()
-}
-
-function drawHammerSwing(ctx: CanvasRenderingContext2D, x: number, y: number, color: string, time: number) {
-  ctx.save()
-  ctx.translate(x, y)
-  ctx.rotate(-0.55 + Math.sin(time * 5) * 0.25)
-  ctx.fillStyle = '#7b4a2b'
-  ctx.fillRect(-3, -18, 6, 36)
-  ctx.fillStyle = color
-  ctx.fillRect(-15, -24, 30, 12)
-  ctx.strokeStyle = '#07100c'
-  ctx.lineWidth = 2
-  ctx.strokeRect(-15, -24, 30, 12)
-  ctx.restore()
-}
-
-function drawDanceNotes(ctx: CanvasRenderingContext2D, x: number, y: number, color: string, time: number) {
-  ctx.save()
-  for (let i = 0; i < 3; i++) {
-    const px = x - 24 + i * 22 + Math.sin(time * 3 + i) * 5
-    const py = y - ((time * 26 + i * 19) % 44)
-    ctx.fillStyle = i % 2 === 0 ? color : '#f2c866'
-    ctx.fillRect(px, py, 7, 18)
-    ctx.fillRect(px + 7, py + 12, 10, 7)
-  }
-  ctx.restore()
-}
-
-function drawPortalGlyph(ctx: CanvasRenderingContext2D, x: number, y: number, color: string, time: number) {
-  ctx.save()
-  ctx.translate(x, y)
-  ctx.rotate(time * 0.8)
-  ctx.strokeStyle = color
-  ctx.lineWidth = 3
-  ctx.strokeRect(-15, -15, 30, 30)
-  ctx.rotate(-time * 1.6)
-  ctx.strokeStyle = '#f2c866'
-  ctx.strokeRect(-9, -9, 18, 18)
-  ctx.restore()
-}
-
-function drawWaveMarks(ctx: CanvasRenderingContext2D, x: number, y: number, color: string, time: number) {
-  ctx.save()
-  ctx.strokeStyle = color
-  ctx.lineWidth = 3
-  for (let i = 0; i < 3; i++) {
-    const offset = i * 9 + Math.sin(time * 3 + i) * 2
-    ctx.beginPath()
-    ctx.moveTo(x + offset, y - 10)
-    ctx.quadraticCurveTo(x + offset + 9, y - 18, x + offset + 18, y - 10)
-    ctx.stroke()
-  }
-  ctx.restore()
-}
-
-function drawFishingRig(ctx: CanvasRenderingContext2D, x: number, y: number, time: number) {
-  const bobX = POND_RECT.x + POND_RECT.w - 36
-  const bobY = POND_RECT.y + 72 + Math.sin(time * 3) * 5
-  ctx.save()
-  ctx.strokeStyle = 'rgba(247,241,223,.72)'
-  ctx.lineWidth = 2
-  ctx.beginPath()
-  ctx.moveTo(x + 22, y - 54)
-  ctx.quadraticCurveTo((x + bobX) / 2, y - 94, bobX, bobY)
-  ctx.stroke()
-  ctx.fillStyle = '#ff8066'
-  ctx.fillRect(bobX - 4, bobY - 4, 8, 8)
-  if (Math.sin(time * 1.2) > 0.78) {
-    ctx.fillStyle = '#f2c866'
-    ctx.fillRect(bobX + 10, bobY - 22, 7, 7)
-    ctx.fillStyle = '#f7f1df'
-    ctx.fillRect(bobX + 22, bobY - 33, 9, 9)
-  }
-  ctx.restore()
-}
-
-function drawHearts(ctx: CanvasRenderingContext2D, x: number, y: number, color: string, time: number) {
-  ctx.save()
-  for (let i = 0; i < 3; i++) {
-    const yy = y - ((time * 22 + i * 18) % 48)
-    const xx = x + Math.sin(time * 2 + i) * 12
-    ctx.fillStyle = i % 2 === 0 ? '#ff7ad9' : color
-    ctx.fillRect(xx - 4, yy, 8, 8)
-    ctx.fillRect(xx + 2, yy - 4, 8, 8)
-    ctx.fillRect(xx - 1, yy + 6, 7, 7)
-  }
   ctx.restore()
 }
 
@@ -2411,37 +2035,6 @@ function questNpcMotion(quest: QuestNpc, time: number) {
     y: quest.y + Math.sin(phase * 2.2) * 4,
     moving: false,
     direction: 'down' as const,
-  }
-}
-
-function drawQuestStationActivity(
-  ctx: CanvasRenderingContext2D,
-  quest: QuestNpc,
-  motion: { x: number; y: number; moving: boolean; direction: PlayerState['dir'] },
-  time: number,
-  layer: 'behind' | 'front',
-) {
-  const x = motion.x
-  const y = motion.y
-  if (layer === 'behind') {
-    if (quest.zone === 'Temple Gate') drawGuidePing(ctx, x, y - 66, quest.accent, time + quest.id)
-    if (quest.zone === 'RWA Vault') drawRuneCircle(ctx, x, y - 8, quest.accent, time + quest.id)
-    if (quest.zone === 'Agent Camp') drawWorkBench(ctx, x - 48, y - 22, quest.accent, time + quest.id)
-    if (quest.zone === 'Signal Tower') drawSignalTicks(ctx, x, y - 92, quest.accent, time + quest.id)
-    if (quest.zone === 'SCALE Lab') drawPortalGlyph(ctx, x + 36, y - 72, quest.accent, time + quest.id)
-    return
-  }
-
-  if (quest.zone === 'Temple Gate') {
-    drawTinySign(ctx, x + 36, y - 56, 'START', quest.accent)
-  } else if (quest.zone === 'RWA Vault') {
-    drawTinyTool(ctx, x - 34, y - 54, 'stamp', quest.accent, time + quest.id)
-  } else if (quest.zone === 'Agent Camp') {
-    drawTinyScroll(ctx, x + 36, y - 70, quest.accent, time + quest.id)
-  } else if (quest.zone === 'Signal Tower') {
-    drawFloatingOrb(ctx, x + 32, y - 94, quest.accent, time + quest.id)
-  } else if (quest.zone === 'SCALE Lab') {
-    drawHammerSwing(ctx, x + 32, y - 58, quest.accent, time + quest.id)
   }
 }
 
