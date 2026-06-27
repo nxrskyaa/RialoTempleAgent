@@ -255,7 +255,7 @@ const PROPS: Record<PropKey, string> = {
   buildingMarketHall: '/temple-play/world/building/building-2.png',
   buildingGreenhouseInn: '/temple-play/world/building/building-3.png',
   buildingOracleHouse: '/temple-play/world/building/building-1.png',
-  buildingWoodenCabin: '/temple-play/world/building/building-2.png',
+  buildingWoodenCabin: '/temple-play/world/building/warungpecel.png',
   buildingOrangeCottage: '/temple-play/world/building/building-1.png',
   buildingGuildHouse: '/temple-play/world/building/building-2.png',
 }
@@ -472,7 +472,7 @@ const BUILDINGS: BuildingSpec[] = [
   { key: 'buildingMarketHall', x: 1180, y: 1050, w: 278, h: 266, label: 'Signal Tower', color: '#b9ff66' },
   { key: 'buildingGreenhouseInn', x: 270, y: 1276, w: 230, h: 296, label: 'Privacy Grove', color: '#ff7ad9' },
   { key: 'buildingOracleHouse', x: 1035, y: 535, w: 248, h: 276, label: 'Bridge Gate', color: '#57e39f' },
-  { key: 'buildingWoodenCabin', x: 850, y: 1150, w: 198, h: 184, label: 'Rest Stop', color: '#ffad72' },
+  { key: 'buildingWoodenCabin', x: 850, y: 1150, w: 250, h: 220, label: 'Warung Pecel', color: '#ffad72' },
   { key: 'buildingOrangeCottage', x: 1430, y: 1150, w: 206, h: 210, label: 'Quest Hut', color: '#f2c866' },
   { key: 'buildingGuildHouse', x: 1425, y: 620, w: 248, h: 236, label: 'Guild Hall', color: '#78ecff' },
 ]
@@ -2150,8 +2150,10 @@ function drawSpriteActor(
     : moving ? -Math.abs(walkPhase) * 2.6 : -Math.abs(Math.sin(time * 4 + seed)) * 2.6
   const facingDir = direction === 'left' ? -1 : direction === 'right' ? 1 : 0.35
   const rotation = player && moving ? walkPhase * 0.06 * facingDir : 0
-  const drawW = player ? sheet.drawW * 1.04 : sheet.drawW
-  const drawH = player ? sheet.drawH * 1.04 : sheet.drawH
+  const baseDrawW = sprite === 'nxr' && !player ? 58 : sheet.drawW
+  const baseDrawH = sprite === 'nxr' && !player ? 82 : sheet.drawH
+  const drawW = player ? baseDrawW * 1.04 : baseDrawW
+  const drawH = player ? baseDrawH * 1.04 : baseDrawH
 
   ctx.fillStyle = 'rgba(0,0,0,.34)'
   ctx.fillRect(Math.round(x - drawW * 0.28), Math.round(y - 10), Math.round(drawW * 0.56), 12)
