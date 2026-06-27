@@ -80,6 +80,8 @@ type SpriteKey =
   | 'npcSage'
   | 'npcHerbalist'
   | 'npcAlchemist'
+  | 'npcKGufran'
+  | 'npcRikky'
 
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000' as const
 const MAP_W = 50
@@ -180,7 +182,7 @@ type PropKey =
   | 'buildingOrangeCottage'
 
 const SPRITES: Record<SpriteKey, SpriteSheet> = {
-  nxr: { src: '/temple-play/characters/rt-nxr.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
+  nxr: { src: '/temple-play/sprites/nxr-v2.png', frameW: 210, frameH: 280, frames: 16, drawW: 70, drawH: 94 },
   npcOracle: { src: '/temple-play/characters/rt-vika-joestar.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
   npcForestGuide: { src: '/temple-play/characters/rt-ade.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
   npcBuilder: { src: '/temple-play/characters/rt-barong.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
@@ -189,7 +191,9 @@ const SPRITES: Record<SpriteKey, SpriteSheet> = {
   npcShadowAgent: { src: '/temple-play/characters/rt-rollins.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
   npcSage: { src: '/temple-play/characters/rt-pinkeu.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
   npcHerbalist: { src: '/temple-play/characters/rt-blond.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
-  npcAlchemist: { src: '/temple-play/characters/rt-vika-joestar.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
+  npcAlchemist: { src: '/temple-play/characters/rt-dikzzy.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
+  npcKGufran: { src: '/temple-play/characters/rt-k-gufran.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
+  npcRikky: { src: '/temple-play/characters/rt-rikky.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
 }
 
 const CHARACTER_CHOICES: Array<{ key: SpriteKey; label: string }> = [
@@ -202,6 +206,9 @@ const CHARACTER_CHOICES: Array<{ key: SpriteKey; label: string }> = [
   { key: 'npcShadowAgent', label: 'Rollins' },
   { key: 'npcSage', label: 'Pinkeu' },
   { key: 'npcHerbalist', label: 'Blond' },
+  { key: 'npcAlchemist', label: 'Dikzzy' },
+  { key: 'npcKGufran', label: 'K.Gufran' },
+  { key: 'npcRikky', label: 'Rikky' },
 ]
 
 function initialPlayerSprite(): SpriteKey {
@@ -293,7 +300,7 @@ const QUESTS: QuestNpc[] = [
     id: 2,
     quizId: 2,
     zone: 'RWA Vault',
-    npc: 'Vault Keeper Mino',
+    npc: 'Blond',
     role: 'Asset Guardian',
     sprite: 'npcHerbalist',
     x: 1290,
@@ -328,7 +335,7 @@ const QUESTS: QuestNpc[] = [
     id: 3,
     quizId: 3,
     zone: 'Agent Camp',
-    npc: 'Scout Luma',
+    npc: 'Rollins',
     role: 'Agent Coordinator',
     sprite: 'npcShadowAgent',
     x: 580,
@@ -363,7 +370,7 @@ const QUESTS: QuestNpc[] = [
     id: 4,
     quizId: 4,
     zone: 'Signal Tower',
-    npc: 'Zap Tiko',
+    npc: 'Garuda',
     role: 'Signal Runner',
     sprite: 'npcNavigator',
     x: 1180,
@@ -398,9 +405,9 @@ const QUESTS: QuestNpc[] = [
     id: 5,
     quizId: 5,
     zone: 'SCALE Lab',
-    npc: 'Professor Rune',
+    npc: 'Vika Joestar',
     role: 'SCALE Engineer',
-    sprite: 'npcAlchemist',
+    sprite: 'npcOracle',
     x: 395,
     y: 400,
     color: '#c886ff',
@@ -438,18 +445,13 @@ const QUESTS: QuestNpc[] = [
 ]
 
 const AMBIENT_NPCS: AmbientNpc[] = [
-  { name: 'Boba Byte', sprite: 'npcSage', x: 430, y: 955, color: '#ff7ad9', accent: '#f2c866', line: 'Rain makes the data spring louder.', activity: 'dance', persona: 'homebody' },
-  { name: 'Mossy Dex', sprite: 'npcForestGuide', x: 250, y: 360, color: '#57e39f', accent: '#78ecff', line: 'Forest paths are quiet, but data never sleeps.', activity: 'wander', persona: 'wanderer' },
-  { name: 'Peeko Bond', sprite: 'npcHerbalist', x: 1185, y: 450, color: '#f2c866', accent: '#ffad72', line: 'RWA vaults like clean verification stamps.', activity: 'gather', persona: 'homebody' },
-  { name: 'Firo Mail', sprite: 'npcCaptain', x: 930, y: 590, color: '#78ecff', accent: '#ff7ad9', line: 'Bridge Gate scrolls carry API messages out and back.', activity: 'stroll', persona: 'wanderer' },
-  { name: 'Jade Numi', sprite: 'npcAlchemist', x: 1290, y: 650, color: '#b9ff66', accent: '#57e39f', line: 'Temple Energy returns when the daily ritual cools down.', activity: 'meditate', persona: 'homebody' },
-  { name: 'Pixel Kora', sprite: 'npcOracle', x: 440, y: 1120, color: '#c886ff', accent: '#f2c866', line: 'Privacy chambers turn plain scrolls into protected ones.', activity: 'sit', persona: 'homebody' },
-  { name: 'Tama Tick', sprite: 'npcNavigator', x: 1010, y: 1000, color: '#ffad72', accent: '#78ecff', line: 'Signals are tiny real-world updates with big consequences.', activity: 'stroll', persona: 'pacer' },
-  { name: 'Orb Nalo', sprite: 'npcBuilder', x: 1250, y: 1160, color: '#57e39f', accent: '#c886ff', line: 'Every badge is better when the ledger can verify it.', activity: 'wander', persona: 'pacer' },
-  { name: 'Rune Pika', sprite: 'npcShadowAgent', x: 790, y: 815, color: '#ffe36e', accent: '#57e39f', line: 'Quest boards like brave learners.', activity: 'dance', persona: 'homebody' },
-  { name: 'Minty Mox', sprite: 'npcSage', x: 530, y: 1110, color: '#67ffc0', accent: '#f2c866', line: 'The map gets brighter when badges are claimed.', activity: 'tend', persona: 'homebody' },
-  { name: 'Sera API', sprite: 'npcCaptain', x: 1000, y: 245, color: '#88d7ff', accent: '#ff8066', line: 'A response scroll always comes back through Bridge Gate.', activity: 'wander', persona: 'wanderer' },
-  { name: 'Candi Dot', sprite: 'npcForestGuide', x: 1210, y: 420, color: '#b9ff66', accent: '#f2c866', line: 'The temple is friendlier when every system can talk.', activity: 'couple', persona: 'homebody', pair: 'Peeko Bond' },
+  { name: 'Ade', sprite: 'npcForestGuide', x: 250, y: 360, color: '#57e39f', accent: '#78ecff', line: 'Forest paths are quiet, but data never sleeps.', activity: 'wander', persona: 'wanderer' },
+  { name: 'Barong', sprite: 'npcBuilder', x: 1250, y: 1160, color: '#57e39f', accent: '#c886ff', line: 'Every badge is better when the ledger can verify it.', activity: 'wander', persona: 'pacer' },
+  { name: 'Eric Argent', sprite: 'npcCaptain', x: 930, y: 590, color: '#78ecff', accent: '#ff7ad9', line: 'Bridge Gate scrolls carry API messages out and back.', activity: 'stroll', persona: 'wanderer' },
+  { name: 'Pinkeu', sprite: 'npcSage', x: 530, y: 1110, color: '#ff7ad9', accent: '#f2c866', line: 'The map gets brighter when badges are claimed.', activity: 'tend', persona: 'homebody' },
+  { name: 'Dikzzy', sprite: 'npcAlchemist', x: 440, y: 1120, color: '#c886ff', accent: '#f2c866', line: 'Privacy chambers turn plain scrolls into protected ones.', activity: 'dance', persona: 'homebody' },
+  { name: 'K.Gufran', sprite: 'npcKGufran', x: 1000, y: 245, color: '#88d7ff', accent: '#ff8066', line: 'A response scroll always comes back through Bridge Gate.', activity: 'gather', persona: 'wanderer' },
+  { name: 'Rikky', sprite: 'npcRikky', x: 1010, y: 1000, color: '#ffad72', accent: '#78ecff', line: 'Signals are tiny real-world updates with big consequences.', activity: 'meditate', persona: 'homebody' },
 ]
 
 type BuildingSpec = {
@@ -862,7 +864,7 @@ function TemplePlayCanvas({
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const wrapRef = useRef<HTMLDivElement | null>(null)
   const keys = useRef(new Set<string>())
-  const player = useRef<PlayerState>({ x: 792, y: 780, dir: 'down', moving: false })
+  const player = useRef<PlayerState>({ x: 792, y: 840, dir: 'down', moving: false })
   const nearId = useRef<number | null>(null)
   const completedLatest = useRef(completedIds)
   const assetsRef = useRef<TemplePlayAssets | null>(null)
@@ -1461,21 +1463,56 @@ function drawQuestHint(
   nearNpcId: number | null,
 ) {
   const close = nearNpcId === quest.id
-  const ring = 1 + Math.sin(time * 4.2) * 0.08
-  ctx.save()
-  ctx.translate(quest.x, quest.y - 12)
-  ctx.globalAlpha = close ? 0.92 : 0.48
-  ctx.strokeStyle = close ? 'rgba(87, 227, 159, 0.9)' : 'rgba(242, 200, 102, 0.52)'
-  ctx.fillStyle = close ? 'rgba(87, 227, 159, 0.18)' : 'rgba(242, 200, 102, 0.08)'
-  ctx.lineWidth = close ? 4 : 2
-  ctx.beginPath()
-  ctx.ellipse(0, 0, 42 * ring, 18 * ring, 0, 0, Math.PI * 2)
-  ctx.fill()
-  ctx.stroke()
-  ctx.restore()
+  drawPixelInteractCue(ctx, quest.x, quest.y, 62, 34, time, close ? '#57e39f' : '#f2c866', close)
   if (close) {
     drawPixelNameTag(ctx, quest.x, quest.y - 148, 'Tap / E to talk', '#07100c', true, '#57e39f', true)
   }
+}
+
+function drawPixelInteractCue(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  time: number,
+  color: string,
+  active: boolean,
+) {
+  const step = Math.round(Math.sin(time * 5.2) * 2)
+  const left = Math.round(x - width / 2 - (active ? step : 0))
+  const right = Math.round(x + width / 2 + (active ? step : 0))
+  const top = Math.round(y - height)
+  const bottom = Math.round(y - 8)
+  const alpha = active ? 0.92 : 0.42
+
+  ctx.save()
+  ctx.globalAlpha = alpha
+  ctx.fillStyle = 'rgba(7,16,12,.72)'
+  ctx.fillRect(Math.round(x - width * 0.34), Math.round(y - 12), Math.round(width * 0.68), 5)
+  ctx.fillStyle = color
+
+  const corner = active ? 12 : 8
+  const thickness = active ? 3 : 2
+  const drawCorner = (cx: number, cy: number, sx: 1 | -1, sy: 1 | -1) => {
+    ctx.fillRect(cx, cy, corner * sx, thickness * sy)
+    ctx.fillRect(cx, cy, thickness * sx, corner * sy)
+  }
+
+  drawCorner(left, top, 1, 1)
+  drawCorner(right, top, -1, 1)
+  drawCorner(left, bottom, 1, -1)
+  drawCorner(right, bottom, -1, -1)
+
+  if (active) {
+    ctx.fillStyle = '#f7f1df'
+    ctx.fillRect(Math.round(x - 2), top - 9 + step, 4, 4)
+    ctx.fillStyle = color
+    ctx.fillRect(Math.round(x - width * 0.42), top + 9 - step, 3, 3)
+    ctx.fillRect(Math.round(x + width * 0.4), bottom - 13 + step, 3, 3)
+  }
+
+  ctx.restore()
 }
 
 const WORLD_TILES = buildWorldTiles()
@@ -2112,16 +2149,7 @@ function drawSpriteActor(
   ctx.fillRect(Math.round(x - drawW * 0.28), Math.round(y - 10), Math.round(drawW * 0.56), 12)
 
   if (near) {
-    const pulse = 1 + Math.sin(time * 5) * 0.08
-    ctx.strokeStyle = tone
-    ctx.lineWidth = 4
-    ctx.beginPath()
-    ctx.ellipse(x, y - drawH * 0.45, drawW * 0.54 * pulse, drawH * 0.48 * pulse, 0, 0, Math.PI * 2)
-    ctx.stroke()
-    ctx.fillStyle = 'rgba(242,200,102,.16)'
-    ctx.beginPath()
-    ctx.ellipse(x, y - drawH * 0.45, drawW * 0.42, drawH * 0.36, 0, 0, Math.PI * 2)
-    ctx.fill()
+    drawPixelInteractCue(ctx, x, y, drawW * 1.16, drawH * 0.6, time + seed, tone, true)
   }
 
   ctx.save()
