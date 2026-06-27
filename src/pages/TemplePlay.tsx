@@ -2072,6 +2072,14 @@ function drawMiniBubble(ctx: CanvasRenderingContext2D, x: number, y: number, tex
 
 function questNpcMotion(quest: QuestNpc, time: number) {
   const phase = time + quest.id * 0.83
+  if (quest.sprite === 'nxr') {
+    return {
+      x: quest.x,
+      y: quest.y,
+      moving: false,
+      direction: 'down' as const,
+    }
+  }
   if (quest.id % 3 === 0) {
     return {
       x: quest.x + Math.sin(phase * 1.2) * 3,
