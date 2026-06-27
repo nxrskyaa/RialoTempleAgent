@@ -19,13 +19,14 @@ const NAV = [
 export default function Navbar() {
   const location = useLocation()
   const [open, setOpen] = useState(false)
+  const isTemplePlay = location.pathname === '/temple-play'
 
   // close the mobile menu whenever the route changes
   useEffect(() => setOpen(false), [location.pathname])
 
   return (
-    <nav className="fixed left-0 right-0 top-0 z-50 px-3 pt-3 sm:px-6">
-      <div className="nav-cloud mx-auto flex h-[68px] max-w-7xl items-center justify-between gap-2 px-3 sm:px-5">
+    <nav className={`fixed left-0 right-0 top-0 z-50 px-3 pt-3 sm:px-6 ${isTemplePlay ? 'is-temple-play-nav' : ''}`}>
+      <div className={`nav-cloud flex h-[68px] max-w-7xl items-center justify-between gap-2 px-3 sm:px-5 ${isTemplePlay ? 'ml-auto mr-2 nav-cloud-game' : 'mx-auto'}`}>
         <Link to="/" className="brand-pill group flex min-w-0 items-center gap-2 rounded-full px-2 py-1.5 transition">
           <span className="logo-charm relative flex h-12 w-12 items-center justify-center rounded-full">
             <img src="/rialo_logo.png" alt="" className="rialo-nav-logo relative z-10 transition group-hover:scale-110" />
@@ -34,7 +35,7 @@ export default function Navbar() {
         </Link>
 
         {/* desktop inline nav: icon-only, label shown only for the active item */}
-        <div className="nav-bubble hidden items-center gap-0.5 rounded-full p-1 lg:flex">
+        {!isTemplePlay && <div className="nav-bubble hidden items-center gap-0.5 rounded-full p-1 lg:flex">
           {NAV.map(item => {
             const active = location.pathname === item.path
             return (
@@ -47,7 +48,7 @@ export default function Navbar() {
               </Link>
             )
           })}
-        </div>
+        </div>}
 
         <div className="flex items-center gap-2">
           <ConnectButton.Custom>
@@ -72,7 +73,8 @@ export default function Navbar() {
             aria-label="Toggle menu"
             aria-expanded={open}
             onClick={() => setOpen(value => !value)}
-            className="nav-link flex h-10 w-10 shrink-0 items-center justify-center rounded-full lg:hidden"
+            className={`nav-link flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${isTemplePlay ? '' : 'lg:hidden'}`}
+            data-game-menu={isTemplePlay ? 'true' : undefined}
             style={{ color: 'var(--temple-text)' }}
           >
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -82,7 +84,7 @@ export default function Navbar() {
 
       {/* mobile dropdown menu */}
       {open && (
-        <div className="nav-cloud mx-auto mt-2 grid max-w-7xl grid-cols-2 gap-1.5 p-2 sm:grid-cols-3 lg:hidden">
+        <div className={`nav-menu-panel mx-auto mt-2 grid max-w-7xl grid-cols-2 gap-1.5 p-2 sm:grid-cols-3 ${isTemplePlay ? 'nav-menu-panel-game' : 'lg:hidden'}`}>
           {NAV.map(item => {
             const active = location.pathname === item.path
             return (

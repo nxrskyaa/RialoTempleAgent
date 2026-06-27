@@ -5,6 +5,7 @@ import Navbar from './Navbar'
 
 export default function Layout() {
   const location = useLocation()
+  const isTemplePlay = location.pathname === '/temple-play'
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0 })
@@ -13,7 +14,7 @@ export default function Layout() {
   return (
     <div className="temple-shell min-h-screen text-[var(--temple-text)]">
       <Navbar />
-      <main className="relative z-10 pt-[72px]">
+      <main className={`relative z-10 ${isTemplePlay ? 'pt-0' : 'pt-[72px]'}`}>
         <Outlet />
       </main>
     </div>

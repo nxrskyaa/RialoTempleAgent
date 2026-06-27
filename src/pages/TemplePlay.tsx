@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Award, CheckCircle2, Gamepad2, Loader2, MapPin, Sparkles, XCircle } from 'lucide-react'
+import { Award, CheckCircle2, Loader2, Sparkles, XCircle } from 'lucide-react'
 import { useAccount, useReadContract, useReadContracts, useWaitForTransactionReceipt, useWriteContract } from 'wagmi'
 import { ARC_CHAIN, RIALO_TEMPLE_ABI, RIALO_TEMPLE_ADDRESS } from '@/config/contracts'
 import { parseUnifiedUser } from '@/lib/rialo'
@@ -45,7 +45,6 @@ type AmbientNpc = {
 
 type AmbientActivity =
   | 'wander'
-  | 'fish'
   | 'dance'
   | 'gather'
   | 'stroll'
@@ -168,11 +167,6 @@ type PropKey =
   | 'parkLantern'
   | 'parkBush'
   | 'parkPlanter'
-  // fishing set
-  | 'fishingRod'
-  | 'fishingBobber'
-  | 'fishingBucket'
-  | 'fishingNet'
   // buildings (10 slots reuse 3 cozy-village designs)
   | 'balineseTemple'
   | 'buildingMarketHall'
@@ -186,16 +180,34 @@ type PropKey =
   | 'buildingOrangeCottage'
 
 const SPRITES: Record<SpriteKey, SpriteSheet> = {
-  nxr: { src: '/temple-play/sprites/nxr-v2.png', frameW: 210, frameH: 280, frames: 16, drawW: 70, drawH: 94 },
-  npcOracle: { src: '/temple-play/sprites/npc-shrine-maiden.png', frameW: 160, frameH: 220, frames: 4, drawW: 52, drawH: 72 },
-  npcForestGuide: { src: '/temple-play/sprites/npc-merchant.png', frameW: 160, frameH: 220, frames: 4, drawW: 52, drawH: 72 },
-  npcBuilder: { src: '/temple-play/sprites/npc-samurai.png', frameW: 160, frameH: 220, frames: 4, drawW: 52, drawH: 72 },
-  npcCaptain: { src: '/temple-play/sprites/npc-samurai.png', frameW: 160, frameH: 220, frames: 4, drawW: 52, drawH: 72 },
-  npcNavigator: { src: '/temple-play/sprites/npc-merchant.png', frameW: 160, frameH: 220, frames: 4, drawW: 52, drawH: 72 },
-  npcShadowAgent: { src: '/temple-play/sprites/npc-ninja.png', frameW: 160, frameH: 220, frames: 4, drawW: 52, drawH: 72 },
-  npcSage: { src: '/temple-play/sprites/npc-shrine-maiden.png', frameW: 160, frameH: 220, frames: 4, drawW: 52, drawH: 72 },
-  npcHerbalist: { src: '/temple-play/sprites/npc-herbalist-jp.png', frameW: 160, frameH: 220, frames: 4, drawW: 52, drawH: 72 },
-  npcAlchemist: { src: '/temple-play/sprites/npc-alchemist-jp.png', frameW: 160, frameH: 220, frames: 4, drawW: 52, drawH: 72 },
+  nxr: { src: '/temple-play/characters/rt-nxr.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
+  npcOracle: { src: '/temple-play/characters/rt-vika-joestar.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
+  npcForestGuide: { src: '/temple-play/characters/rt-ade.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
+  npcBuilder: { src: '/temple-play/characters/rt-barong.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
+  npcCaptain: { src: '/temple-play/characters/rt-eric-argent.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
+  npcNavigator: { src: '/temple-play/characters/rt-garuda.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
+  npcShadowAgent: { src: '/temple-play/characters/rt-rollins.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
+  npcSage: { src: '/temple-play/characters/rt-pinkeu.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
+  npcHerbalist: { src: '/temple-play/characters/rt-blond.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
+  npcAlchemist: { src: '/temple-play/characters/rt-vika-joestar.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
+}
+
+const CHARACTER_CHOICES: Array<{ key: SpriteKey; label: string }> = [
+  { key: 'nxr', label: 'NXR' },
+  { key: 'npcOracle', label: 'Vika' },
+  { key: 'npcForestGuide', label: 'Ade' },
+  { key: 'npcBuilder', label: 'Barong' },
+  { key: 'npcCaptain', label: 'Eric' },
+  { key: 'npcNavigator', label: 'Garuda' },
+  { key: 'npcShadowAgent', label: 'Rollins' },
+  { key: 'npcSage', label: 'Pinkeu' },
+  { key: 'npcHerbalist', label: 'Blond' },
+]
+
+function initialPlayerSprite(): SpriteKey {
+  if (typeof window === 'undefined') return 'nxr'
+  const stored = localStorage.getItem('temple-player-sprite') as SpriteKey | null
+  return stored && CHARACTER_CHOICES.some((choice) => choice.key === stored) ? stored : 'nxr'
 }
 
 const PROPS: Record<PropKey, string> = {
@@ -228,10 +240,6 @@ const PROPS: Record<PropKey, string> = {
   parkLantern: '/temple-play/world/park/park-lantern.png',
   parkBush: '/temple-play/world/park/park-bush.png',
   parkPlanter: '/temple-play/world/park/park-planter.png',
-  fishingRod: '/temple-play/world/fishing/fishing-rod.png',
-  fishingBobber: '/temple-play/world/fishing/fishing-bobber.png',
-  fishingBucket: '/temple-play/world/fishing/fishing-bucket.png',
-  fishingNet: '/temple-play/world/fishing/fishing-net.png',
   // 10 building slots reuse 3 designs (aspect-matched to minimise distortion)
   balineseTemple: '/temple-play/world/building/building-3.png',
   buildingScaleDojo: '/temple-play/world/building/building-1.png',
@@ -430,7 +438,7 @@ const QUESTS: QuestNpc[] = [
 ]
 
 const AMBIENT_NPCS: AmbientNpc[] = [
-  { name: 'Boba Byte', sprite: 'npcSage', x: 430, y: 955, color: '#ff7ad9', accent: '#f2c866', line: 'Rain makes the data spring louder.', activity: 'fish', persona: 'homebody' },
+  { name: 'Boba Byte', sprite: 'npcSage', x: 430, y: 955, color: '#ff7ad9', accent: '#f2c866', line: 'Rain makes the data spring louder.', activity: 'dance', persona: 'homebody' },
   { name: 'Mossy Dex', sprite: 'npcForestGuide', x: 250, y: 360, color: '#57e39f', accent: '#78ecff', line: 'Forest paths are quiet, but data never sleeps.', activity: 'wander', persona: 'wanderer' },
   { name: 'Peeko Bond', sprite: 'npcHerbalist', x: 1185, y: 450, color: '#f2c866', accent: '#ffad72', line: 'RWA vaults like clean verification stamps.', activity: 'gather', persona: 'homebody' },
   { name: 'Firo Mail', sprite: 'npcCaptain', x: 930, y: 590, color: '#78ecff', accent: '#ff7ad9', line: 'Bridge Gate scrolls carry API messages out and back.', activity: 'stroll', persona: 'wanderer' },
@@ -523,6 +531,7 @@ function TemplePlayInner() {
   const [quizDone, setQuizDone] = useState(false)
   const [nearNpcId, setNearNpcId] = useState<number | null>(null)
   const [showGuide, setShowGuide] = useState(true)
+  const [playerSprite, setPlayerSprite] = useState<SpriteKey>(() => initialPlayerSprite())
   const [toast, setToast] = useState('')
   const [claimingQuest, setClaimingQuest] = useState<QuestNpc | null>(null)
   const completedRef = useRef<Set<number>>(new Set())
@@ -714,6 +723,13 @@ function TemplePlayInner() {
   }
 
   const nearestQuest = nearNpcId ? QUESTS.find((quest) => quest.id === nearNpcId) : null
+  const selectedCharacter = CHARACTER_CHOICES.find((choice) => choice.key === playerSprite) ?? CHARACTER_CHOICES[0]
+
+  const chooseCharacter = useCallback((sprite: SpriteKey) => {
+    setPlayerSprite(sprite)
+    localStorage.setItem('temple-player-sprite', sprite)
+    playTempleSfx('tap')
+  }, [])
 
   return (
     <main className="temple-play-page">
@@ -737,27 +753,15 @@ function TemplePlayInner() {
           <TemplePlayCanvas
             completedIds={completedIds}
             nextQuest={nextQuest}
+            playerSprite={playerSprite}
             onNearQuestChange={setNearNpcId}
             onOpenQuest={(quest) => openQuestRef.current(quest)}
           />
 
-          <div style={{
-            position: 'absolute',
-            bottom: 48,
-            left: 12,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            background: 'rgba(7,16,12,.88)',
-            border: '1px solid #f2c866',
-            padding: '4px 10px',
-            borderRadius: 4,
-            zIndex: 10,
-          }}>
+          <div className="temple-play-audio-control">
             <button
               type="button"
               aria-label={lofiMuted ? 'Unmute lofi music' : 'Mute lofi music'}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#f2c866', fontSize: 12, fontWeight: 900 }}
               onClick={() => {
                 const muted = !lofiMuted
                 setLofiMuted(muted)
@@ -774,7 +778,6 @@ function TemplePlayInner() {
               step={0.05}
               value={lofiVolume}
               aria-label="Temple lofi volume"
-              style={{ width: 72, accentColor: '#f2c866' }}
               onChange={(event) => {
                 const volume = Number(event.target.value)
                 setLofiVolume(volume)
@@ -784,23 +787,19 @@ function TemplePlayInner() {
             />
           </div>
 
-          <div className="temple-play-hud">
-            <span><Gamepad2 className="h-4 w-4" /> Click / tap map to move</span>
-            <span><MapPin className="h-4 w-4" /> Follow the gold arrow</span>
-            <span><Gamepad2 className="h-4 w-4" /> WASD optional on desktop</span>
-          </div>
+          <CharacterPicker selected={playerSprite} selectedLabel={selectedCharacter.label} onSelect={chooseCharacter} />
 
           <div className="temple-play-miniquest">
             <p>{nearestQuest ? 'Talk now' : 'Next destination'}</p>
-            <strong>{nearestQuest ? `${nearestQuest.npc} / ${nearestQuest.zone}` : `${nextQuest.zone} - follow arrow`}</strong>
+            <strong>{nearestQuest ? `${nearestQuest.npc} / ${nearestQuest.zone}` : `${nextQuest.zone}`}</strong>
             <button type="button" disabled={!nearestQuest} onClick={() => nearestQuest && openQuest(nearestQuest)}>
-              {nearestQuest ? 'Talk' : 'Move there'}
+              {nearestQuest ? 'Talk' : 'Find NPC'}
             </button>
           </div>
 
           <AnimatePresence>
             {showGuide && !activeQuest ? (
-              <GuideOverlay onClose={() => setShowGuide(false)} />
+              <GuideOverlay selected={playerSprite} onSelect={chooseCharacter} onClose={() => setShowGuide(false)} />
             ) : null}
           </AnimatePresence>
 
@@ -850,11 +849,13 @@ function TemplePlayInner() {
 function TemplePlayCanvas({
   completedIds,
   nextQuest,
+  playerSprite,
   onNearQuestChange,
   onOpenQuest,
 }: {
   completedIds: Set<number>
   nextQuest: QuestNpc
+  playerSprite: SpriteKey
   onNearQuestChange: (id: number | null) => void
   onOpenQuest: (quest: QuestNpc) => void
 }) {
@@ -1002,7 +1003,7 @@ function TemplePlayCanvas({
       }
       cameraRef.current = { ...camera, zoom }
 
-      drawWorld(context, rect.width, rect.height, viewport.width, viewport.height, camera, zoom, frame, current, completedLatest.current, nearId.current, assets, tapTarget.current, nextQuest)
+      drawWorld(context, rect.width, rect.height, viewport.width, viewport.height, camera, zoom, frame, current, completedLatest.current, nearId.current, assets, tapTarget.current, nextQuest, playerSprite)
       window.requestAnimationFrame(tick)
     }
 
@@ -1014,7 +1015,7 @@ function TemplePlayCanvas({
       window.removeEventListener('keydown', keyDown)
       window.removeEventListener('keyup', keyUp)
     }
-  }, [nextQuest, onNearQuestChange, onOpenQuest])
+  }, [nextQuest, onNearQuestChange, onOpenQuest, playerSprite])
 
   return (
     <div ref={wrapRef} className="temple-play-canvas-wrap">
@@ -1163,8 +1164,57 @@ function QuizOverlay({
   )
 }
 
-function GuideOverlay({ onClose }: { onClose: () => void }) {
-  const portrait = SPRITES.nxr
+function CharacterPicker({
+  selected,
+  selectedLabel,
+  onSelect,
+}: {
+  selected: SpriteKey
+  selectedLabel: string
+  onSelect: (sprite: SpriteKey) => void
+}) {
+  return (
+    <details className="temple-play-character-picker">
+      <summary>
+        <span>Character</span>
+        <strong>{selectedLabel}</strong>
+      </summary>
+      <div>
+        {CHARACTER_CHOICES.map((choice) => {
+          const sheet = SPRITES[choice.key]
+          return (
+            <button
+              key={choice.key}
+              type="button"
+              className={choice.key === selected ? 'is-selected' : ''}
+              onClick={() => onSelect(choice.key)}
+            >
+              <span
+                style={{
+                  backgroundImage: `url(${sheet.src})`,
+                  backgroundSize: `${sheet.frames * 100}% 100%`,
+                  backgroundPosition: '0 0',
+                }}
+              />
+              {choice.label}
+            </button>
+          )
+        })}
+      </div>
+    </details>
+  )
+}
+
+function GuideOverlay({
+  selected,
+  onSelect,
+  onClose,
+}: {
+  selected: SpriteKey
+  onSelect: (sprite: SpriteKey) => void
+  onClose: () => void
+}) {
+  const portrait = SPRITES[selected]
 
   return (
     <motion.div className="temple-play-guide-layer" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
@@ -1189,12 +1239,34 @@ function GuideOverlay({ onClose }: { onClose: () => void }) {
           <p>NXR Guide</p>
           <h2>Welcome to Temple Play</h2>
           <span>
-            This is a pixel quest for learning Rialo. Tap the map to move, follow the gold arrow, talk to NPCs, answer mini quizzes, then claim badges on-chain.
+            This is a pixel quest for learning Rialo. Tap the map to move, walk near a character, talk to NPCs, answer mini quizzes, then claim badges on-chain.
           </span>
-          <div>
+          <div className="temple-play-guide-actions">
             <small>Tap map: move</small>
-            <small>Arrow: next quest</small>
+            <small>Near NPC: talk</small>
             <small>E key: talk nearby</small>
+          </div>
+          <div className="temple-play-guide-characters" aria-label="Choose player character">
+            {CHARACTER_CHOICES.map((choice) => {
+              const sheet = SPRITES[choice.key]
+              return (
+                <button
+                  key={choice.key}
+                  type="button"
+                  className={choice.key === selected ? 'is-selected' : ''}
+                  onClick={() => onSelect(choice.key)}
+                >
+                  <span
+                    style={{
+                      backgroundImage: `url(${sheet.src})`,
+                      backgroundSize: `${sheet.frames * 100}% 100%`,
+                      backgroundPosition: '0 0',
+                    }}
+                  />
+                  {choice.label}
+                </button>
+              )
+            })}
           </div>
         </div>
         <button type="button" onClick={onClose}>Start</button>
@@ -1345,6 +1417,7 @@ function drawWorld(
   assets: TemplePlayAssets,
   target: { x: number; y: number } | null,
   nextQuest: QuestNpc,
+  playerSprite: SpriteKey,
 ) {
   ctx.clearRect(0, 0, width, height)
   ctx.save()
@@ -1355,8 +1428,8 @@ function drawWorld(
   drawWater(ctx, assets)
   drawEnvironmentProps(ctx, time, assets)
   drawTapTarget(ctx, time, target)
-  drawQuestDirection(ctx, time, player, nextQuest, nearNpcId)
-  drawActors(ctx, time, completedIds, nearNpcId, player, assets)
+  drawQuestHint(ctx, time, nextQuest, nearNpcId)
+  drawActors(ctx, time, completedIds, nearNpcId, player, assets, playerSprite)
   drawWeather(ctx, camera, viewportWidth, viewportHeight, time)
   drawShootingStar(ctx, camera, viewportWidth, viewportHeight, time)
   ctx.restore()
@@ -1381,64 +1454,28 @@ function drawTapTarget(ctx: CanvasRenderingContext2D, time: number, target: { x:
   ctx.restore()
 }
 
-function drawQuestDirection(
+function drawQuestHint(
   ctx: CanvasRenderingContext2D,
   time: number,
-  player: PlayerState,
   quest: QuestNpc,
   nearNpcId: number | null,
 ) {
-  const dx = quest.x - player.x
-  const dy = quest.y - player.y
-  const distance = Math.hypot(dx, dy)
-  const angle = Math.atan2(dy, dx)
-  const close = nearNpcId === quest.id || distance < 130
-  const arrowDistance = clamp(distance * 0.34, 84, 172)
-  const ax = player.x + Math.cos(angle) * arrowDistance
-  const ay = player.y + Math.sin(angle) * arrowDistance - 44 + Math.sin(time * 3) * 5
-
-  ctx.save()
-  ctx.globalAlpha = close ? 0.55 : 0.96
-  ctx.strokeStyle = 'rgba(242, 200, 102, 0.84)'
-  ctx.lineWidth = 5
-  ctx.setLineDash([16, 14])
-  ctx.lineDashOffset = -time * 38
-  ctx.beginPath()
-  ctx.moveTo(player.x, player.y - 42)
-  ctx.lineTo(quest.x, quest.y - 44)
-  ctx.stroke()
-  ctx.setLineDash([])
-
-  ctx.translate(ax, ay)
-  ctx.rotate(angle)
-  ctx.fillStyle = '#f2c866'
-  ctx.strokeStyle = '#07100c'
-  ctx.lineWidth = 5
-  ctx.beginPath()
-  ctx.moveTo(34, 0)
-  ctx.lineTo(-24, -24)
-  ctx.lineTo(-13, 0)
-  ctx.lineTo(-24, 24)
-  ctx.closePath()
-  ctx.fill()
-  ctx.stroke()
-  ctx.fillStyle = '#57e39f'
-  ctx.fillRect(-12, -6, 24, 12)
-  ctx.restore()
-
+  const close = nearNpcId === quest.id
   const ring = 1 + Math.sin(time * 4.2) * 0.08
   ctx.save()
   ctx.translate(quest.x, quest.y - 12)
-  ctx.strokeStyle = close ? 'rgba(87, 227, 159, 0.9)' : 'rgba(242, 200, 102, 0.86)'
-  ctx.fillStyle = close ? 'rgba(87, 227, 159, 0.18)' : 'rgba(242, 200, 102, 0.14)'
-  ctx.lineWidth = 5
+  ctx.globalAlpha = close ? 0.92 : 0.48
+  ctx.strokeStyle = close ? 'rgba(87, 227, 159, 0.9)' : 'rgba(242, 200, 102, 0.52)'
+  ctx.fillStyle = close ? 'rgba(87, 227, 159, 0.18)' : 'rgba(242, 200, 102, 0.08)'
+  ctx.lineWidth = close ? 4 : 2
   ctx.beginPath()
-  ctx.ellipse(0, 0, 60 * ring, 26 * ring, 0, 0, Math.PI * 2)
+  ctx.ellipse(0, 0, 42 * ring, 18 * ring, 0, 0, Math.PI * 2)
   ctx.fill()
   ctx.stroke()
   ctx.restore()
-
-  drawPixelNameTag(ctx, quest.x, quest.y - 170, close ? 'Tap Talk' : `Next: ${quest.zone}`, '#07100c', false, '#f2c866', true)
+  if (close) {
+    drawPixelNameTag(ctx, quest.x, quest.y - 148, 'Tap / E to talk', '#07100c', true, '#57e39f', true)
+  }
 }
 
 const WORLD_TILES = buildWorldTiles()
@@ -1645,23 +1682,10 @@ function drawBuildingAsset(
   assets: TemplePlayAssets,
   building: BuildingSpec,
 ) {
-  const { key, x, y, w, h, label, color } = building
+  const { key, x, y, w, h } = building
   ctx.fillStyle = 'rgba(0,0,0,.24)'
   ctx.fillRect(Math.round(x - w * 0.36), Math.round(y - 16), Math.round(w * 0.72), 26)
   drawPropBottomCenter(ctx, assets, key, x, y, w, h)
-  drawBuildingLabel(ctx, x, y + 12, label, color)
-}
-
-function drawBuildingLabel(ctx: CanvasRenderingContext2D, x: number, y: number, label: string, color: string) {
-  const width = Math.max(118, label.length * 11 + 24)
-  ctx.fillStyle = '#07100c'
-  ctx.fillRect(Math.round(x - width / 2), y, width, 30)
-  ctx.strokeStyle = color
-  ctx.lineWidth = 2
-  ctx.strokeRect(Math.round(x - width / 2) + 1, y + 1, width - 2, 28)
-  ctx.fillStyle = color
-  ctx.font = '900 16px monospace'
-  ctx.fillText(label, Math.round(x - width / 2 + 12), y + 21)
 }
 
 const FLOWERS: PropKey[] = ['flowerBlue', 'flowerAmber', 'flowerCream', 'flowerYellow', 'flowerRed', 'flowerOrange', 'flowerPink', 'flowerPurple']
@@ -1699,11 +1723,6 @@ function drawEnvironmentProps(ctx: CanvasRenderingContext2D, time: number, asset
       drawPropBottomCenter(ctx, assets, key, x, y, 40, 44)
     }
   }
-
-  // fishing nook on the east bank of the pond
-  drawProp(ctx, assets, 'fishingBobber', 352, 884 + Math.sin(time * 1.6) * 2, 20, 24)
-  drawProp(ctx, assets, 'fishingNet', 506, 992, 50, 40)
-  drawPropBottomCenter(ctx, assets, 'fishingBucket', 466, 992, 40, 50)
 
   drawFloatingLeaves(ctx, time)
 }
@@ -1773,6 +1792,7 @@ function drawActors(
   nearNpcId: number | null,
   player: PlayerState,
   assets: TemplePlayAssets,
+  playerSprite: SpriteKey,
 ) {
   const actors: Array<{ y: number; draw: () => void }> = BUILDINGS.map((building) => ({
     y: building.y,
@@ -1807,6 +1827,7 @@ function drawActors(
           compact: true,
           moving: motion.moving,
           direction: motion.direction,
+          activity: npc.activity,
         })
       },
     })
@@ -1839,10 +1860,10 @@ function drawActors(
   actors.push({
     y: player.y,
     draw: () => drawSpriteActor(ctx, assets, {
-      sprite: 'nxr',
+      sprite: playerSprite,
       x: player.x,
       y: player.y,
-      name: 'NXR (you)',
+      name: `${characterName(playerSprite)} (you)`,
       tone: '#f2c866',
       accent: '#57e39f',
       time,
@@ -1879,7 +1900,7 @@ const npcRuntime: NpcRuntime[] = AMBIENT_NPCS.map((npc) => ({
   home: { x: npc.x, y: npc.y },
   x: npc.x,
   y: npc.y,
-  dir: npc.activity === 'fish' ? 'left' : 'down',
+  dir: 'down',
   moving: false,
   target: null,
   pause: Math.random() * 2.5,
@@ -2016,15 +2037,15 @@ function questNpcMotion(quest: QuestNpc, time: number) {
   const phase = time + quest.id * 0.83
   if (quest.id % 3 === 0) {
     return {
-      x: quest.x + Math.sin(phase * 1.5) * 5,
-      y: quest.y + Math.sin(phase * 3.2) * 3,
+      x: quest.x + Math.sin(phase * 1.2) * 3,
+      y: quest.y + Math.sin(phase * 2.4) * 2,
       moving: false,
       direction: Math.sin(phase * 1.5) > 0 ? 'right' as const : 'left' as const,
     }
   }
   if (quest.id % 3 === 1) {
     return {
-      x: quest.x + Math.sin(phase * 0.72) * 16,
+      x: quest.x + Math.sin(phase * 0.72) * 8,
       y: quest.y,
       moving: true,
       direction: Math.cos(phase * 0.72) > 0 ? 'right' as const : 'left' as const,
@@ -2056,6 +2077,7 @@ function drawSpriteActor(
     player = false,
     moving = false,
     direction = 'down',
+    activity,
   }: {
     sprite: SpriteKey
     x: number
@@ -2071,6 +2093,7 @@ function drawSpriteActor(
     player?: boolean
     moving?: boolean
     direction?: PlayerState['dir']
+    activity?: AmbientActivity
   },
 ) {
   const sheet = SPRITES[sprite]
@@ -2130,7 +2153,49 @@ function drawSpriteActor(
     ctx.stroke()
   }
 
+  if (activity) {
+    drawActivityCue(ctx, x, y, drawW, drawH, time + seed, activity, tone, accent)
+  }
+
   drawPixelNameTag(ctx, x, y - drawH - (compact ? 18 : 24), name, completed ? '#57e39f' : '#f7f1df', compact, tone)
+}
+
+function drawActivityCue(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  drawW: number,
+  drawH: number,
+  time: number,
+  activity: AmbientActivity,
+  tone: string,
+  accent: string,
+) {
+  ctx.save()
+  ctx.font = '900 14px monospace'
+  ctx.textAlign = 'center'
+  if (activity === 'dance') {
+    const beat = Math.sin(time * 5)
+    ctx.fillStyle = beat > 0 ? accent : tone
+    ctx.fillText('♪', x + drawW * 0.45, y - drawH * 0.82 + beat * 4)
+    ctx.fillText('♪', x - drawW * 0.44, y - drawH * 0.58 - beat * 3)
+  } else if (activity === 'meditate') {
+    ctx.fillStyle = 'rgba(242,200,102,.86)'
+    ctx.fillText('✦', x, y - drawH - 28 + Math.sin(time * 2) * 4)
+  } else if (activity === 'tend') {
+    ctx.fillStyle = 'rgba(87,227,159,.82)'
+    ctx.fillRect(x + drawW * 0.35, y - drawH * 0.35, 12, 7)
+    ctx.fillRect(x + drawW * 0.48, y - drawH * 0.43, 9, 5)
+  } else if (activity === 'gather') {
+    drawMiniBubble(ctx, x + drawW * 0.42, y - drawH - 20, '...', tone)
+  } else if (activity === 'couple') {
+    ctx.fillStyle = 'rgba(255,122,217,.9)'
+    ctx.fillText('♥', x, y - drawH - 20 + Math.sin(time * 2.6) * 3)
+  } else if (activity === 'sit') {
+    ctx.fillStyle = 'rgba(247,241,223,.76)'
+    ctx.fillText('~', x + drawW * 0.42, y - drawH * 0.72)
+  }
+  ctx.restore()
 }
 
 function chooseSpriteFrame(
@@ -2145,13 +2210,17 @@ function chooseSpriteFrame(
   direction: PlayerState['dir'],
 ) {
   if (frameCount <= 1) return 0
-  if (sprite === 'nxr') {
+  if (sprite === 'nxr' && frameCount >= 16) {
     const row = direction === 'up' ? 1 : direction === 'left' ? 3 : direction === 'right' ? 2 : 0
     const step = moving ? Math.floor(time * 6.4 + seed) % 4 : 0
     return Math.min(frameCount - 1, row * 4 + step)
   }
   if (frameCount === 4) return frameForDirection(direction)
   return 0
+}
+
+function characterName(sprite: SpriteKey) {
+  return CHARACTER_CHOICES.find((choice) => choice.key === sprite)?.label ?? 'Player'
 }
 
 function frameForDirection(direction: PlayerState['dir']) {
