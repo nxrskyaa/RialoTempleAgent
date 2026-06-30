@@ -38,6 +38,8 @@ type AmbientNpc = {
   color: string
   accent: string
   line: string
+  topic: string
+  dialogue: string[]
   activity: AmbientActivity
   persona?: NpcPersona
   pair?: string
@@ -457,17 +459,193 @@ const QUESTS: QuestNpc[] = [
 ]
 
 const AMBIENT_NPCS: AmbientNpc[] = [
-  { name: 'Ade', sprite: 'npcForestGuide', x: 250, y: 360, color: '#57e39f', accent: '#78ecff', line: 'Forest paths are quiet, but data never sleeps.', activity: 'wander', persona: 'wanderer' },
-  { name: 'Barong', sprite: 'npcBuilder', x: 1250, y: 1160, color: '#57e39f', accent: '#c886ff', line: 'Every badge is better when the ledger can verify it.', activity: 'wander', persona: 'pacer' },
-  { name: 'Eric Argent', sprite: 'npcCaptain', x: 930, y: 590, color: '#78ecff', accent: '#ff7ad9', line: 'Bridge Gate scrolls carry API messages out and back.', activity: 'stroll', persona: 'wanderer' },
-  { name: 'Pinkeu', sprite: 'npcSage', x: 530, y: 1110, color: '#ff7ad9', accent: '#f2c866', line: 'The map gets brighter when badges are claimed.', activity: 'tend', persona: 'homebody' },
-  { name: 'Dikzzy', sprite: 'npcAlchemist', x: 440, y: 1120, color: '#c886ff', accent: '#f2c866', line: 'Privacy chambers turn plain scrolls into protected ones.', activity: 'dance', persona: 'homebody' },
-  { name: 'K.Gufran', sprite: 'npcKGufran', x: 1000, y: 245, color: '#88d7ff', accent: '#ff8066', line: 'A response scroll always comes back through Bridge Gate.', activity: 'gather', persona: 'wanderer' },
-  { name: 'Rikky', sprite: 'npcRikky', x: 1010, y: 1000, color: '#ffad72', accent: '#78ecff', line: 'Signals are tiny real-world updates with big consequences.', activity: 'meditate', persona: 'homebody' },
-  { name: 'Vibevortex', sprite: 'npcVibevortex', x: 1435, y: 815, color: '#57e39f', accent: '#c886ff', line: 'I keep the ritual energy moving between quests.', activity: 'dance', persona: 'homebody' },
-  { name: 'Wisnu', sprite: 'npcWisnu', x: 760, y: 1188, color: '#f2c866', accent: '#88d7ff', line: 'Every clean signal needs a calm verifier.', activity: 'meditate', persona: 'homebody' },
-  { name: 'Raka', sprite: 'npcRaka', x: 735, y: 275, color: '#ffad72', accent: '#57e39f', line: 'I patrol the gate so new explorers stay on track.', activity: 'stroll', persona: 'pacer' },
-  { name: 'Jepanya', sprite: 'npcJepanya', x: 1110, y: 700, color: '#78ecff', accent: '#f2c866', line: 'Boxes, scrolls, and data all need a route home.', activity: 'wander', persona: 'wanderer' },
+  {
+    name: 'Ade',
+    sprite: 'npcForestGuide',
+    x: 250,
+    y: 360,
+    color: '#57e39f',
+    accent: '#78ecff',
+    line: 'Forest paths are quiet, but data never sleeps.',
+    topic: 'Data Spring',
+    dialogue: [
+      'Rialo apps can listen to live real-world data, not just old values already written onchain.',
+      'Imagine weather, market prices, shipment status, or ratings flowing into a temple pool after being checked.',
+      'That lets contracts and agents react to what is happening outside crypto right now.',
+    ],
+    activity: 'wander',
+    persona: 'wanderer',
+  },
+  {
+    name: 'Barong',
+    sprite: 'npcBuilder',
+    x: 1250,
+    y: 1160,
+    color: '#57e39f',
+    accent: '#c886ff',
+    line: 'Every badge is better when the ledger can verify it.',
+    topic: 'Onchain Progress',
+    dialogue: [
+      'A local game save can disappear, but an onchain badge can be checked by anyone.',
+      'Temple Play uses quests like tiny proof-of-learning stamps for your Rialo Passport.',
+      'That is why progression should come from the contract, not from hidden browser memory.',
+    ],
+    activity: 'wander',
+    persona: 'pacer',
+  },
+  {
+    name: 'Eric Argent',
+    sprite: 'npcCaptain',
+    x: 930,
+    y: 590,
+    color: '#78ecff',
+    accent: '#ff7ad9',
+    line: 'Bridge Gate scrolls carry API messages out and back.',
+    topic: 'Bridge Gate',
+    dialogue: [
+      'Rialo is built so apps can talk to real internet services and systems.',
+      'A contract can send a request, wait for an API or real-world response, then use that result.',
+      'That makes blockchain apps feel closer to the apps normal people already use.',
+    ],
+    activity: 'stroll',
+    persona: 'wanderer',
+  },
+  {
+    name: 'Pinkeu',
+    sprite: 'npcSage',
+    x: 530,
+    y: 1110,
+    color: '#ff7ad9',
+    accent: '#f2c866',
+    line: 'The map gets brighter when badges are claimed.',
+    topic: 'Quest Board',
+    dialogue: [
+      'Quests turn learning into little actions instead of long boring reading.',
+      'Each badge should prove you understood one Rialo concept, like RWA, agents, or signals.',
+      'The fun part is simple: explore, learn, answer, then claim the proof.',
+    ],
+    activity: 'tend',
+    persona: 'homebody',
+  },
+  {
+    name: 'Dikzzy',
+    sprite: 'npcAlchemist',
+    x: 440,
+    y: 1120,
+    color: '#c886ff',
+    accent: '#f2c866',
+    line: 'Privacy chambers turn plain scrolls into protected ones.',
+    topic: 'Privacy Chamber',
+    dialogue: [
+      'Real-world apps often touch identity, finance, and personal messages.',
+      'Not every detail should be public forever, especially when users are normal people.',
+      'Rialo needs privacy patterns so useful apps can stay safe and respectful.',
+    ],
+    activity: 'dance',
+    persona: 'homebody',
+  },
+  {
+    name: 'K.Gufran',
+    sprite: 'npcKGufran',
+    x: 1000,
+    y: 245,
+    color: '#88d7ff',
+    accent: '#ff8066',
+    line: 'A response scroll always comes back through Bridge Gate.',
+    topic: 'Real-World Connectivity',
+    dialogue: [
+      'Connectivity means contracts are not trapped inside a sealed box.',
+      'They can coordinate with payments, delivery systems, databases, marketplaces, and more.',
+      'Less middleware means the app can feel more direct and easier to trust.',
+    ],
+    activity: 'gather',
+    persona: 'wanderer',
+  },
+  {
+    name: 'Rikky',
+    sprite: 'npcRikky',
+    x: 1010,
+    y: 1000,
+    color: '#ffad72',
+    accent: '#78ecff',
+    line: 'Signals are tiny real-world updates with big consequences.',
+    topic: 'Speed Engine',
+    dialogue: [
+      'Real-world apps need fast reaction, not long waiting screens.',
+      'A payment, check-in, price update, or deadline can become a trigger.',
+      'When signals move fast, automations and agents can respond while the moment still matters.',
+    ],
+    activity: 'meditate',
+    persona: 'homebody',
+  },
+  {
+    name: 'Vibevortex',
+    sprite: 'npcVibevortex',
+    x: 1435,
+    y: 815,
+    color: '#57e39f',
+    accent: '#c886ff',
+    line: 'I keep the ritual energy moving between quests.',
+    topic: 'Grialo Ritual',
+    dialogue: [
+      'Grialo is the daily ritual loop: channel energy, open the mystery box, earn PTS.',
+      'The box reveal is visual dopamine, but the score belongs to your onchain profile.',
+      'That makes the temple feel playful while still keeping progression verifiable.',
+    ],
+    activity: 'dance',
+    persona: 'homebody',
+  },
+  {
+    name: 'Wisnu',
+    sprite: 'npcWisnu',
+    x: 760,
+    y: 1188,
+    color: '#f2c866',
+    accent: '#88d7ff',
+    line: 'Every clean signal needs a calm verifier.',
+    topic: 'SCALE Verification',
+    dialogue: [
+      'SCALE helps define agent work before payment moves.',
+      'A task needs terms, a deadline, a quality check, and a clear settlement rule.',
+      'That gives AI agents safer rails before they touch real value.',
+    ],
+    activity: 'meditate',
+    persona: 'homebody',
+  },
+  {
+    name: 'Raka',
+    sprite: 'npcRaka',
+    x: 735,
+    y: 275,
+    color: '#ffad72',
+    accent: '#57e39f',
+    line: 'I patrol the gate so new explorers stay on track.',
+    topic: 'Rialo Passport',
+    dialogue: [
+      'Your Rialo Passport is the identity layer for this temple world.',
+      'It connects username, X handle, Grialo PTS, quiz PTS, and wish count.',
+      'A beginner should feel like they have a home in the app before doing bigger onchain actions.',
+    ],
+    activity: 'stroll',
+    persona: 'pacer',
+  },
+  {
+    name: 'Jepanya',
+    sprite: 'npcJepanya',
+    x: 1110,
+    y: 700,
+    color: '#78ecff',
+    accent: '#f2c866',
+    line: 'Boxes, scrolls, and data all need a route home.',
+    topic: 'RWA Vault',
+    dialogue: [
+      'RWA means real-world assets become useful inside blockchain apps.',
+      'An invoice, house, ticket, or gold record should update when real-world status changes.',
+      'That is the difference between a static token and an asset agents can actually use.',
+    ],
+    activity: 'wander',
+    persona: 'wanderer',
+  },
 ]
 
 type BuildingSpec = {
@@ -545,9 +723,11 @@ export default function TemplePlay() {
 function TemplePlayInner() {
   const { address, isConnected } = useAccount()
   const [activeQuest, setActiveQuest] = useState<QuestNpc | null>(null)
+  const [activeTalkNpc, setActiveTalkNpc] = useState<AmbientNpc | null>(null)
   const [answers, setAnswers] = useState<Record<number, number>>({})
   const [quizDone, setQuizDone] = useState(false)
   const [nearNpcId, setNearNpcId] = useState<number | null>(null)
+  const [nearAmbientIndex, setNearAmbientIndex] = useState<number | null>(null)
   const [showGuide, setShowGuide] = useState(true)
   const [playerSprite, setPlayerSprite] = useState<SpriteKey>(() => initialPlayerSprite())
   const [toast, setToast] = useState('')
@@ -686,6 +866,7 @@ function TemplePlayInner() {
 
   const openQuest = useCallback((quest: QuestNpc) => {
     playTempleSfx('talk')
+    setActiveTalkNpc(null)
     setActiveQuest(quest)
     setAnswers({})
     setQuizDone(false)
@@ -695,6 +876,13 @@ function TemplePlayInner() {
   useEffect(() => {
     openQuestRef.current = openQuest
   }, [openQuest])
+
+  const openAmbientTalk = useCallback((npc: AmbientNpc) => {
+    playTempleSfx('talk')
+    setActiveQuest(null)
+    setActiveTalkNpc(npc)
+    setToast('')
+  }, [])
 
   function answer(questionIndex: number, optionIndex: number) {
     if (quizDone) return
@@ -741,6 +929,7 @@ function TemplePlayInner() {
   }
 
   const nearestQuest = nearNpcId ? QUESTS.find((quest) => quest.id === nearNpcId) : null
+  const nearestAmbientNpc = nearAmbientIndex !== null ? AMBIENT_NPCS[nearAmbientIndex] : null
   const selectedCharacter = CHARACTER_CHOICES.find((choice) => choice.key === playerSprite) ?? CHARACTER_CHOICES[0]
 
   const chooseCharacter = useCallback((sprite: SpriteKey) => {
@@ -751,7 +940,7 @@ function TemplePlayInner() {
 
   return (
     <main className="temple-play-page">
-      <section className={`temple-play-shell ${activeQuest ? 'is-dialog-open' : ''}`}>
+      <section className={`temple-play-shell ${activeQuest || activeTalkNpc ? 'is-dialog-open' : ''}`}>
         <div className="temple-play-topbar">
           <div>
             <p className="text-xs font-black uppercase tracking-[0.18em] text-[var(--temple-gold)]">Temple Play</p>
@@ -773,7 +962,9 @@ function TemplePlayInner() {
             nextQuest={nextQuest}
             playerSprite={playerSprite}
             onNearQuestChange={setNearNpcId}
+            onNearAmbientChange={setNearAmbientIndex}
             onOpenQuest={(quest) => openQuestRef.current(quest)}
+            onOpenAmbientTalk={openAmbientTalk}
           />
 
           <div className="temple-play-audio-control">
@@ -808,15 +999,25 @@ function TemplePlayInner() {
           <CharacterPicker selected={playerSprite} selectedLabel={selectedCharacter.label} onSelect={chooseCharacter} />
 
           <div className="temple-play-miniquest">
-            <p>{nearestQuest ? 'Talk now' : 'Next destination'}</p>
-            <strong>{nearestQuest ? `${nearestQuest.npc} / ${nearestQuest.zone}` : `${nextQuest.zone}`}</strong>
-            <button type="button" disabled={!nearestQuest} onClick={() => nearestQuest && openQuest(nearestQuest)}>
-              {nearestQuest ? 'Talk' : 'Find NPC'}
+            <p>{nearestQuest || nearestAmbientNpc ? 'Talk now' : 'Next destination'}</p>
+            <strong>
+              {nearestQuest
+                ? `${nearestQuest.npc} / ${nearestQuest.zone}`
+                : nearestAmbientNpc
+                  ? `${nearestAmbientNpc.name} / ${nearestAmbientNpc.topic}`
+                  : `${nextQuest.zone}`}
+            </strong>
+            <button
+              type="button"
+              disabled={!nearestQuest && !nearestAmbientNpc}
+              onClick={() => nearestQuest ? openQuest(nearestQuest) : nearestAmbientNpc && openAmbientTalk(nearestAmbientNpc)}
+            >
+              {nearestQuest || nearestAmbientNpc ? 'Talk' : 'Find NPC'}
             </button>
           </div>
 
           <AnimatePresence>
-            {showGuide && !activeQuest ? (
+            {showGuide && !activeQuest && !activeTalkNpc ? (
               <GuideOverlay selected={playerSprite} onSelect={chooseCharacter} onClose={() => setShowGuide(false)} />
             ) : null}
           </AnimatePresence>
@@ -840,6 +1041,12 @@ function TemplePlayInner() {
                 onRetry={retryQuiz}
                 onClaim={claimBadge}
               />
+            ) : null}
+          </AnimatePresence>
+
+          <AnimatePresence>
+            {activeTalkNpc ? (
+              <AmbientTalkPanel key={activeTalkNpc.name} npc={activeTalkNpc} onClose={() => setActiveTalkNpc(null)} />
             ) : null}
           </AnimatePresence>
         </div>
@@ -869,22 +1076,27 @@ function TemplePlayCanvas({
   nextQuest,
   playerSprite,
   onNearQuestChange,
+  onNearAmbientChange,
   onOpenQuest,
+  onOpenAmbientTalk,
 }: {
   completedIds: Set<number>
   nextQuest: QuestNpc
   playerSprite: SpriteKey
   onNearQuestChange: (id: number | null) => void
+  onNearAmbientChange: (index: number | null) => void
   onOpenQuest: (quest: QuestNpc) => void
+  onOpenAmbientTalk: (npc: AmbientNpc) => void
 }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const wrapRef = useRef<HTMLDivElement | null>(null)
   const keys = useRef(new Set<string>())
   const player = useRef<PlayerState>({ x: 792, y: 840, dir: 'down', moving: false })
   const nearId = useRef<number | null>(null)
+  const nearAmbient = useRef<number | null>(null)
   const completedLatest = useRef(completedIds)
   const assetsRef = useRef<TemplePlayAssets | null>(null)
-  const tapTarget = useRef<{ x: number; y: number; questId?: number } | null>(null)
+  const tapTarget = useRef<{ x: number; y: number; questId?: number; ambientIndex?: number } | null>(null)
   const cameraRef = useRef({ x: 0, y: 0, zoom: DESKTOP_CAMERA_ZOOM })
 
   useEffect(() => {
@@ -926,6 +1138,14 @@ function TemplePlayCanvas({
         if (quest) {
           playTempleSfx('talk')
           onOpenQuest(quest)
+          return
+        }
+        if (nearAmbient.current !== null) {
+          const npc = AMBIENT_NPCS[nearAmbient.current]
+          if (npc) {
+            playTempleSfx('talk')
+            onOpenAmbientTalk(npc)
+          }
         }
       }
     }
@@ -971,6 +1191,7 @@ function TemplePlayCanvas({
         const distance = Math.hypot(dx, dy)
         if (distance < 10) {
           const arrivedQuest = tapTarget.current.questId
+          const arrivedAmbient = tapTarget.current.ambientIndex
           tapTarget.current = null
           input = { x: 0, y: 0 }
           if (arrivedQuest) {
@@ -978,6 +1199,13 @@ function TemplePlayCanvas({
             if (quest && Math.hypot(current.x - quest.x, current.y - quest.y) < 105) {
               playTempleSfx('talk')
               onOpenQuest(quest)
+            }
+          } else if (arrivedAmbient !== undefined) {
+            const npc = AMBIENT_NPCS[arrivedAmbient]
+            const motion = npcRuntime[arrivedAmbient]
+            if (npc && motion && Math.hypot(current.x - motion.x, current.y - motion.y) < 105) {
+              playTempleSfx('talk')
+              onOpenAmbientTalk(npc)
             }
           }
         } else {
@@ -1007,6 +1235,12 @@ function TemplePlayCanvas({
         nearId.current = nearest?.id ?? null
         onNearQuestChange(nearId.current)
       }
+      const ambient = nearId.current ? null : nearestAmbientNpc(current)
+      const ambientIndex = ambient?.index ?? null
+      if (ambientIndex !== nearAmbient.current) {
+        nearAmbient.current = ambientIndex
+        onNearAmbientChange(nearAmbient.current)
+      }
 
       const zoom = cameraZoom(rect.width)
       const viewport = { width: rect.width / zoom, height: rect.height / zoom }
@@ -1021,7 +1255,7 @@ function TemplePlayCanvas({
       }
       cameraRef.current = { ...camera, zoom }
 
-      drawWorld(context, rect.width, rect.height, viewport.width, viewport.height, camera, zoom, frame, current, completedLatest.current, nearId.current, assets, tapTarget.current, nextQuest, playerSprite)
+      drawWorld(context, rect.width, rect.height, viewport.width, viewport.height, camera, zoom, frame, current, completedLatest.current, nearId.current, nearAmbient.current, assets, tapTarget.current, nextQuest, playerSprite)
       window.requestAnimationFrame(tick)
     }
 
@@ -1033,7 +1267,7 @@ function TemplePlayCanvas({
       window.removeEventListener('keydown', keyDown)
       window.removeEventListener('keyup', keyUp)
     }
-  }, [nextQuest, onNearQuestChange, onOpenQuest, playerSprite])
+  }, [nextQuest, onNearQuestChange, onNearAmbientChange, onOpenQuest, onOpenAmbientTalk, playerSprite])
 
   return (
     <div ref={wrapRef} className="temple-play-canvas-wrap">
@@ -1049,10 +1283,14 @@ function TemplePlayCanvas({
             y: clamp((event.clientY - rect.top) / camera.zoom + camera.y, 90, WORLD.height - 90),
           }
           const tappedQuest = QUESTS.find((quest) => Math.hypot(target.x - quest.x, target.y - quest.y) < 70)
-          const walkTarget = tappedQuest
-            ? approachPoint(player.current, tappedQuest, 76)
+          const tappedAmbient = tappedQuest ? null : tappedAmbientNpc(target)
+          const targetActor = tappedQuest ?? tappedAmbient
+          const walkTarget = targetActor
+            ? approachPoint(player.current, targetActor, 76)
             : target
-          tapTarget.current = isMovementBlocked(walkTarget.x, walkTarget.y) ? null : { ...walkTarget, questId: tappedQuest?.id }
+          tapTarget.current = isMovementBlocked(walkTarget.x, walkTarget.y)
+            ? null
+            : { ...walkTarget, questId: tappedQuest?.id, ambientIndex: tappedAmbient?.index }
           playTempleSfx('tap')
         }}
       />
@@ -1179,6 +1417,61 @@ function QuizOverlay({
         </div>
       </motion.section>
     </motion.div>
+  )
+}
+
+function AmbientTalkPanel({
+  npc,
+  onClose,
+}: {
+  npc: AmbientNpc
+  onClose: () => void
+}) {
+  const [lineIndex, setLineIndex] = useState(0)
+  const portrait = SPRITES[npc.sprite]
+  const currentLine = npc.dialogue[lineIndex] ?? npc.line
+  const isLast = lineIndex >= npc.dialogue.length - 1
+
+  return (
+    <motion.section
+      className="temple-play-talk-panel"
+      style={{ '--npc': npc.color, '--npc-accent': npc.accent } as CSSProperties}
+      initial={{ opacity: 0, y: 18, scale: 0.96 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: 12, scale: 0.97 }}
+      transition={{ type: 'spring', stiffness: 260, damping: 24 }}
+    >
+      <div className="temple-play-talk-portrait">
+        <span
+          style={{
+            backgroundImage: `url(${portrait.src})`,
+            backgroundSize: `${portrait.frames * 100}% 100%`,
+            backgroundPosition: '0 0',
+          }}
+        />
+      </div>
+      <div className="temple-play-talk-copy">
+        <p>{npc.name} / {npc.topic}</p>
+        <strong>{currentLine}</strong>
+        <small>{lineIndex + 1}/{npc.dialogue.length} field note</small>
+      </div>
+      <div className="temple-play-talk-actions">
+        <button type="button" onClick={onClose}>Close</button>
+        <button
+          type="button"
+          onClick={() => {
+            if (isLast) {
+              onClose()
+              return
+            }
+            playTempleSfx('tap')
+            setLineIndex((current) => current + 1)
+          }}
+        >
+          {isLast ? 'Done' : 'Next'}
+        </button>
+      </div>
+    </motion.section>
   )
 }
 
@@ -1363,6 +1656,36 @@ function nearestQuest(player: PlayerState) {
   return distance < 118 ? nearest : null
 }
 
+type AmbientHit = { index: number; x: number; y: number }
+
+function nearestAmbientNpc(player: PlayerState): AmbientHit | null {
+  let nearest: { index: number; x: number; y: number } | null = null
+  let distance = Number.POSITIVE_INFINITY
+  for (let index = 0; index < npcRuntime.length; index++) {
+    const runtime = npcRuntime[index]
+    const current = Math.hypot(player.x - runtime.x, player.y - runtime.y)
+    if (current < distance) {
+      nearest = { index, x: runtime.x, y: runtime.y }
+      distance = current
+    }
+  }
+  return distance < 112 ? nearest : null
+}
+
+function tappedAmbientNpc(point: { x: number; y: number }): AmbientHit | null {
+  let nearest: { index: number; x: number; y: number } | null = null
+  let distance = Number.POSITIVE_INFINITY
+  for (let index = 0; index < npcRuntime.length; index++) {
+    const runtime = npcRuntime[index]
+    const current = Math.hypot(point.x - runtime.x, point.y - runtime.y)
+    if (current < distance) {
+      nearest = { index, x: runtime.x, y: runtime.y }
+      distance = current
+    }
+  }
+  return distance < 70 ? nearest : null
+}
+
 function isMovementBlocked(x: number, y: number) {
   return WORLD_BLOCKERS.some((rect) => pointInRect(x, y, rect))
 }
@@ -1410,13 +1733,13 @@ function direction(ax: number, ay: number, bx: number, by: number, cx: number, c
   return (cx - ax) * (by - ay) - (cy - ay) * (bx - ax)
 }
 
-function approachPoint(player: PlayerState, quest: QuestNpc, distance: number) {
-  const dx = player.x - quest.x
-  const dy = player.y - quest.y
+function approachPoint(player: PlayerState, actor: { x: number; y: number }, distance: number) {
+  const dx = player.x - actor.x
+  const dy = player.y - actor.y
   const len = Math.hypot(dx, dy) || 1
   return {
-    x: clamp(quest.x + (dx / len) * distance, 90, WORLD.width - 90),
-    y: clamp(quest.y + (dy / len) * distance, 90, WORLD.height - 90),
+    x: clamp(actor.x + (dx / len) * distance, 90, WORLD.width - 90),
+    y: clamp(actor.y + (dy / len) * distance, 90, WORLD.height - 90),
   }
 }
 
@@ -1432,6 +1755,7 @@ function drawWorld(
   player: PlayerState,
   completedIds: Set<number>,
   nearNpcId: number | null,
+  nearAmbientIndex: number | null,
   assets: TemplePlayAssets,
   target: { x: number; y: number } | null,
   nextQuest: QuestNpc,
@@ -1447,7 +1771,7 @@ function drawWorld(
   drawEnvironmentProps(ctx, time, assets)
   drawTapTarget(ctx, time, target)
   drawQuestHint(ctx, time, nextQuest, nearNpcId)
-  drawActors(ctx, time, completedIds, nearNpcId, player, assets, playerSprite)
+  drawActors(ctx, time, completedIds, nearNpcId, nearAmbientIndex, player, assets, playerSprite)
   drawWeather(ctx, camera, viewportWidth, viewportHeight, time)
   drawShootingStar(ctx, camera, viewportWidth, viewportHeight, time)
   ctx.restore()
@@ -1843,6 +2167,7 @@ function drawActors(
   time: number,
   completedIds: Set<number>,
   nearNpcId: number | null,
+  nearAmbientIndex: number | null,
   player: PlayerState,
   assets: TemplePlayAssets,
   playerSprite: SpriteKey,
@@ -1877,11 +2202,15 @@ function drawActors(
           accent: npc.accent,
           time,
           seed: index * 0.73,
+          near: nearAmbientIndex === index,
           compact: true,
           moving: motion.moving,
           direction: motion.direction,
           activity: npc.activity,
         })
+        if (nearAmbientIndex === index) {
+          drawPixelNameTag(ctx, motion.x, motion.y - 134, 'Tap / E to chat', '#07100c', true, npc.color, true)
+        }
       },
     })
   })
