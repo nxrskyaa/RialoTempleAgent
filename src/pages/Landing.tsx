@@ -48,7 +48,7 @@ export default function Landing() {
                   <p className="text-xs text-[var(--temple-muted)]">Arc Testnet playground</p>
                 </div>
               </div>
-              <div className="sticker-note candy-sticker hidden rounded-lg px-3 py-2 text-xs font-black sm:block">Arc Testnet rituals</div>
+              <div className="sticker-note candy-sticker hidden rounded-lg px-3 py-2 text-xs font-black sm:block">Build For Rialo</div>
             </div>
 
             <h1 className="arcade-title max-w-xl text-5xl font-black leading-[0.92] tracking-normal sm:text-7xl">

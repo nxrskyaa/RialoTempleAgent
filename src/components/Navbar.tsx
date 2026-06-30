@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { motion } from 'framer-motion'
-import { Gamepad2, Globe2, IdCard, Menu, MessageSquareText, ScrollText, Sparkles, Trophy, UserCircle, Wand2, X } from 'lucide-react'
+import { Flame, Gamepad2, Globe2, IdCard, Menu, MessageSquareText, ScrollText, Trophy, UserCircle, Wand2, X } from 'lucide-react'
 
 const NAV = [
-  { path: '/grialo', label: 'Grialo', icon: Sparkles },
+  { path: '/grialo', label: 'Grialo', icon: Flame },
   { path: '/world', label: 'World', icon: Globe2 },
   { path: '/temple-play', label: 'Temple Play', icon: Gamepad2 },
   { path: '/quiz', label: 'Quiz', icon: Wand2 },
