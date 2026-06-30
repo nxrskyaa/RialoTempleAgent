@@ -934,14 +934,14 @@ const BUILDINGS: BuildingSpec[] = [
 ]
 
 const RIALO_SIGN_GATHER_SPOTS = [
-  { x: 792, y: 720 },
-  { x: 880, y: 720 },
-  { x: 980, y: 700 },
-  { x: 1010, y: 760 },
-  { x: 610, y: 610 },
-  { x: 980, y: 610 },
-  { x: 760, y: 670 },
-  { x: 890, y: 675 },
+  { x: 690, y: 720 },
+  { x: 760, y: 740 },
+  { x: 835, y: 742 },
+  { x: 910, y: 735 },
+  { x: 985, y: 712 },
+  { x: 705, y: 795 },
+  { x: 815, y: 810 },
+  { x: 930, y: 795 },
 ]
 
 const BUILDING_COLLIDERS = BUILDINGS.map((building) => buildingCollider(building))
@@ -2446,7 +2446,7 @@ function drawActors(
   playerSprite: SpriteKey,
 ) {
   const actors: Array<{ y: number; draw: () => void }> = BUILDINGS.map((building) => ({
-    y: building.y,
+    y: building.key === 'buildingRialoSign' ? building.y - 105 : building.y,
     draw: () => drawBuildingAsset(ctx, assets, building),
   }))
   SCENERY.forEach((s) => {
