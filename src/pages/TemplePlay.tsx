@@ -82,6 +82,10 @@ type SpriteKey =
   | 'npcAlchemist'
   | 'npcKGufran'
   | 'npcRikky'
+  | 'npcVibevortex'
+  | 'npcWisnu'
+  | 'npcRaka'
+  | 'npcJepanya'
 
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000' as const
 const MAP_W = 50
@@ -194,6 +198,10 @@ const SPRITES: Record<SpriteKey, SpriteSheet> = {
   npcAlchemist: { src: '/temple-play/characters/rt-dikzzy.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
   npcKGufran: { src: '/temple-play/characters/rt-k-gufran.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
   npcRikky: { src: '/temple-play/characters/rt-rikky.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
+  npcVibevortex: { src: '/temple-play/characters/rt-vibevortex.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
+  npcWisnu: { src: '/temple-play/characters/rt-wisnu.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
+  npcRaka: { src: '/temple-play/characters/rt-raka.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
+  npcJepanya: { src: '/temple-play/characters/rt-jepanya.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
 }
 
 const CHARACTER_CHOICES: Array<{ key: SpriteKey; label: string }> = [
@@ -209,6 +217,10 @@ const CHARACTER_CHOICES: Array<{ key: SpriteKey; label: string }> = [
   { key: 'npcAlchemist', label: 'Dikzzy' },
   { key: 'npcKGufran', label: 'K.Gufran' },
   { key: 'npcRikky', label: 'Rikky' },
+  { key: 'npcVibevortex', label: 'Vibevortex' },
+  { key: 'npcWisnu', label: 'Wisnu' },
+  { key: 'npcRaka', label: 'Raka' },
+  { key: 'npcJepanya', label: 'Jepanya' },
 ]
 
 function initialPlayerSprite(): SpriteKey {
@@ -452,6 +464,10 @@ const AMBIENT_NPCS: AmbientNpc[] = [
   { name: 'Dikzzy', sprite: 'npcAlchemist', x: 440, y: 1120, color: '#c886ff', accent: '#f2c866', line: 'Privacy chambers turn plain scrolls into protected ones.', activity: 'dance', persona: 'homebody' },
   { name: 'K.Gufran', sprite: 'npcKGufran', x: 1000, y: 245, color: '#88d7ff', accent: '#ff8066', line: 'A response scroll always comes back through Bridge Gate.', activity: 'gather', persona: 'wanderer' },
   { name: 'Rikky', sprite: 'npcRikky', x: 1010, y: 1000, color: '#ffad72', accent: '#78ecff', line: 'Signals are tiny real-world updates with big consequences.', activity: 'meditate', persona: 'homebody' },
+  { name: 'Vibevortex', sprite: 'npcVibevortex', x: 1435, y: 815, color: '#57e39f', accent: '#c886ff', line: 'I keep the ritual energy moving between quests.', activity: 'dance', persona: 'homebody' },
+  { name: 'Wisnu', sprite: 'npcWisnu', x: 760, y: 1188, color: '#f2c866', accent: '#88d7ff', line: 'Every clean signal needs a calm verifier.', activity: 'meditate', persona: 'homebody' },
+  { name: 'Raka', sprite: 'npcRaka', x: 735, y: 275, color: '#ffad72', accent: '#57e39f', line: 'I patrol the gate so new explorers stay on track.', activity: 'stroll', persona: 'pacer' },
+  { name: 'Jepanya', sprite: 'npcJepanya', x: 1110, y: 700, color: '#78ecff', accent: '#f2c866', line: 'Boxes, scrolls, and data all need a route home.', activity: 'wander', persona: 'wanderer' },
 ]
 
 type BuildingSpec = {
@@ -2024,7 +2040,7 @@ function drawNpcEventLayer(ctx: CanvasRenderingContext2D, time: number, motions:
   }
 
   if (kind === 2 && local < 1.3) {
-    const greeters = [1, 8, 11]
+    const greeters = [1, 8, 10]
     const index = greeters[slot % greeters.length]
     const motion = motions[index]
     if (!motion) return
