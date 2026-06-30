@@ -88,6 +88,19 @@ type SpriteKey =
   | 'npcWisnu'
   | 'npcRaka'
   | 'npcJepanya'
+  | 'npcAqc'
+  | 'npcDp'
+  | 'npcIshu'
+  | 'npcJeams'
+  | 'npcKoushik'
+  | 'npcKingJ'
+  | 'npcRichard12'
+  | 'npcLuka'
+  | 'npcSilverwave'
+  | 'npcSuleyman'
+  | 'npcYozi'
+  | 'npcDora'
+  | 'npcDarma'
 
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000' as const
 const MAP_W = 50
@@ -186,6 +199,7 @@ type PropKey =
   | 'buildingScaleDojo'
   | 'buildingGreenhouseInn'
   | 'buildingOrangeCottage'
+  | 'buildingRialoSign'
 
 const SPRITES: Record<SpriteKey, SpriteSheet> = {
   nxr: { src: '/temple-play/sprites/nxr-v2.png', frameW: 210, frameH: 280, frames: 16, drawW: 70, drawH: 94 },
@@ -204,6 +218,19 @@ const SPRITES: Record<SpriteKey, SpriteSheet> = {
   npcWisnu: { src: '/temple-play/characters/rt-wisnu.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
   npcRaka: { src: '/temple-play/characters/rt-raka.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
   npcJepanya: { src: '/temple-play/characters/rt-jepanya.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
+  npcAqc: { src: '/temple-play/characters/rt-aqc.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
+  npcDp: { src: '/temple-play/characters/rt-dp.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
+  npcIshu: { src: '/temple-play/characters/rt-ishu.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
+  npcJeams: { src: '/temple-play/characters/rt-jeams.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
+  npcKoushik: { src: '/temple-play/characters/rt-koushik.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
+  npcKingJ: { src: '/temple-play/characters/rt-kingj.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
+  npcRichard12: { src: '/temple-play/characters/rt-richard12.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
+  npcLuka: { src: '/temple-play/characters/rt-luka.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
+  npcSilverwave: { src: '/temple-play/characters/rt-silverwave.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
+  npcSuleyman: { src: '/temple-play/characters/rt-suleyman.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
+  npcYozi: { src: '/temple-play/characters/rt-yozi.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
+  npcDora: { src: '/temple-play/characters/rt-dora.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
+  npcDarma: { src: '/temple-play/characters/rt-darma.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
 }
 
 const CHARACTER_CHOICES: Array<{ key: SpriteKey; label: string }> = [
@@ -223,6 +250,19 @@ const CHARACTER_CHOICES: Array<{ key: SpriteKey; label: string }> = [
   { key: 'npcWisnu', label: 'Wisnu' },
   { key: 'npcRaka', label: 'Raka' },
   { key: 'npcJepanya', label: 'Jepanya' },
+  { key: 'npcAqc', label: 'AQC' },
+  { key: 'npcDp', label: 'DP' },
+  { key: 'npcIshu', label: 'Ishu' },
+  { key: 'npcJeams', label: 'Jeams' },
+  { key: 'npcKoushik', label: 'Koushik' },
+  { key: 'npcKingJ', label: 'KingJ' },
+  { key: 'npcRichard12', label: 'Richard12' },
+  { key: 'npcLuka', label: 'Luka' },
+  { key: 'npcSilverwave', label: 'Silverwave' },
+  { key: 'npcSuleyman', label: 'Suleyman' },
+  { key: 'npcYozi', label: 'Yozi' },
+  { key: 'npcDora', label: 'Dora' },
+  { key: 'npcDarma', label: 'Darma' },
 ]
 
 function initialPlayerSprite(): SpriteKey {
@@ -272,6 +312,7 @@ const PROPS: Record<PropKey, string> = {
   buildingWoodenCabin: '/temple-play/world/building/warungpecel.png',
   buildingOrangeCottage: '/temple-play/world/building/building-1.png',
   buildingGuildHouse: '/temple-play/world/building/building-2.png',
+  buildingRialoSign: '/temple-play/world/building/rialo-sign.png',
 }
 
 const QUESTS: QuestNpc[] = [
@@ -496,8 +537,8 @@ const AMBIENT_NPCS: AmbientNpc[] = [
   {
     name: 'Eric Argent',
     sprite: 'npcCaptain',
-    x: 930,
-    y: 590,
+    x: 1010,
+    y: 690,
     color: '#78ecff',
     accent: '#ff7ad9',
     line: 'Bridge Gate scrolls carry API messages out and back.',
@@ -646,6 +687,227 @@ const AMBIENT_NPCS: AmbientNpc[] = [
     activity: 'wander',
     persona: 'wanderer',
   },
+  {
+    name: 'AQC',
+    sprite: 'npcAqc',
+    x: 980,
+    y: 720,
+    color: '#57e39f',
+    accent: '#78ecff',
+    line: 'The sign plaza is where every signal gets noticed.',
+    topic: 'Rialo Signal Plaza',
+    dialogue: [
+      'The RialoSign marks the center of the map: learn, gather, then move with purpose.',
+      'When many explorers meet here, it feels like the temple has a real heartbeat.',
+      'Signals matter because they turn outside-world changes into app actions.',
+    ],
+    activity: 'wander',
+    persona: 'wanderer',
+  },
+  {
+    name: 'DP',
+    sprite: 'npcDp',
+    x: 575,
+    y: 610,
+    color: '#ffad72',
+    accent: '#f2c866',
+    line: 'A clear passport makes every quest easier to trust.',
+    topic: 'Temple Passport',
+    dialogue: [
+      'Your Rialo Passport connects identity, quest proof, and score without needing a messy profile system.',
+      'A wallet can hold progress, but username and X handle make the world feel human.',
+      'That is why onboarding should feel familiar before the app asks for deeper Web3 actions.',
+    ],
+    activity: 'stroll',
+    persona: 'pacer',
+  },
+  {
+    name: 'Ishu',
+    sprite: 'npcIshu',
+    x: 930,
+    y: 760,
+    color: '#c886ff',
+    accent: '#78ecff',
+    line: 'Fast apps need live triggers, not sleepy buttons.',
+    topic: 'Real-World Reactivity',
+    dialogue: [
+      'Rialo apps should react when a real event happens: payment, delivery, deadline, or price move.',
+      'The app should not make users refresh forever while the world already changed.',
+      'That is the difference between a static chain app and a real-world app.',
+    ],
+    activity: 'dance',
+    persona: 'homebody',
+  },
+  {
+    name: 'Jeams',
+    sprite: 'npcJeams',
+    x: 1100,
+    y: 710,
+    color: '#57e39f',
+    accent: '#ff7ad9',
+    line: 'I keep the API scrolls neat before they cross the gate.',
+    topic: 'API Connectivity',
+    dialogue: [
+      'Real-world connectivity means smart contracts can coordinate with internet services.',
+      'A request can leave the temple, check an external system, then return with a useful result.',
+      'That is how blockchain starts talking to apps people already use.',
+    ],
+    activity: 'gather',
+    persona: 'wanderer',
+  },
+  {
+    name: 'Koushik',
+    sprite: 'npcKoushik',
+    x: 260,
+    y: 700,
+    color: '#88d7ff',
+    accent: '#f2c866',
+    line: 'Data needs a filter before it becomes app truth.',
+    topic: 'Real-World Data',
+    dialogue: [
+      'Live data is useful only when the app can understand and check it.',
+      'Weather, price, shipment, or review data can become an input for onchain logic.',
+      'Better data makes agents and users less blind.',
+    ],
+    activity: 'wander',
+    persona: 'wanderer',
+  },
+  {
+    name: 'KingJ',
+    sprite: 'npcKingJ',
+    x: 420,
+    y: 760,
+    color: '#f2c866',
+    accent: '#57e39f',
+    line: 'A good vault turns ownership into something apps can use.',
+    topic: 'RWA Utility',
+    dialogue: [
+      'RWA is not just making a token and calling it a day.',
+      'Useful real-world assets should update with status, verification, and live conditions.',
+      'Then agents can reason about them instead of staring at a static badge.',
+    ],
+    activity: 'meditate',
+    persona: 'homebody',
+  },
+  {
+    name: 'Richard12',
+    sprite: 'npcRichard12',
+    x: 1010,
+    y: 1120,
+    color: '#78ecff',
+    accent: '#c886ff',
+    line: 'SCALE keeps agent work from turning into chaos.',
+    topic: 'Agent Work Terms',
+    dialogue: [
+      'Agents need clear tasks, limits, deadlines, and verification before payment.',
+      'SCALE makes those terms easier to coordinate between users, agents, and judges.',
+      'That is safer than hoping an AI did the right thing.',
+    ],
+    activity: 'stroll',
+    persona: 'pacer',
+  },
+  {
+    name: 'Luka',
+    sprite: 'npcLuka',
+    x: 1360,
+    y: 840,
+    color: '#ff7ad9',
+    accent: '#78ecff',
+    line: 'Private messages should stay private.',
+    topic: 'Real-World Privacy',
+    dialogue: [
+      'Not every real-world interaction belongs on a public wall.',
+      'Identity, finance, and personal updates need careful privacy design.',
+      'A useful app protects the user while still giving the system enough proof.',
+    ],
+    activity: 'sit',
+    persona: 'homebody',
+  },
+  {
+    name: 'Silverwave',
+    sprite: 'npcSilverwave',
+    x: 1500,
+    y: 890,
+    color: '#78ecff',
+    accent: '#f2c866',
+    line: 'Signal Tower watches for the little updates that matter.',
+    topic: 'Automation Signals',
+    dialogue: [
+      'Automation starts when a condition becomes true.',
+      'A deadline passes, a delivery completes, or a price crosses a line.',
+      'Rialo makes those signals easier for apps and agents to use.',
+    ],
+    activity: 'wander',
+    persona: 'wanderer',
+  },
+  {
+    name: 'Suleyman',
+    sprite: 'npcSuleyman',
+    x: 420,
+    y: 1050,
+    color: '#b9ff66',
+    accent: '#57e39f',
+    line: 'Quests are tiny lessons with proof attached.',
+    topic: 'Learning Quests',
+    dialogue: [
+      'Temple Play makes learning interactive instead of dumping a long document on users.',
+      'Talk, answer, claim, then see progress through your profile.',
+      'A beginner should understand by walking the world, not just reading a pitch.',
+    ],
+    activity: 'tend',
+    persona: 'homebody',
+  },
+  {
+    name: 'Yozi',
+    sprite: 'npcYozi',
+    x: 700,
+    y: 1210,
+    color: '#c886ff',
+    accent: '#ffad72',
+    line: 'Judges make agent work less risky.',
+    topic: 'Verification',
+    dialogue: [
+      'A judge step checks whether an output matches the requested task.',
+      'That matters before payment releases or before an agent touches real-world value.',
+      'Verification turns agent work from vibes into a process.',
+    ],
+    activity: 'dance',
+    persona: 'homebody',
+  },
+  {
+    name: 'Dora',
+    sprite: 'npcDora',
+    x: 890,
+    y: 250,
+    color: '#ffad72',
+    accent: '#ff7ad9',
+    line: 'The bridge is only useful if the response comes back clean.',
+    topic: 'Response Loops',
+    dialogue: [
+      'Connectivity is a loop: ask a real system, receive the result, then act with it.',
+      'Without the return path, the contract only shouts into the void.',
+      'Rialo’s real-world direction is about closing that loop cleanly.',
+    ],
+    activity: 'stroll',
+    persona: 'wanderer',
+  },
+  {
+    name: 'Darma',
+    sprite: 'npcDarma',
+    x: 1250,
+    y: 670,
+    color: '#f2c866',
+    accent: '#88d7ff',
+    line: 'The best apps feel simple even when the rails are serious.',
+    topic: 'Rialo UX',
+    dialogue: [
+      'A real-world blockchain app should not feel like homework.',
+      'Good UX hides complexity until the user actually needs it.',
+      'That is why this world teaches with characters, movement, and small proofs.',
+    ],
+    activity: 'wander',
+    persona: 'wanderer',
+  },
 ]
 
 type BuildingSpec = {
@@ -659,16 +921,27 @@ type BuildingSpec = {
 }
 
 const BUILDINGS: BuildingSpec[] = [
-  { key: 'balineseTemple', x: 792, y: 630, w: 235, h: 298, label: 'NXR Temple', color: '#f2c866' },
+  { key: 'buildingRialoSign', x: 792, y: 650, w: 340, h: 340, label: 'Rialo Sign', color: '#f2c866' },
   { key: 'buildingScaleDojo', x: 395, y: 332, w: 250, h: 282, label: 'SCALE Lab', color: '#c886ff' },
   { key: 'buildingStoneVault', x: 1290, y: 370, w: 258, h: 306, label: 'RWA Vault', color: '#f2c866' },
-  { key: 'buildingTempleLodge', x: 580, y: 900, w: 318, h: 268, label: 'Agent Camp', color: '#78ecff' },
+  { key: 'buildingTempleLodge', x: 585, y: 920, w: 318, h: 268, label: 'Agent Camp', color: '#78ecff' },
   { key: 'buildingMarketHall', x: 1180, y: 1050, w: 278, h: 266, label: 'Signal Tower', color: '#b9ff66' },
   { key: 'buildingGreenhouseInn', x: 270, y: 1276, w: 230, h: 296, label: 'Privacy Grove', color: '#ff7ad9' },
-  { key: 'buildingOracleHouse', x: 1035, y: 535, w: 248, h: 276, label: 'Bridge Gate', color: '#57e39f' },
+  { key: 'buildingOracleHouse', x: 1100, y: 760, w: 248, h: 276, label: 'Bridge Gate', color: '#57e39f' },
   { key: 'buildingWoodenCabin', x: 850, y: 1150, w: 250, h: 220, label: 'Warung Pecel', color: '#ffad72' },
   { key: 'buildingOrangeCottage', x: 1430, y: 1150, w: 206, h: 210, label: 'Quest Hut', color: '#f2c866' },
   { key: 'buildingGuildHouse', x: 1425, y: 620, w: 248, h: 236, label: 'Guild Hall', color: '#78ecff' },
+]
+
+const RIALO_SIGN_GATHER_SPOTS = [
+  { x: 792, y: 720 },
+  { x: 880, y: 720 },
+  { x: 980, y: 700 },
+  { x: 1010, y: 760 },
+  { x: 610, y: 610 },
+  { x: 980, y: 610 },
+  { x: 760, y: 670 },
+  { x: 890, y: 675 },
 ]
 
 const BUILDING_COLLIDERS = BUILDINGS.map((building) => buildingCollider(building))
@@ -698,10 +971,10 @@ const SCENERY: ScenerySpec[] = [
   { key: 'lamp', x: 430, y: 560, w: 78, h: 160, solid: true },
   { key: 'lamp', x: 250, y: 760, w: 78, h: 160, solid: true },
   // park nook in the open pocket between temple / oracle / market / guild
-  { key: 'parkBench', x: 1000, y: 640, w: 104, h: 78, solid: true },
-  { key: 'parkLantern', x: 1180, y: 650, w: 86, h: 104, solid: true },
-  { key: 'parkBush', x: 1000, y: 760, w: 104, h: 100 },
-  { key: 'parkPlanter', x: 1180, y: 762, w: 104, h: 101 },
+  { key: 'parkBench', x: 1320, y: 720, w: 104, h: 78, solid: true },
+  { key: 'parkLantern', x: 1445, y: 730, w: 86, h: 104, solid: true },
+  { key: 'parkBush', x: 1375, y: 835, w: 104, h: 100 },
+  { key: 'parkPlanter', x: 1545, y: 835, w: 104, h: 101 },
 ]
 
 function sceneryCollider(s: ScenerySpec) {
@@ -2272,6 +2545,8 @@ type NpcRuntime = {
   target: { x: number; y: number } | null
   pause: number
   roams: boolean
+  signTrip: 'idle' | 'toSign' | 'atSign' | 'returnHome'
+  visitCooldown: number
 }
 
 const ROAM_ACTIVITIES = new Set<AmbientActivity>(['wander', 'stroll'])
@@ -2287,33 +2562,90 @@ const npcRuntime: NpcRuntime[] = AMBIENT_NPCS.map((npc) => ({
   target: null,
   pause: Math.random() * 2.5,
   roams: ROAM_ACTIVITIES.has(npc.activity),
+  signTrip: 'idle',
+  visitCooldown: 2 + Math.random() * 14,
 }))
 
-function pickNpcTarget(r: NpcRuntime) {
+function pickNpcTarget(r: NpcRuntime, radius = NPC_ROAM_RADIUS) {
   for (let tries = 0; tries < 14; tries++) {
     const angle = Math.random() * Math.PI * 2
-    const radius = 30 + Math.random() * NPC_ROAM_RADIUS
-    const x = clamp(r.home.x + Math.cos(angle) * radius, 80, WORLD.width - 80)
-    const y = clamp(r.home.y + Math.sin(angle) * radius, 80, WORLD.height - 80)
+    const distance = 30 + Math.random() * radius
+    const x = clamp(r.home.x + Math.cos(angle) * distance, 80, WORLD.width - 80)
+    const y = clamp(r.home.y + Math.sin(angle) * distance, 80, WORLD.height - 80)
     if (!isMovementBlocked(x, y) && !pathBlocked(r.x, r.y, x, y)) return { x, y }
   }
   return null
 }
 
+function pickRialoSignTarget(r: NpcRuntime) {
+  const start = Math.floor(Math.random() * RIALO_SIGN_GATHER_SPOTS.length)
+  for (let i = 0; i < RIALO_SIGN_GATHER_SPOTS.length; i++) {
+    const spot = RIALO_SIGN_GATHER_SPOTS[(start + i) % RIALO_SIGN_GATHER_SPOTS.length]
+    const x = spot.x + (Math.random() - 0.5) * 24
+    const y = spot.y + (Math.random() - 0.5) * 18
+    if (!isMovementBlocked(x, y) && !pathBlocked(r.x, r.y, x, y)) return { x, y }
+  }
+  return null
+}
+
+function pickHomeTarget(r: NpcRuntime) {
+  if (!isMovementBlocked(r.home.x, r.home.y) && !pathBlocked(r.x, r.y, r.home.x, r.home.y)) return { ...r.home }
+  return pickNpcTarget(r, 46)
+}
+
 function updateAmbientNpcs(dt: number) {
   for (const r of npcRuntime) {
-    if (!r.roams) { r.moving = false; continue }
     if (r.pause > 0) { r.pause -= dt; r.moving = false; continue }
     if (!r.target) {
-      r.target = pickNpcTarget(r)
-      if (!r.target) { r.pause = 0.6; continue }
+      if (r.signTrip === 'atSign') {
+        r.target = pickHomeTarget(r)
+        r.signTrip = 'returnHome'
+        if (!r.target) {
+          r.signTrip = 'idle'
+          r.visitCooldown = 6 + Math.random() * 16
+          r.pause = 0.8
+          continue
+        }
+      } else if (r.signTrip === 'idle') {
+        r.visitCooldown -= dt
+        if (r.visitCooldown <= 0) {
+          r.target = pickRialoSignTarget(r)
+          if (r.target) {
+            r.signTrip = 'toSign'
+          } else {
+            r.visitCooldown = 3 + Math.random() * 8
+            r.pause = 0.4
+            continue
+          }
+        } else if (r.roams) {
+          r.target = pickNpcTarget(r)
+          if (!r.target) { r.pause = 0.6; continue }
+        } else {
+          r.moving = false
+          continue
+        }
+      } else {
+        r.signTrip = 'idle'
+        r.visitCooldown = 5 + Math.random() * 12
+        r.moving = false
+        continue
+      }
     }
     const dx = r.target.x - r.x
     const dy = r.target.y - r.y
     const dist = Math.hypot(dx, dy)
     if (dist < 3) {
       r.target = null
-      r.pause = 1.4 + Math.random() * 2.6
+      if (r.signTrip === 'toSign') {
+        r.signTrip = 'atSign'
+        r.pause = 2.4 + Math.random() * 4.2
+      } else if (r.signTrip === 'returnHome') {
+        r.signTrip = 'idle'
+        r.visitCooldown = 8 + Math.random() * 22
+        r.pause = 1 + Math.random() * 2
+      } else {
+        r.pause = 1.4 + Math.random() * 2.6
+      }
       r.moving = false
       continue
     }
@@ -2323,7 +2655,14 @@ function updateAmbientNpcs(dt: number) {
     let moved = false
     if (!isMovementBlocked(nx, r.y)) { r.x = nx; moved = true }
     if (!isMovementBlocked(r.x, ny)) { r.y = ny; moved = true }
-    if (!moved) { r.target = null; r.pause = 0.4 + Math.random() }
+    if (!moved) {
+      r.target = null
+      r.pause = 0.4 + Math.random()
+      if (r.signTrip !== 'idle') {
+        r.signTrip = 'idle'
+        r.visitCooldown = 4 + Math.random() * 12
+      }
+    }
     r.moving = moved
     if (Math.abs(dx) > Math.abs(dy)) r.dir = dx < 0 ? 'left' : 'right'
     else r.dir = dy < 0 ? 'up' : 'down'
