@@ -1810,8 +1810,8 @@ function RialoSignPanel({ onClose }: { onClose: () => void }) {
       </div>
       <div className="temple-play-talk-copy">
         <p>RialoSign / Temple Info</p>
-        <strong>Rialo Temple is a gamified education experience built for Rialo.</strong>
-        <small>Explore, talk to NPCs, learn real-world blockchain concepts, and collect onchain learning badges.</small>
+        <strong>Rialo Temple is a gamified education experience built for Rialo by nxrskyaa.</strong>
+        <small>Builder: nxrskyaa. Explore, talk to NPCs, learn real-world blockchain concepts, and collect onchain learning badges.</small>
       </div>
       <div className="temple-play-talk-actions">
         <button type="button" onClick={onClose}>Close</button>
@@ -2045,6 +2045,16 @@ function pointInRect(x: number, y: number, rect: { x: number; y: number; w: numb
 }
 
 function buildingCollider(building: BuildingSpec) {
+  if (building.key === 'buildingRialoSign') {
+    const w = building.w * 0.82
+    const h = building.h * 0.52
+    return {
+      x: building.x - w / 2,
+      y: building.y - h + 18,
+      w,
+      h,
+    }
+  }
   const w = building.w * 0.72
   const h = building.h * 0.35
   return {
@@ -2179,37 +2189,26 @@ function drawPixelInteractCue(
   color: string,
   active: boolean,
 ) {
-  const step = Math.round(Math.sin(time * 5.2) * 2)
-  const left = Math.round(x - width / 2 - (active ? step : 0))
-  const right = Math.round(x + width / 2 + (active ? step : 0))
-  const top = Math.round(y - height)
-  const bottom = Math.round(y - 8)
-  const alpha = active ? 0.92 : 0.42
+  const pulse = active ? 1 + Math.sin(time * 4.4) * 0.08 : 1
+  const ringW = Math.round(width * (active ? 0.82 : 0.66) * pulse)
+  const ringH = Math.round(Math.max(10, height * 0.28) * pulse)
+  const centerY = Math.round(y - 4)
 
   ctx.save()
-  ctx.globalAlpha = alpha
-  ctx.fillStyle = 'rgba(7,16,12,.72)'
-  ctx.fillRect(Math.round(x - width * 0.34), Math.round(y - 12), Math.round(width * 0.68), 5)
-  ctx.fillStyle = color
-
-  const corner = active ? 12 : 8
-  const thickness = active ? 3 : 2
-  const drawCorner = (cx: number, cy: number, sx: 1 | -1, sy: 1 | -1) => {
-    ctx.fillRect(cx, cy, corner * sx, thickness * sy)
-    ctx.fillRect(cx, cy, thickness * sx, corner * sy)
-  }
-
-  drawCorner(left, top, 1, 1)
-  drawCorner(right, top, -1, 1)
-  drawCorner(left, bottom, 1, -1)
-  drawCorner(right, bottom, -1, -1)
-
+  ctx.globalAlpha = active ? 0.82 : 0.34
+  ctx.strokeStyle = color
+  ctx.lineWidth = active ? 3 : 2
+  ctx.beginPath()
+  ctx.ellipse(Math.round(x), centerY, ringW / 2, ringH / 2, 0, 0, Math.PI * 2)
+  ctx.stroke()
+  ctx.fillStyle = 'rgba(7,16,12,.42)'
+  ctx.fillRect(Math.round(x - ringW * 0.28), centerY - 1, Math.round(ringW * 0.56), 2)
   if (active) {
-    ctx.fillStyle = '#f7f1df'
-    ctx.fillRect(Math.round(x - 2), top - 9 + step, 4, 4)
     ctx.fillStyle = color
-    ctx.fillRect(Math.round(x - width * 0.42), top + 9 - step, 3, 3)
-    ctx.fillRect(Math.round(x + width * 0.4), bottom - 13 + step, 3, 3)
+    ctx.fillRect(Math.round(x - ringW / 2 - 6), centerY - 2, 4, 4)
+    ctx.fillRect(Math.round(x + ringW / 2 + 2), centerY - 2, 4, 4)
+    ctx.fillStyle = '#f7f1df'
+    ctx.fillRect(Math.round(x - 2), centerY + Math.round(ringH / 2) - 2, 4, 4)
   }
 
   ctx.restore()
@@ -2391,27 +2390,9 @@ function drawWater(ctx: CanvasRenderingContext2D, assets: TemplePlayAssets) {
   ctx.drawImage(img, Math.round(cx - w / 2), Math.round(cy - h / 2), w, h)
 }
 
-function drawCompletedBadges(ctx: CanvasRenderingContext2D, time: number, completedIds: Set<number>) {
-  QUESTS.forEach((quest) => {
-    if (!completedIds.has(quest.quizId)) return
-    ctx.save()
-    ctx.translate(quest.x, quest.y - 78)
-    ctx.rotate(Math.sin(time * 2.5 + quest.id) * 0.06)
-    ctx.fillStyle = quest.color
-    ctx.strokeStyle = '#07100c'
-    ctx.lineWidth = 5
-    ctx.beginPath()
-    ctx.moveTo(0, -22)
-    ctx.lineTo(18, 0)
-    ctx.lineTo(0, 22)
-    ctx.lineTo(-18, 0)
-    ctx.closePath()
-    ctx.fill()
-    ctx.stroke()
-    ctx.fillStyle = '#07100c'
-    ctx.fillRect(-8, -3, 16, 6)
-    ctx.restore()
-  })
+function drawCompletedBadges(_ctx: CanvasRenderingContext2D, _time: number, _completedIds: Set<number>) {
+  // Completed state is carried by the NPC name color and quest UI.
+  // Keep the playfield clean: no overhead badges that fight the pixel-art scene.
 }
 
 function drawBuildingAsset(
@@ -2423,8 +2404,6 @@ function drawBuildingAsset(
   if (key === 'buildingRialoSign') {
     drawRialoSignPlatform(ctx, x, y, w)
   }
-  ctx.fillStyle = 'rgba(0,0,0,.24)'
-  ctx.fillRect(Math.round(x - w * 0.36), Math.round(y - 16), Math.round(w * 0.72), 26)
   drawPropBottomCenter(ctx, assets, key, x, y, w, h)
 }
 
@@ -2505,15 +2484,18 @@ function drawEnvironmentProps(ctx: CanvasRenderingContext2D, time: number, asset
 
 function drawFlyingLanterns(ctx: CanvasRenderingContext2D, time: number) {
   ctx.save()
-  for (let i = 0; i < 12; i++) {
-    const lane = i % 4
-    const xBase = 180 + lane * 410 + (i % 3) * 46
-    const cycle = (time * (18 + lane * 3) + i * 115) % (WORLD.height + 220)
-    const y = WORLD.height + 80 - cycle
-    const x = (xBase + Math.sin(time * 0.55 + i) * 34) % WORLD.width
-    const glow = 0.45 + Math.sin(time * 2.2 + i) * 0.14
-    ctx.globalAlpha = y > 20 && y < WORLD.height + 80 ? 1 : 0
-    ctx.fillStyle = `rgba(242, 200, 102, ${0.18 + glow * 0.2})`
+  for (let i = 0; i < 10; i++) {
+    const lane = i % 5
+    const loop = 18 + lane * 1.9
+    const progress = (time / loop + i * 0.173) % 1
+    const y = WORLD.height + 110 - progress * (WORLD.height + 240)
+    const xBase = 150 + lane * 340 + (i % 2) * 70
+    const x = Math.round((xBase + Math.sin(time * 0.32 + i) * 28 + WORLD.width) % WORLD.width)
+    const fade = clamp(Math.min(progress * 8, (1 - progress) * 8), 0, 1)
+    const glow = 0.42 + Math.sin(time * 1.6 + i) * 0.1
+    if (y < -90 || y > WORLD.height + 130) continue
+    ctx.globalAlpha = 0.22 + fade * 0.58
+    ctx.fillStyle = `rgba(242, 200, 102, ${0.16 + glow * 0.2})`
     ctx.fillRect(Math.round(x - 14), Math.round(y - 16), 28, 32)
     ctx.fillStyle = 'rgba(7, 16, 12, .72)'
     ctx.fillRect(Math.round(x - 10), Math.round(y - 13), 20, 3)
@@ -2598,15 +2580,13 @@ function drawActors(
   playerSprite: SpriteKey,
 ) {
   const actors: Array<{ y: number; draw: () => void }> = BUILDINGS.map((building) => ({
-    y: building.key === 'buildingRialoSign' ? building.y - 105 : building.y,
+    y: building.y,
     draw: () => drawBuildingAsset(ctx, assets, building),
   }))
   SCENERY.forEach((s) => {
     actors.push({
       y: s.y,
       draw: () => {
-        ctx.fillStyle = 'rgba(0,0,0,.22)'
-        ctx.fillRect(Math.round(s.x - s.w * 0.26), Math.round(s.y - 8), Math.round(s.w * 0.52), 9)
         drawPropBottomCenter(ctx, assets, s.key, s.x, s.y, s.w, s.h)
       },
     })
@@ -2650,7 +2630,7 @@ function drawActors(
           sprite: quest.sprite,
           x: action.x,
           y: action.y,
-          name: completed ? `${quest.npc} OK` : quest.npc,
+          name: quest.npc,
           tone: quest.color,
           accent: quest.accent,
           time,
@@ -3019,19 +2999,6 @@ function drawSpriteActor(
   )
   ctx.restore()
 
-  if (completed) {
-    ctx.fillStyle = accent
-    ctx.strokeStyle = '#07100c'
-    ctx.lineWidth = 3
-    ctx.beginPath()
-    ctx.moveTo(x + drawW * 0.34, y - drawH * 0.88)
-    ctx.lineTo(x + drawW * 0.44, y - drawH * 0.76)
-    ctx.lineTo(x + drawW * 0.29, y - drawH * 0.8)
-    ctx.closePath()
-    ctx.fill()
-    ctx.stroke()
-  }
-
   if (activity) {
     drawActivityCue(ctx, x, y, drawW, drawH, time + seed, activity, tone, accent)
   }
@@ -3155,24 +3122,24 @@ function drawWeather(ctx: CanvasRenderingContext2D, camera: { x: number; y: numb
   ctx.save()
   ctx.translate(camera.x, camera.y)
   for (let i = 0; i < 16; i++) {
-    const x = ((i * 190 + time * (18 + (i % 3) * 6)) % (width + 300)) - 170
-    const y = 28 + (i * 47 + Math.sin(time * 0.4 + i) * 18) % Math.max(120, height * 0.46)
+    const x = Math.round(((i * 190 + time * (12 + (i % 3) * 4)) % (width + 300)) - 170)
+    const y = Math.round(28 + (i * 47 + Math.sin(time * 0.32 + i) * 14) % Math.max(120, height * 0.46))
     ctx.fillStyle = 'rgba(247,241,223,.13)'
     ctx.fillRect(x, y, 104, 18)
     ctx.fillRect(x + 22, y - 12, 66, 18)
     ctx.fillRect(x + 52, y + 11, 46, 12)
   }
-  const wind = Math.sin(time * 0.47) * 22
+  const wind = Math.round(Math.sin(time * 0.36) * 14)
   for (let layer = 0; layer < 2; layer++) {
-    ctx.strokeStyle = layer === 0 ? 'rgba(210,232,255,.22)' : 'rgba(247,241,223,.18)'
+    ctx.strokeStyle = layer === 0 ? 'rgba(210,232,255,.19)' : 'rgba(247,241,223,.14)'
     ctx.lineWidth = layer === 0 ? 2 : 1
-    const count = layer === 0 ? 58 : 42
+    const count = layer === 0 ? 44 : 32
     for (let i = 0; i < count; i++) {
-      const speed = layer === 0 ? 310 : 220
-      const x = (i * 73 + time * (speed + (i % 5) * 12) + wind * 5) % (width + 140) - 70
-      const y = (i * 97 + time * (410 + (i % 4) * 30)) % (height + 190) - 40
-      const slant = -10 + wind * 0.28 + Math.sin(time + i) * 4
-      const length = layer === 0 ? 34 + (i % 3) * 8 : 21 + (i % 4) * 5
+      const speed = layer === 0 ? 245 : 170
+      const x = Math.round((i * 79 + time * (speed + (i % 5) * 9) + wind * 4) % (width + 160) - 80)
+      const y = Math.round((i * 101 + time * (285 + (i % 4) * 24)) % (height + 190) - 40)
+      const slant = Math.round(-7 + wind * 0.18 + Math.sin(time * 0.7 + i) * 2)
+      const length = layer === 0 ? 28 + (i % 3) * 7 : 18 + (i % 4) * 4
       ctx.beginPath()
       ctx.moveTo(x, y)
       ctx.lineTo(x + slant, y + length)
@@ -3181,17 +3148,17 @@ function drawWeather(ctx: CanvasRenderingContext2D, camera: { x: number; y: numb
   }
 
   for (let i = 0; i < 18; i++) {
-    const x = (i * 131 + time * 70) % (width + 80) - 40
-    const y = (i * 73 + time * 46) % (height + 120) - 20
+    const x = Math.round((i * 131 + time * 42) % (width + 80) - 40)
+    const y = Math.round((i * 73 + time * 28) % (height + 120) - 20)
     ctx.fillStyle = i % 2 === 0 ? 'rgba(185,255,102,.34)' : 'rgba(87,227,159,.28)'
-    ctx.fillRect(x + Math.sin(time + i) * 7, y, 9, 5)
+    ctx.fillRect(Math.round(x + Math.sin(time + i) * 7), y, 9, 5)
   }
 
   ctx.strokeStyle = 'rgba(210, 251, 255, .3)'
   ctx.lineWidth = 2
   for (let i = 0; i < 10; i++) {
-    const x = POND_RECT.x - camera.x + 24 + ((i * 31 + time * 30) % Math.max(40, POND_RECT.w - 48))
-    const y = POND_RECT.y - camera.y + 24 + ((i * 23) % Math.max(40, POND_RECT.h - 48))
+    const x = Math.round(POND_RECT.x - camera.x + 24 + ((i * 31 + time * 24) % Math.max(40, POND_RECT.w - 48)))
+    const y = Math.round(POND_RECT.y - camera.y + 24 + ((i * 23) % Math.max(40, POND_RECT.h - 48)))
     ctx.beginPath()
     ctx.ellipse(x, y, 12 + Math.sin(time * 3 + i) * 4, 5, 0, 0, Math.PI * 2)
     ctx.stroke()
