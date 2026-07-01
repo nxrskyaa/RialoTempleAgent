@@ -2725,13 +2725,28 @@
   }
 
   .temple-play-guide-characters,
-  .temple-play-character-picker div {
+  .temple-play-character-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+
+  .temple-play-character-grid {
     display: flex;
     flex-wrap: wrap;
     gap: 7px;
   }
 
-  .temple-play-guide-characters button,
+  .temple-play-character-section > p {
+    margin: 0 0 6px;
+    color: rgba(247, 241, 223, 0.62);
+    font-size: 9px;
+    font-weight: 950;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .temple-play-character-grid button,
   .temple-play-character-picker button {
     display: inline-flex;
     align-items: center;
@@ -2746,21 +2761,21 @@
     transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
   }
 
-  .temple-play-guide-characters button:hover,
+  .temple-play-character-grid button:hover,
   .temple-play-character-picker button:hover,
-  .temple-play-guide-characters button.is-selected,
+  .temple-play-character-grid button.is-selected,
   .temple-play-character-picker button.is-selected {
     border-color: rgba(242, 200, 102, 0.58);
     background: rgba(242, 200, 102, 0.14);
     color: var(--temple-text);
   }
 
-  .temple-play-guide-characters button:hover,
+  .temple-play-character-grid button:hover,
   .temple-play-character-picker button:hover {
     transform: translateY(-1px);
   }
 
-  .temple-play-guide-characters button span,
+  .temple-play-character-grid button span,
   .temple-play-character-picker button span {
     display: block;
     width: 25px;
@@ -2805,8 +2820,8 @@
     color: var(--temple-gold);
   }
 
-  .temple-play-character-picker div {
-    max-height: 180px;
+  .temple-play-character-sections {
+    max-height: 220px;
     overflow: auto;
     padding: 0 8px 8px;
   }
@@ -3396,7 +3411,7 @@
       width: min(194px, calc(100% - 16px));
     }
 
-    .temple-play-character-picker div {
+    .temple-play-character-sections {
       max-height: 128px;
     }
 
@@ -3433,7 +3448,7 @@
       overflow: auto;
     }
 
-    .temple-play-guide-characters button {
+    .temple-play-character-grid button {
       flex: 1 1 86px;
       justify-content: center;
     }

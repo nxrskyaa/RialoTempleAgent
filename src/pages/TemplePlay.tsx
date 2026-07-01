@@ -105,6 +105,11 @@ type SpriteKey =
   | 'npcEcelannister'
   | 'npcAli'
   | 'npcLongLife'
+  | 'npcBjoestar'
+  | 'npcKeep'
+  | 'npcSukanto'
+  | 'npcElias'
+  | 'npcSpider'
 
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000' as const
 const MAP_W = 58
@@ -241,25 +246,21 @@ const SPRITES: Record<SpriteKey, SpriteSheet> = {
   npcEcelannister: { src: '/temple-play/characters/rt-ecelannister.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
   npcAli: { src: '/temple-play/characters/rt-ali.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
   npcLongLife: { src: '/temple-play/characters/rt-longlife.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
+  npcBjoestar: { src: '/temple-play/characters/rt-bjoestar.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
+  npcKeep: { src: '/temple-play/characters/rt-keep.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
+  npcSukanto: { src: '/temple-play/characters/rt-sukanto.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
+  npcElias: { src: '/temple-play/characters/rt-elias.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
+  npcSpider: { src: '/temple-play/characters/rt-spider.png', frameW: 160, frameH: 220, frames: 4, drawW: 48, drawH: 62 },
 }
 
-const RIGHT_WALK_CYCLE_SPRITES = new Set<SpriteKey>([
-  'npcDora',
-  'npcDp',
-  'npcKingJ',
-  'npcKoushik',
-  'npcRichard12',
-  'npcRikky',
-  'npcSuleyman',
-  'npcYozi',
-])
+const RIGHT_WALK_CYCLE_SPRITES = new Set<SpriteKey>()
 
 const CHARACTER_CHOICES: Array<{ key: SpriteKey; label: string }> = [
   { key: 'nxr', label: 'NXR' },
   { key: 'npcOracle', label: 'Vika' },
   { key: 'npcForestGuide', label: 'Ade' },
   { key: 'npcBuilder', label: 'Barong' },
-  { key: 'npcCaptain', label: 'Eric' },
+  { key: 'npcCaptain', label: 'Eric Argent' },
   { key: 'npcNavigator', label: 'Garuda' },
   { key: 'npcShadowAgent', label: 'Rollins' },
   { key: 'npcSage', label: 'Pinkeu' },
@@ -267,11 +268,11 @@ const CHARACTER_CHOICES: Array<{ key: SpriteKey; label: string }> = [
   { key: 'npcAlchemist', label: 'Dikzzy' },
   { key: 'npcKGufran', label: 'K.Gufran' },
   { key: 'npcRikky', label: 'Rikky' },
-  { key: 'npcVibevortex', label: 'Vibevortex' },
+  { key: 'npcVibevortex', label: 'VibeVortex' },
   { key: 'npcWisnu', label: 'Wisnu' },
   { key: 'npcRaka', label: 'Raka' },
   { key: 'npcJepanya', label: 'Jepanya' },
-  { key: 'npcAqc', label: 'AQC' },
+  { key: 'npcAqc', label: 'Aqc' },
   { key: 'npcDp', label: 'DP' },
   { key: 'npcIshu', label: 'Ishu' },
   { key: 'npcJeams', label: 'Jeams' },
@@ -288,6 +289,46 @@ const CHARACTER_CHOICES: Array<{ key: SpriteKey; label: string }> = [
   { key: 'npcEcelannister', label: 'Ecelannister' },
   { key: 'npcAli', label: 'Ali' },
   { key: 'npcLongLife', label: 'LongLife' },
+  { key: 'npcBjoestar', label: 'Bjoestar' },
+  { key: 'npcKeep', label: 'Keep' },
+  { key: 'npcSukanto', label: 'Sukanto' },
+  { key: 'npcElias', label: 'Elias' },
+  { key: 'npcSpider', label: 'Spider' },
+]
+
+const RIALO_TEAM_HELPER_KEYS = new Set<SpriteKey>([
+  'npcForestGuide',
+  'npcAli',
+  'npcAqc',
+  'npcDora',
+  'npcDp',
+  'npcEcelannister',
+  'npcCaptain',
+  'npcFlippedFace',
+  'npcJeams',
+  'npcKGufran',
+  'npcKeep',
+  'npcKingJ',
+  'npcKoushik',
+  'npcLongLife',
+  'npcLuka',
+  'npcRichard12',
+  'npcShadowAgent',
+  'npcSilverwave',
+  'npcSuleyman',
+  'npcVibevortex',
+  'npcYozi',
+])
+
+const CHARACTER_CHOICE_SECTIONS = [
+  {
+    title: 'Rialo Team & Helper',
+    choices: CHARACTER_CHOICES.filter((choice) => RIALO_TEAM_HELPER_KEYS.has(choice.key)),
+  },
+  {
+    title: 'Character Selection',
+    choices: CHARACTER_CHOICES.filter((choice) => !RIALO_TEAM_HELPER_KEYS.has(choice.key)),
+  },
 ]
 
 function initialPlayerSprite(): SpriteKey {
@@ -645,7 +686,7 @@ const AMBIENT_NPCS: AmbientNpc[] = [
     persona: 'homebody',
   },
   {
-    name: 'Vibevortex',
+    name: 'VibeVortex',
     sprite: 'npcVibevortex',
     x: 1435,
     y: 815,
@@ -713,7 +754,7 @@ const AMBIENT_NPCS: AmbientNpc[] = [
     persona: 'wanderer',
   },
   {
-    name: 'AQC',
+    name: 'Aqc',
     sprite: 'npcAqc',
     x: 1040,
     y: 890,
@@ -1001,7 +1042,95 @@ const AMBIENT_NPCS: AmbientNpc[] = [
     activity: 'stroll',
     persona: 'wanderer',
   },
+  {
+    name: 'Bjoestar',
+    sprite: 'npcBjoestar',
+    x: 250,
+    y: 820,
+    color: '#ffad72',
+    accent: '#78ecff',
+    line: 'I keep the map routes clean for new builders.',
+    topic: 'Builder Routes',
+    dialogue: [
+      'A good onboarding world should feel easy to walk through.',
+      'Rialo Temple uses characters and small quests so users learn by exploring.',
+      'The smoother the route, the easier it is to understand real-world blockchain ideas.',
+    ],
+    activity: 'stroll',
+    persona: 'pacer',
+  },
+  {
+    name: 'Keep',
+    sprite: 'npcKeep',
+    x: 1035,
+    y: 930,
+    color: '#b9ff66',
+    accent: '#57e39f',
+    line: 'I keep the helper notes near RialoSign tidy.',
+    topic: 'Rialo Team & Helper',
+    dialogue: [
+      'Helpers make the temple feel alive by answering small questions around the map.',
+      'A beginner can ask what Rialo does, why agents need rails, or how quests become proof.',
+      'Good helpers turn confusion into a short path forward.',
+    ],
+    activity: 'wander',
+    persona: 'homebody',
+  },
+  {
+    name: 'Sukanto',
+    sprite: 'npcSukanto',
+    x: 1600,
+    y: 1180,
+    color: '#f2c866',
+    accent: '#ff7ad9',
+    line: 'I trade short lessons for better quests.',
+    topic: 'Temple Lessons',
+    dialogue: [
+      'Rialo ideas are easier when each zone teaches one clear thing.',
+      'Data, identity, privacy, assets, and agents all become little stories here.',
+      'That is why Temple Play should feel like a learning RPG, not a plain form.',
+    ],
+    activity: 'wander',
+    persona: 'wanderer',
+  },
+  {
+    name: 'Elias',
+    sprite: 'npcElias',
+    x: 675,
+    y: 1330,
+    color: '#88d7ff',
+    accent: '#f2c866',
+    line: 'Signals should arrive fast and clean.',
+    topic: 'Signal Timing',
+    dialogue: [
+      'Real-world apps need quick reaction when something important changes.',
+      'A payment clears, a delivery updates, or a deadline passes: the app should know.',
+      'Rialo is interesting because it makes those real-world signals more usable.',
+    ],
+    activity: 'meditate',
+    persona: 'homebody',
+  },
+  {
+    name: 'Spider',
+    sprite: 'npcSpider',
+    x: 1238,
+    y: 1000,
+    color: '#57e39f',
+    accent: '#f2c866',
+    line: 'Grialo!, Im Spider',
+    topic: 'Eric Argent Pet',
+    dialogue: [
+      'Grialo!, Im Spider.',
+      'I follow Eric Argent and sniff out Bridge Gate messages.',
+      'If the API scroll returns clean, I do a tiny victory patrol.',
+    ],
+    activity: 'wander',
+    persona: 'pacer',
+  },
 ]
+
+const ERIC_ARGENT_NPC_INDEX = AMBIENT_NPCS.findIndex((npc) => npc.name === 'Eric Argent')
+const SPIDER_NPC_INDEX = AMBIENT_NPCS.findIndex((npc) => npc.name === 'Spider')
 
 type BuildingSpec = {
   key: PropKey
@@ -1927,29 +2056,50 @@ function CharacterPicker({
         <span>Character</span>
         <strong>{selectedLabel}</strong>
       </summary>
-      <div>
-        {CHARACTER_CHOICES.map((choice) => {
-          const sheet = SPRITES[choice.key]
-          return (
-            <button
-              key={choice.key}
-              type="button"
-              className={choice.key === selected ? 'is-selected' : ''}
-              onClick={() => onSelect(choice.key)}
-            >
-              <span
-                style={{
-                  backgroundImage: `url(${sheet.src})`,
-                  backgroundSize: `${sheet.frames * 100}% 100%`,
-                  backgroundPosition: '0 0',
-                }}
-              />
-              {choice.label}
-            </button>
-          )
-        })}
+      <div className="temple-play-character-sections">
+        <CharacterChoiceSections selected={selected} onSelect={onSelect} />
       </div>
     </details>
+  )
+}
+
+function CharacterChoiceSections({
+  selected,
+  onSelect,
+}: {
+  selected: SpriteKey
+  onSelect: (sprite: SpriteKey) => void
+}) {
+  return (
+    <>
+      {CHARACTER_CHOICE_SECTIONS.map((section) => (
+        <section key={section.title} className="temple-play-character-section">
+          <p>{section.title}</p>
+          <div className="temple-play-character-grid">
+            {section.choices.map((choice) => {
+              const sheet = SPRITES[choice.key]
+              return (
+                <button
+                  key={choice.key}
+                  type="button"
+                  className={choice.key === selected ? 'is-selected' : ''}
+                  onClick={() => onSelect(choice.key)}
+                >
+                  <span
+                    style={{
+                      backgroundImage: `url(${sheet.src})`,
+                      backgroundSize: `${sheet.frames * 100}% 100%`,
+                      backgroundPosition: '0 0',
+                    }}
+                  />
+                  {choice.label}
+                </button>
+              )
+            })}
+          </div>
+        </section>
+      ))}
+    </>
   )
 }
 
@@ -1995,26 +2145,7 @@ function GuideOverlay({
             <small>E key: talk nearby</small>
           </div>
           <div className="temple-play-guide-characters" aria-label="Choose player character">
-            {CHARACTER_CHOICES.map((choice) => {
-              const sheet = SPRITES[choice.key]
-              return (
-                <button
-                  key={choice.key}
-                  type="button"
-                  className={choice.key === selected ? 'is-selected' : ''}
-                  onClick={() => onSelect(choice.key)}
-                >
-                  <span
-                    style={{
-                      backgroundImage: `url(${sheet.src})`,
-                      backgroundSize: `${sheet.frames * 100}% 100%`,
-                      backgroundPosition: '0 0',
-                    }}
-                  />
-                  {choice.label}
-                </button>
-              )
-            })}
+            <CharacterChoiceSections selected={selected} onSelect={onSelect} />
           </div>
         </div>
         <button type="button" onClick={onClose}>Start</button>
@@ -2717,6 +2848,12 @@ function drawActors(
           direction: motion.direction,
           activity: npc.activity,
         })
+        if (index === SPIDER_NPC_INDEX) {
+          const eric = ambientMotions[ERIC_ARGENT_NPC_INDEX]
+          if (eric && Math.hypot(motion.x - eric.x, motion.y - eric.y) < 112) {
+            drawMiniBubble(ctx, motion.x, motion.y - 118, 'Grialo!, Im Spider', npc.color)
+          }
+        }
         if (nearAmbientIndex === index) {
           drawPixelNameTag(ctx, motion.x, motion.y - 134, 'Tap / E to chat', '#07100c', true, npc.color, true)
         }
@@ -2830,11 +2967,43 @@ function pickHomeTarget(r: NpcRuntime) {
   return pickNpcTarget(r, 46)
 }
 
+function pickSpiderTarget(r: NpcRuntime, eric: NpcRuntime) {
+  const farFromEric = Math.hypot(r.x - eric.x, r.y - eric.y) > 150
+  const baseX = farFromEric ? eric.x : eric.x + (Math.random() - 0.5) * 42
+  const baseY = farFromEric ? eric.y : eric.y + (Math.random() - 0.5) * 30
+  const minDistance = farFromEric ? 26 : 42
+  const radius = farFromEric ? 64 : 94
+  for (let tries = 0; tries < 16; tries++) {
+    const angle = Math.random() * Math.PI * 2
+    const distance = minDistance + Math.random() * radius
+    const x = clamp(baseX + Math.cos(angle) * distance, 80, WORLD.width - 80)
+    const y = clamp(baseY + Math.sin(angle) * distance, 80, WORLD.height - 80)
+    if (!isNpcMovementBlocked(x, y) && !npcPathBlocked(r.x, r.y, x, y)) return { x, y }
+  }
+  return null
+}
+
 function updateAmbientNpcs(dt: number) {
-  for (const r of npcRuntime) {
+  for (let index = 0; index < npcRuntime.length; index++) {
+    const r = npcRuntime[index]
+    const eric = npcRuntime[ERIC_ARGENT_NPC_INDEX]
+    const isSpider = index === SPIDER_NPC_INDEX && Boolean(eric)
+    if (isSpider && eric) {
+      r.home = { x: eric.x, y: eric.y }
+      r.signTrip = 'idle'
+      r.visitCooldown = 6
+      r.roams = true
+    }
     if (r.pause > 0) { r.pause -= dt; r.moving = false; continue }
     if (!r.target) {
-      if (r.signTrip === 'atSign') {
+      if (isSpider && eric) {
+        r.target = pickSpiderTarget(r, eric)
+        if (!r.target) {
+          r.pause = 0.35
+          r.moving = false
+          continue
+        }
+      } else if (r.signTrip === 'atSign') {
         r.target = pickHomeTarget(r)
         r.signTrip = 'returnHome'
         if (!r.target) {
@@ -2873,7 +3042,9 @@ function updateAmbientNpcs(dt: number) {
     const dist = Math.hypot(dx, dy)
     if (dist < 3) {
       r.target = null
-      if (r.signTrip === 'toSign') {
+      if (isSpider) {
+        r.pause = 0.25 + Math.random() * 0.55
+      } else if (r.signTrip === 'toSign') {
         r.signTrip = 'atSign'
         r.pause = 2.4 + Math.random() * 4.2
       } else if (r.signTrip === 'returnHome') {
