@@ -235,6 +235,17 @@ const SPRITES: Record<SpriteKey, SpriteSheet> = {
   npcDarma: { src: '/temple-play/characters/rt-darma.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
 }
 
+const RIGHT_WALK_CYCLE_SPRITES = new Set<SpriteKey>([
+  'npcDora',
+  'npcDp',
+  'npcKingJ',
+  'npcKoushik',
+  'npcRichard12',
+  'npcRikky',
+  'npcSuleyman',
+  'npcYozi',
+])
+
 const CHARACTER_CHOICES: Array<{ key: SpriteKey; label: string }> = [
   { key: 'nxr', label: 'NXR' },
   { key: 'npcOracle', label: 'Vika' },
@@ -2955,6 +2966,7 @@ function drawSpriteActor(
   const sheet = SPRITES[sprite]
   const image = assets.sprites[sprite]
   const frame = chooseSpriteFrame(sprite, sheet.frames, time, seed, moving, near, completed, player, direction)
+  const flipX = shouldFlipSprite(sprite, sheet.frames, direction)
   const walkPhase = Math.sin(time * 10 + seed)
   const bodyOffset = player
     ? moving ? -Math.abs(walkPhase) * 3.2 : -Math.abs(Math.sin(time * 2.4 + seed)) * 1
@@ -2976,6 +2988,7 @@ function drawSpriteActor(
   ctx.save()
   ctx.translate(Math.round(x), Math.round(y))
   ctx.rotate(rotation)
+  if (flipX) ctx.scale(-1, 1)
   ctx.drawImage(
     image,
     frame * sheet.frameW,
@@ -3080,19 +3093,22 @@ function chooseSpriteFrame(
     const step = moving ? Math.floor(time * 6.4 + seed) % 4 : 0
     return Math.min(frameCount - 1, row * 4 + step)
   }
-  if (frameCount === 4) return frameForDirection(direction)
+  if (frameCount === 4) {
+    if (direction === 'left' || direction === 'right') {
+      if (RIGHT_WALK_CYCLE_SPRITES.has(sprite) && moving) return Math.floor(time * 6.2 + seed) % 4
+      return 1
+    }
+    return direction === 'up' && !RIGHT_WALK_CYCLE_SPRITES.has(sprite) ? 2 : 0
+  }
   return 0
+}
+
+function shouldFlipSprite(sprite: SpriteKey, frameCount: number, direction: PlayerState['dir']) {
+  return sprite !== 'nxr' && frameCount === 4 && direction === 'left'
 }
 
 function characterName(sprite: SpriteKey) {
   return CHARACTER_CHOICES.find((choice) => choice.key === sprite)?.label ?? 'Player'
-}
-
-function frameForDirection(direction: PlayerState['dir']) {
-  if (direction === 'right') return 1
-  if (direction === 'up') return 2
-  if (direction === 'left') return 3
-  return 0
 }
 
 function drawPixelNameTag(ctx: CanvasRenderingContext2D, x: number, y: number, text: string, color: string, compact = false, border = '#f2c866', filled = false) {
