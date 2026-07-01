@@ -135,9 +135,9 @@ const T = {
 } as const
 type TileType = (typeof T)[keyof typeof T]
 const PLAYER_SPEED = 245
-const DESKTOP_CAMERA_ZOOM = 0.86
-const TABLET_CAMERA_ZOOM = 0.76
-const MOBILE_CAMERA_ZOOM = 0.58
+const DESKTOP_CAMERA_ZOOM = 0.78
+const TABLET_CAMERA_ZOOM = 0.68
+const MOBILE_CAMERA_ZOOM = 0.52
 const RIALO_SIGN_INTERACT = { x: 928, y: 860 }
 const RIALO_SIGN_PROFILE_URL = 'https://x.com/nxrskyaa'
 
@@ -326,7 +326,7 @@ const QUESTS: QuestNpc[] = [
     role: 'Builder Guide',
     sprite: 'nxr',
     x: 928,
-    y: 850,
+    y: 880,
     color: '#f2c866',
     accent: '#57e39f',
     reward: 50,
@@ -360,8 +360,8 @@ const QUESTS: QuestNpc[] = [
     npc: 'Blond',
     role: 'Asset Guardian',
     sprite: 'npcHerbalist',
-    x: 1510,
-    y: 445,
+    x: 1515,
+    y: 470,
     color: '#ffad72',
     accent: '#f2c866',
     reward: 75,
@@ -395,8 +395,8 @@ const QUESTS: QuestNpc[] = [
     npc: 'Rollins',
     role: 'Agent Coordinator',
     sprite: 'npcShadowAgent',
-    x: 640,
-    y: 1125,
+    x: 615,
+    y: 1150,
     color: '#78ecff',
     accent: '#c886ff',
     reward: 75,
@@ -431,7 +431,7 @@ const QUESTS: QuestNpc[] = [
     role: 'Signal Runner',
     sprite: 'npcNavigator',
     x: 1365,
-    y: 1325,
+    y: 1328,
     color: '#b9ff66',
     accent: '#78ecff',
     reward: 80,
@@ -465,7 +465,7 @@ const QUESTS: QuestNpc[] = [
     npc: 'Vika Joestar',
     role: 'SCALE Engineer',
     sprite: 'npcOracle',
-    x: 350,
+    x: 320,
     y: 430,
     color: '#c886ff',
     accent: '#57e39f',
@@ -505,8 +505,8 @@ const AMBIENT_NPCS: AmbientNpc[] = [
   {
     name: 'Ade',
     sprite: 'npcForestGuide',
-    x: 250,
-    y: 360,
+    x: 230,
+    y: 420,
     color: '#57e39f',
     accent: '#78ecff',
     line: 'Forest paths are quiet, but data never sleeps.',
@@ -522,8 +522,8 @@ const AMBIENT_NPCS: AmbientNpc[] = [
   {
     name: 'Barong',
     sprite: 'npcBuilder',
-    x: 1250,
-    y: 1160,
+    x: 1530,
+    y: 1295,
     color: '#57e39f',
     accent: '#c886ff',
     line: 'Every badge is better when the ledger can verify it.',
@@ -539,8 +539,8 @@ const AMBIENT_NPCS: AmbientNpc[] = [
   {
     name: 'Eric Argent',
     sprite: 'npcCaptain',
-    x: 1010,
-    y: 690,
+    x: 1180,
+    y: 950,
     color: '#78ecff',
     accent: '#ff7ad9',
     line: 'Bridge Gate scrolls carry API messages out and back.',
@@ -557,7 +557,7 @@ const AMBIENT_NPCS: AmbientNpc[] = [
     name: 'Pinkeu',
     sprite: 'npcSage',
     x: 530,
-    y: 1110,
+    y: 1195,
     color: '#ff7ad9',
     accent: '#f2c866',
     line: 'The map gets brighter when badges are claimed.',
@@ -573,8 +573,8 @@ const AMBIENT_NPCS: AmbientNpc[] = [
   {
     name: 'Dikzzy',
     sprite: 'npcAlchemist',
-    x: 440,
-    y: 1120,
+    x: 445,
+    y: 1190,
     color: '#c886ff',
     accent: '#f2c866',
     line: 'Privacy chambers turn plain scrolls into protected ones.',
@@ -590,8 +590,8 @@ const AMBIENT_NPCS: AmbientNpc[] = [
   {
     name: 'K.Gufran',
     sprite: 'npcKGufran',
-    x: 1000,
-    y: 245,
+    x: 1110,
+    y: 900,
     color: '#88d7ff',
     accent: '#ff8066',
     line: 'A response scroll always comes back through Bridge Gate.',
@@ -607,8 +607,8 @@ const AMBIENT_NPCS: AmbientNpc[] = [
   {
     name: 'Rikky',
     sprite: 'npcRikky',
-    x: 1010,
-    y: 1000,
+    x: 1135,
+    y: 1220,
     color: '#ffad72',
     accent: '#78ecff',
     line: 'Signals are tiny real-world updates with big consequences.',
@@ -642,7 +642,7 @@ const AMBIENT_NPCS: AmbientNpc[] = [
     name: 'Wisnu',
     sprite: 'npcWisnu',
     x: 760,
-    y: 1188,
+    y: 1210,
     color: '#f2c866',
     accent: '#88d7ff',
     line: 'Every clean signal needs a calm verifier.',
@@ -658,8 +658,8 @@ const AMBIENT_NPCS: AmbientNpc[] = [
   {
     name: 'Raka',
     sprite: 'npcRaka',
-    x: 735,
-    y: 275,
+    x: 690,
+    y: 360,
     color: '#ffad72',
     accent: '#57e39f',
     line: 'I patrol the gate so new explorers stay on track.',
@@ -675,8 +675,8 @@ const AMBIENT_NPCS: AmbientNpc[] = [
   {
     name: 'Jepanya',
     sprite: 'npcJepanya',
-    x: 1110,
-    y: 700,
+    x: 1140,
+    y: 850,
     color: '#78ecff',
     accent: '#f2c866',
     line: 'Boxes, scrolls, and data all need a route home.',
@@ -710,7 +710,7 @@ const AMBIENT_NPCS: AmbientNpc[] = [
     name: 'DP',
     sprite: 'npcDp',
     x: 575,
-    y: 610,
+    y: 680,
     color: '#ffad72',
     accent: '#f2c866',
     line: 'A clear passport makes every quest easier to trust.',
@@ -726,8 +726,8 @@ const AMBIENT_NPCS: AmbientNpc[] = [
   {
     name: 'Ishu',
     sprite: 'npcIshu',
-    x: 835,
-    y: 920,
+    x: 820,
+    y: 980,
     color: '#c886ff',
     accent: '#78ecff',
     line: 'Fast apps need live triggers, not sleepy buttons.',
@@ -743,8 +743,8 @@ const AMBIENT_NPCS: AmbientNpc[] = [
   {
     name: 'Jeams',
     sprite: 'npcJeams',
-    x: 1100,
-    y: 710,
+    x: 1190,
+    y: 950,
     color: '#57e39f',
     accent: '#ff7ad9',
     line: 'I keep the API scrolls neat before they cross the gate.',
@@ -760,8 +760,8 @@ const AMBIENT_NPCS: AmbientNpc[] = [
   {
     name: 'Koushik',
     sprite: 'npcKoushik',
-    x: 260,
-    y: 700,
+    x: 320,
+    y: 740,
     color: '#88d7ff',
     accent: '#f2c866',
     line: 'Data needs a filter before it becomes app truth.',
@@ -778,7 +778,7 @@ const AMBIENT_NPCS: AmbientNpc[] = [
     name: 'KingJ',
     sprite: 'npcKingJ',
     x: 420,
-    y: 760,
+    y: 900,
     color: '#f2c866',
     accent: '#57e39f',
     line: 'A good vault turns ownership into something apps can use.',
@@ -794,8 +794,8 @@ const AMBIENT_NPCS: AmbientNpc[] = [
   {
     name: 'Richard12',
     sprite: 'npcRichard12',
-    x: 1010,
-    y: 1120,
+    x: 1120,
+    y: 1285,
     color: '#78ecff',
     accent: '#c886ff',
     line: 'SCALE keeps agent work from turning into chaos.',
@@ -811,8 +811,8 @@ const AMBIENT_NPCS: AmbientNpc[] = [
   {
     name: 'Luka',
     sprite: 'npcLuka',
-    x: 1360,
-    y: 840,
+    x: 1450,
+    y: 845,
     color: '#ff7ad9',
     accent: '#78ecff',
     line: 'Private messages should stay private.',
@@ -828,8 +828,8 @@ const AMBIENT_NPCS: AmbientNpc[] = [
   {
     name: 'Silverwave',
     sprite: 'npcSilverwave',
-    x: 1500,
-    y: 890,
+    x: 1540,
+    y: 925,
     color: '#78ecff',
     accent: '#f2c866',
     line: 'Signal Tower watches for the little updates that matter.',
@@ -845,8 +845,8 @@ const AMBIENT_NPCS: AmbientNpc[] = [
   {
     name: 'Suleyman',
     sprite: 'npcSuleyman',
-    x: 420,
-    y: 1050,
+    x: 430,
+    y: 1165,
     color: '#b9ff66',
     accent: '#57e39f',
     line: 'Quests are tiny lessons with proof attached.',
@@ -862,8 +862,8 @@ const AMBIENT_NPCS: AmbientNpc[] = [
   {
     name: 'Yozi',
     sprite: 'npcYozi',
-    x: 700,
-    y: 1210,
+    x: 730,
+    y: 1285,
     color: '#c886ff',
     accent: '#ffad72',
     line: 'Judges make agent work less risky.',
@@ -879,8 +879,8 @@ const AMBIENT_NPCS: AmbientNpc[] = [
   {
     name: 'Dora',
     sprite: 'npcDora',
-    x: 890,
-    y: 250,
+    x: 875,
+    y: 320,
     color: '#ffad72',
     accent: '#ff7ad9',
     line: 'The bridge is only useful if the response comes back clean.',
@@ -896,8 +896,8 @@ const AMBIENT_NPCS: AmbientNpc[] = [
   {
     name: 'Darma',
     sprite: 'npcDarma',
-    x: 1250,
-    y: 670,
+    x: 1450,
+    y: 880,
     color: '#f2c866',
     accent: '#88d7ff',
     line: 'The best apps feel simple even when the rails are serious.',
@@ -924,26 +924,26 @@ type BuildingSpec = {
 
 const BUILDINGS: BuildingSpec[] = [
   { key: 'buildingRialoSign', x: 928, y: 760, w: 360, h: 360, label: 'Rialo Sign', color: '#f2c866' },
-  { key: 'buildingScaleDojo', x: 350, y: 350, w: 250, h: 282, label: 'SCALE Lab', color: '#c886ff' },
-  { key: 'buildingStoneVault', x: 1510, y: 385, w: 258, h: 306, label: 'RWA Vault', color: '#f2c866' },
-  { key: 'buildingTempleLodge', x: 640, y: 1040, w: 318, h: 268, label: 'Agent Camp', color: '#78ecff' },
-  { key: 'buildingMarketHall', x: 1365, y: 1200, w: 278, h: 266, label: 'Signal Tower', color: '#b9ff66' },
-  { key: 'buildingGreenhouseInn', x: 300, y: 1430, w: 230, h: 296, label: 'Privacy Grove', color: '#ff7ad9' },
-  { key: 'buildingOracleHouse', x: 1260, y: 810, w: 248, h: 276, label: 'Bridge Gate', color: '#57e39f' },
-  { key: 'buildingWoodenCabin', x: 980, y: 1315, w: 250, h: 220, label: 'Warung Pecel', color: '#ffad72' },
-  { key: 'buildingOrangeCottage', x: 1660, y: 1320, w: 206, h: 210, label: 'Quest Hut', color: '#f2c866' },
-  { key: 'buildingGuildHouse', x: 1630, y: 735, w: 248, h: 236, label: 'Guild Hall', color: '#78ecff' },
+  { key: 'buildingScaleDojo', x: 320, y: 360, w: 250, h: 282, label: 'SCALE Lab', color: '#c886ff' },
+  { key: 'buildingStoneVault', x: 1515, y: 400, w: 258, h: 306, label: 'RWA Vault', color: '#f2c866' },
+  { key: 'buildingTempleLodge', x: 615, y: 1085, w: 318, h: 268, label: 'Agent Camp', color: '#78ecff' },
+  { key: 'buildingMarketHall', x: 1365, y: 1235, w: 278, h: 266, label: 'Signal Tower', color: '#b9ff66' },
+  { key: 'buildingGreenhouseInn', x: 285, y: 1400, w: 230, h: 296, label: 'Privacy Grove', color: '#ff7ad9' },
+  { key: 'buildingOracleHouse', x: 1300, y: 900, w: 248, h: 276, label: 'Bridge Gate', color: '#57e39f' },
+  { key: 'buildingWoodenCabin', x: 970, y: 1345, w: 250, h: 220, label: 'Warung Pecel', color: '#ffad72' },
+  { key: 'buildingOrangeCottage', x: 1660, y: 1370, w: 206, h: 210, label: 'Quest Hut', color: '#f2c866' },
+  { key: 'buildingGuildHouse', x: 1650, y: 760, w: 248, h: 236, label: 'Guild Hall', color: '#78ecff' },
 ]
 
 const RIALO_SIGN_GATHER_SPOTS = [
-  { x: 830, y: 850 },
-  { x: 870, y: 875 },
-  { x: 945, y: 875 },
-  { x: 1030, y: 855 },
-  { x: 840, y: 935 },
-  { x: 915, y: 960 },
-  { x: 1065, y: 930 },
-  { x: 1120, y: 850 },
+  { x: 800, y: 900 },
+  { x: 870, y: 920 },
+  { x: 945, y: 910 },
+  { x: 1030, y: 910 },
+  { x: 1120, y: 900 },
+  { x: 820, y: 980 },
+  { x: 930, y: 1010 },
+  { x: 1060, y: 980 },
 ]
 
 const BUILDING_COLLIDERS = BUILDINGS.map((building) => buildingCollider(building))
@@ -956,27 +956,27 @@ const SCENERY: ScenerySpec[] = [
   { key: 'tree', x: 140, y: 200, w: 132, h: 144, solid: true },
   { key: 'tree', x: 700, y: 180, w: 132, h: 144, solid: true },
   { key: 'tree', x: 860, y: 190, w: 120, h: 132, solid: true },
-  { key: 'tree', x: 1540, y: 210, w: 132, h: 144, solid: true },
+  { key: 'tree', x: 1740, y: 300, w: 132, h: 144, solid: true },
   { key: 'tree', x: 90, y: 470, w: 120, h: 132, solid: true },
   { key: 'tree', x: 300, y: 660, w: 132, h: 144, solid: true },
   { key: 'tree', x: 110, y: 1010, w: 132, h: 144, solid: true },
   { key: 'tree', x: 500, y: 1250, w: 120, h: 132, solid: true },
-  { key: 'tree', x: 1000, y: 1255, w: 132, h: 144, solid: true },
-  { key: 'tree', x: 1560, y: 1250, w: 132, h: 144, solid: true },
-  { key: 'tree', x: 1560, y: 780, w: 120, h: 132, solid: true },
+  { key: 'tree', x: 1230, y: 1460, w: 132, h: 144, solid: true },
+  { key: 'tree', x: 1465, y: 1440, w: 132, h: 144, solid: true },
+  { key: 'tree', x: 1450, y: 560, w: 120, h: 132, solid: true },
   { key: 'tree', x: 380, y: 520, w: 132, h: 144, solid: true },
-  // lamp posts framing the central plaza + main paths
-  { key: 'lamp', x: 620, y: 560, w: 78, h: 160, solid: true },
-  { key: 'lamp', x: 980, y: 560, w: 78, h: 160, solid: true },
-  { key: 'lamp', x: 620, y: 770, w: 78, h: 160, solid: true },
-  { key: 'lamp', x: 980, y: 770, w: 78, h: 160, solid: true },
-  { key: 'lamp', x: 430, y: 560, w: 78, h: 160, solid: true },
-  { key: 'lamp', x: 250, y: 760, w: 78, h: 160, solid: true },
-  // park nook in the open pocket between temple / oracle / market / guild
-  { key: 'parkBench', x: 1320, y: 720, w: 104, h: 78, solid: true },
-  { key: 'parkLantern', x: 1445, y: 730, w: 86, h: 104, solid: true },
-  { key: 'parkBush', x: 1375, y: 835, w: 104, h: 100 },
-  { key: 'parkPlanter', x: 1545, y: 835, w: 104, h: 101 },
+  // lamp posts framing the sign plaza, pond edge, and main approach paths
+  { key: 'lamp', x: 610, y: 590, w: 78, h: 160, solid: true },
+  { key: 'lamp', x: 690, y: 620, w: 78, h: 160, solid: true },
+  { key: 'lamp', x: 700, y: 780, w: 78, h: 160, solid: true },
+  { key: 'lamp', x: 1145, y: 820, w: 78, h: 160, solid: true },
+  { key: 'lamp', x: 118, y: 920, w: 78, h: 160, solid: true },
+  { key: 'lamp', x: 420, y: 940, w: 78, h: 160, solid: true },
+  // park nook in the open pocket between Bridge Gate / Guild Hall / Signal Tower
+  { key: 'parkBench', x: 1490, y: 880, w: 104, h: 78, solid: true },
+  { key: 'parkLantern', x: 1605, y: 900, w: 86, h: 104, solid: true },
+  { key: 'parkBush', x: 1570, y: 1015, w: 104, h: 100 },
+  { key: 'parkPlanter', x: 1640, y: 990, w: 104, h: 101 },
 ]
 
 function sceneryCollider(s: ScenerySpec) {
@@ -2040,8 +2040,21 @@ function isMovementBlocked(x: number, y: number) {
   return WORLD_BLOCKERS.some((rect) => pointInRect(x, y, rect))
 }
 
+function isNpcMovementBlocked(x: number, y: number) {
+  return WORLD_BLOCKERS.some((rect) => pointInRect(x, y, expandRect(rect, NPC_BLOCKER_MARGIN)))
+}
+
 function pointInRect(x: number, y: number, rect: { x: number; y: number; w: number; h: number }) {
   return x > rect.x && x < rect.x + rect.w && y > rect.y && y < rect.y + rect.h
+}
+
+function expandRect(rect: { x: number; y: number; w: number; h: number }, margin: number) {
+  return {
+    x: rect.x - margin,
+    y: rect.y - margin,
+    w: rect.w + margin * 2,
+    h: rect.h + margin * 2,
+  }
 }
 
 function buildingCollider(building: BuildingSpec) {
@@ -2065,8 +2078,8 @@ function buildingCollider(building: BuildingSpec) {
   }
 }
 
-function pathBlocked(ax: number, ay: number, bx: number, by: number) {
-  return WORLD_BLOCKERS.some((rect) => lineIntersectsRect(ax, ay, bx, by, rect))
+function npcPathBlocked(ax: number, ay: number, bx: number, by: number) {
+  return WORLD_BLOCKERS.some((rect) => lineIntersectsRect(ax, ay, bx, by, expandRect(rect, NPC_BLOCKER_MARGIN)))
 }
 
 function lineIntersectsRect(ax: number, ay: number, bx: number, by: number, rect: { x: number; y: number; w: number; h: number }) {
@@ -2286,7 +2299,7 @@ function buildPathSet() {
 }
 
 // tilled garden plot (soil texture + crops), aligned to the tile grid
-const GARDEN = { x: 480, y: 928, w: 224, h: 160 }
+const GARDEN = { x: 470, y: 1120, w: 224, h: 160 }
 
 const patternCache = new WeakMap<HTMLImageElement, CanvasPattern>()
 function tilePattern(ctx: CanvasRenderingContext2D, image: HTMLImageElement | undefined) {
@@ -2682,8 +2695,9 @@ type NpcRuntime = {
 }
 
 const ROAM_ACTIVITIES = new Set<AmbientActivity>(['wander', 'stroll'])
-const NPC_SPEED = 48
-const NPC_ROAM_RADIUS = 130
+const NPC_SPEED = 36
+const NPC_ROAM_RADIUS = 118
+const NPC_BLOCKER_MARGIN = 48
 
 const npcRuntime: NpcRuntime[] = AMBIENT_NPCS.map((npc) => ({
   home: { x: npc.x, y: npc.y },
@@ -2704,7 +2718,7 @@ function pickNpcTarget(r: NpcRuntime, radius = NPC_ROAM_RADIUS) {
     const distance = 30 + Math.random() * radius
     const x = clamp(r.home.x + Math.cos(angle) * distance, 80, WORLD.width - 80)
     const y = clamp(r.home.y + Math.sin(angle) * distance, 80, WORLD.height - 80)
-    if (!isMovementBlocked(x, y) && !pathBlocked(r.x, r.y, x, y)) return { x, y }
+    if (!isNpcMovementBlocked(x, y) && !npcPathBlocked(r.x, r.y, x, y)) return { x, y }
   }
   return null
 }
@@ -2715,13 +2729,13 @@ function pickRialoSignTarget(r: NpcRuntime) {
     const spot = RIALO_SIGN_GATHER_SPOTS[(start + i) % RIALO_SIGN_GATHER_SPOTS.length]
     const x = spot.x + (Math.random() - 0.5) * 24
     const y = spot.y + (Math.random() - 0.5) * 18
-    if (!isMovementBlocked(x, y) && !pathBlocked(r.x, r.y, x, y)) return { x, y }
+    if (!isNpcMovementBlocked(x, y) && !npcPathBlocked(r.x, r.y, x, y)) return { x, y }
   }
   return null
 }
 
 function pickHomeTarget(r: NpcRuntime) {
-  if (!isMovementBlocked(r.home.x, r.home.y) && !pathBlocked(r.x, r.y, r.home.x, r.home.y)) return { ...r.home }
+  if (!isNpcMovementBlocked(r.home.x, r.home.y) && !npcPathBlocked(r.x, r.y, r.home.x, r.home.y)) return { ...r.home }
   return pickNpcTarget(r, 46)
 }
 
@@ -2787,8 +2801,8 @@ function updateAmbientNpcs(dt: number) {
     const prevX = r.x
     const prevY = r.y
     let moved = false
-    if (!isMovementBlocked(nx, r.y)) { r.x = nx; moved = true }
-    if (!isMovementBlocked(r.x, ny)) { r.y = ny; moved = true }
+    if (!isNpcMovementBlocked(nx, r.y)) { r.x = nx; moved = true }
+    if (!isNpcMovementBlocked(r.x, ny)) { r.y = ny; moved = true }
     if (!moved) {
       r.target = null
       r.pause = 0.4 + Math.random()
@@ -2893,33 +2907,9 @@ function drawMiniBubble(ctx: CanvasRenderingContext2D, x: number, y: number, tex
 
 function questNpcMotion(quest: QuestNpc, time: number) {
   const phase = time + quest.id * 0.83
-  if (quest.sprite === 'nxr') {
-    return {
-      x: quest.x,
-      y: quest.y,
-      moving: false,
-      direction: 'down' as const,
-    }
-  }
-  if (quest.id % 3 === 0) {
-    return {
-      x: quest.x + Math.sin(phase * 1.2) * 3,
-      y: quest.y + Math.sin(phase * 2.4) * 2,
-      moving: false,
-      direction: Math.sin(phase * 1.5) > 0 ? 'right' as const : 'left' as const,
-    }
-  }
-  if (quest.id % 3 === 1) {
-    return {
-      x: quest.x + Math.sin(phase * 0.72) * 8,
-      y: quest.y,
-      moving: true,
-      direction: Math.cos(phase * 0.72) > 0 ? 'right' as const : 'left' as const,
-    }
-  }
   return {
-    x: quest.x,
-    y: quest.y + Math.sin(phase * 2.2) * 4,
+    x: quest.x + Math.sin(phase * 1.1) * 1.4,
+    y: quest.y + Math.sin(phase * 1.8) * 1.2,
     moving: false,
     direction: 'down' as const,
   }
@@ -2965,19 +2955,19 @@ function drawSpriteActor(
   const sheet = SPRITES[sprite]
   const image = assets.sprites[sprite]
   const frame = chooseSpriteFrame(sprite, sheet.frames, time, seed, moving, near, completed, player, direction)
-  const walkPhase = Math.sin(time * 12 + seed)
+  const walkPhase = Math.sin(time * 10 + seed)
   const bodyOffset = player
-    ? moving ? -Math.abs(walkPhase) * 5 : -Math.abs(Math.sin(time * 3.2 + seed)) * 1.6
-    : moving ? -Math.abs(walkPhase) * 2.6 : -Math.abs(Math.sin(time * 4 + seed)) * 2.6
+    ? moving ? -Math.abs(walkPhase) * 3.2 : -Math.abs(Math.sin(time * 2.4 + seed)) * 1
+    : moving ? -Math.abs(walkPhase) * 1.4 : -Math.abs(Math.sin(time * 2.2 + seed)) * 1.1
   const facingDir = direction === 'left' ? -1 : direction === 'right' ? 1 : 0.35
-  const rotation = player && moving ? walkPhase * 0.06 * facingDir : 0
+  const rotation = player && moving ? walkPhase * 0.025 * facingDir : 0
   const baseDrawW = sprite === 'nxr' && !player ? 58 : sheet.drawW
   const baseDrawH = sprite === 'nxr' && !player ? 82 : sheet.drawH
   const drawW = baseDrawW
   const drawH = baseDrawH
 
-  ctx.fillStyle = 'rgba(0,0,0,.34)'
-  ctx.fillRect(Math.round(x - drawW * 0.28), Math.round(y - 10), Math.round(drawW * 0.56), 12)
+  ctx.fillStyle = 'rgba(0,0,0,.22)'
+  ctx.fillRect(Math.round(x - drawW * 0.24), Math.round(y - 8), Math.round(drawW * 0.48), 8)
 
   if (near) {
     drawPixelInteractCue(ctx, x, y, drawW * 1.16, drawH * 0.6, time + seed, tone, true)
