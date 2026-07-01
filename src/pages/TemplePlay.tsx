@@ -101,6 +101,10 @@ type SpriteKey =
   | 'npcYozi'
   | 'npcDora'
   | 'npcDarma'
+  | 'npcFlippedFace'
+  | 'npcEcelannister'
+  | 'npcAli'
+  | 'npcLongLife'
 
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000' as const
 const MAP_W = 58
@@ -233,6 +237,10 @@ const SPRITES: Record<SpriteKey, SpriteSheet> = {
   npcYozi: { src: '/temple-play/characters/rt-yozi.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
   npcDora: { src: '/temple-play/characters/rt-dora.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
   npcDarma: { src: '/temple-play/characters/rt-darma.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
+  npcFlippedFace: { src: '/temple-play/characters/rt-flippedface.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
+  npcEcelannister: { src: '/temple-play/characters/rt-ecelannister.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
+  npcAli: { src: '/temple-play/characters/rt-ali.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
+  npcLongLife: { src: '/temple-play/characters/rt-longlife.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
 }
 
 const RIGHT_WALK_CYCLE_SPRITES = new Set<SpriteKey>([
@@ -276,6 +284,10 @@ const CHARACTER_CHOICES: Array<{ key: SpriteKey; label: string }> = [
   { key: 'npcYozi', label: 'Yozi' },
   { key: 'npcDora', label: 'Dora' },
   { key: 'npcDarma', label: 'Darma' },
+  { key: 'npcFlippedFace', label: 'FlippedFace' },
+  { key: 'npcEcelannister', label: 'Ecelannister' },
+  { key: 'npcAli', label: 'Ali' },
+  { key: 'npcLongLife', label: 'LongLife' },
 ]
 
 function initialPlayerSprite(): SpriteKey {
@@ -919,6 +931,74 @@ const AMBIENT_NPCS: AmbientNpc[] = [
       'That is why this world teaches with characters, movement, and small proofs.',
     ],
     activity: 'wander',
+    persona: 'wanderer',
+  },
+  {
+    name: 'FlippedFace',
+    sprite: 'npcFlippedFace',
+    x: 980,
+    y: 1045,
+    color: '#f2c866',
+    accent: '#57e39f',
+    line: 'I keep the builder sign readable for new explorers.',
+    topic: 'Build For Rialo',
+    dialogue: [
+      'Rialo Temple is a gamified education world built for Rialo by nxrskyaa.',
+      'The goal is simple: make real-world blockchain ideas feel playable, not intimidating.',
+      'If a concept is hard, the temple turns it into a character, quest, or visual ritual.',
+    ],
+    activity: 'wander',
+    persona: 'homebody',
+  },
+  {
+    name: 'Ecelannister',
+    sprite: 'npcEcelannister',
+    x: 720,
+    y: 1015,
+    color: '#ff7ad9',
+    accent: '#f2c866',
+    line: 'A friendly identity flow beats a scary onboarding wall.',
+    topic: 'Real-World Identity',
+    dialogue: [
+      'Real-world users should not need to understand every wallet detail on day one.',
+      'Rialo can support friendlier identity patterns like familiar accounts and clear profiles.',
+      'That is why the temple uses a passport: it makes Web3 feel like a place you can enter.',
+    ],
+    activity: 'dance',
+    persona: 'homebody',
+  },
+  {
+    name: 'Ali',
+    sprite: 'npcAli',
+    x: 1285,
+    y: 1135,
+    color: '#88d7ff',
+    accent: '#57e39f',
+    line: 'Safety is the mask before the message leaves the temple.',
+    topic: 'Privacy and Safety',
+    dialogue: [
+      'Real-world apps touch personal messages, finance, identity, and status updates.',
+      'A useful blockchain experience needs privacy and safer coordination, not public chaos.',
+      'That is why Rialo concepts include private communication, verification, and clear action rules.',
+    ],
+    activity: 'meditate',
+    persona: 'homebody',
+  },
+  {
+    name: 'LongLife',
+    sprite: 'npcLongLife',
+    x: 1510,
+    y: 1125,
+    color: '#57e39f',
+    accent: '#ffad72',
+    line: 'A world stays alive when the community keeps returning.',
+    topic: 'Temple Community',
+    dialogue: [
+      'Daily rituals, quizzes, wishes, and leaderboards give people reasons to come back.',
+      'Those loops only matter when progress is connected to the same onchain profile.',
+      'That is how Rialo Temple can grow from a demo into a living education hub.',
+    ],
+    activity: 'stroll',
     persona: 'wanderer',
   },
 ]
