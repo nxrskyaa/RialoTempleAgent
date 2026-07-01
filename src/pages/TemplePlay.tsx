@@ -103,18 +103,18 @@ type SpriteKey =
   | 'npcDarma'
 
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000' as const
-const MAP_W = 50
-const MAP_H = 40
+const MAP_W = 58
+const MAP_H = 46
 const TILE_SIZE = 32
 const WORLD = { width: MAP_W * TILE_SIZE, height: MAP_H * TILE_SIZE }
-const CENTER_HUB = { tx: 25, ty: 20 }
+const CENTER_HUB = { tx: 29, ty: 23 }
 const HUBS = [
-  [13, 9],
-  [12, 26],
-  [40, 11],
-  [38, 30],
+  [12, 9],
+  [12, 34],
+  [49, 11],
+  [48, 36],
 ] as const
-const POND = { tx: 5, ty: 24, tw: 8, th: 6 }
+const POND = { tx: 5, ty: 27, tw: 8, th: 6 }
 const POND_RECT = {
   x: POND.tx * TILE_SIZE,
   y: POND.ty * TILE_SIZE,
@@ -135,9 +135,11 @@ const T = {
 } as const
 type TileType = (typeof T)[keyof typeof T]
 const PLAYER_SPEED = 245
-const DESKTOP_CAMERA_ZOOM = 1.0
-const TABLET_CAMERA_ZOOM = 0.9
-const MOBILE_CAMERA_ZOOM = 0.7
+const DESKTOP_CAMERA_ZOOM = 0.86
+const TABLET_CAMERA_ZOOM = 0.76
+const MOBILE_CAMERA_ZOOM = 0.58
+const RIALO_SIGN_INTERACT = { x: 928, y: 860 }
+const RIALO_SIGN_PROFILE_URL = 'https://x.com/nxrskyaa'
 
 type SpriteSheet = {
   src: string
@@ -202,7 +204,7 @@ type PropKey =
   | 'buildingRialoSign'
 
 const SPRITES: Record<SpriteKey, SpriteSheet> = {
-  nxr: { src: '/temple-play/sprites/nxr-v2.png', frameW: 210, frameH: 280, frames: 16, drawW: 70, drawH: 94 },
+  nxr: { src: '/temple-play/sprites/nxr-v2.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
   npcOracle: { src: '/temple-play/characters/rt-vika-joestar.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
   npcForestGuide: { src: '/temple-play/characters/rt-ade.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
   npcBuilder: { src: '/temple-play/characters/rt-barong.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
@@ -323,8 +325,8 @@ const QUESTS: QuestNpc[] = [
     npc: 'NXR',
     role: 'Builder Guide',
     sprite: 'nxr',
-    x: 792,
-    y: 700,
+    x: 928,
+    y: 850,
     color: '#f2c866',
     accent: '#57e39f',
     reward: 50,
@@ -358,8 +360,8 @@ const QUESTS: QuestNpc[] = [
     npc: 'Blond',
     role: 'Asset Guardian',
     sprite: 'npcHerbalist',
-    x: 1290,
-    y: 430,
+    x: 1510,
+    y: 445,
     color: '#ffad72',
     accent: '#f2c866',
     reward: 75,
@@ -393,8 +395,8 @@ const QUESTS: QuestNpc[] = [
     npc: 'Rollins',
     role: 'Agent Coordinator',
     sprite: 'npcShadowAgent',
-    x: 580,
-    y: 985,
+    x: 640,
+    y: 1125,
     color: '#78ecff',
     accent: '#c886ff',
     reward: 75,
@@ -428,8 +430,8 @@ const QUESTS: QuestNpc[] = [
     npc: 'Garuda',
     role: 'Signal Runner',
     sprite: 'npcNavigator',
-    x: 1180,
-    y: 1175,
+    x: 1365,
+    y: 1325,
     color: '#b9ff66',
     accent: '#78ecff',
     reward: 80,
@@ -463,8 +465,8 @@ const QUESTS: QuestNpc[] = [
     npc: 'Vika Joestar',
     role: 'SCALE Engineer',
     sprite: 'npcOracle',
-    x: 395,
-    y: 400,
+    x: 350,
+    y: 430,
     color: '#c886ff',
     accent: '#57e39f',
     reward: 100,
@@ -690,8 +692,8 @@ const AMBIENT_NPCS: AmbientNpc[] = [
   {
     name: 'AQC',
     sprite: 'npcAqc',
-    x: 980,
-    y: 720,
+    x: 1040,
+    y: 890,
     color: '#57e39f',
     accent: '#78ecff',
     line: 'The sign plaza is where every signal gets noticed.',
@@ -724,8 +726,8 @@ const AMBIENT_NPCS: AmbientNpc[] = [
   {
     name: 'Ishu',
     sprite: 'npcIshu',
-    x: 930,
-    y: 760,
+    x: 835,
+    y: 920,
     color: '#c886ff',
     accent: '#78ecff',
     line: 'Fast apps need live triggers, not sleepy buttons.',
@@ -921,27 +923,27 @@ type BuildingSpec = {
 }
 
 const BUILDINGS: BuildingSpec[] = [
-  { key: 'buildingRialoSign', x: 792, y: 650, w: 340, h: 340, label: 'Rialo Sign', color: '#f2c866' },
-  { key: 'buildingScaleDojo', x: 395, y: 332, w: 250, h: 282, label: 'SCALE Lab', color: '#c886ff' },
-  { key: 'buildingStoneVault', x: 1290, y: 370, w: 258, h: 306, label: 'RWA Vault', color: '#f2c866' },
-  { key: 'buildingTempleLodge', x: 585, y: 920, w: 318, h: 268, label: 'Agent Camp', color: '#78ecff' },
-  { key: 'buildingMarketHall', x: 1180, y: 1050, w: 278, h: 266, label: 'Signal Tower', color: '#b9ff66' },
-  { key: 'buildingGreenhouseInn', x: 270, y: 1276, w: 230, h: 296, label: 'Privacy Grove', color: '#ff7ad9' },
-  { key: 'buildingOracleHouse', x: 1100, y: 760, w: 248, h: 276, label: 'Bridge Gate', color: '#57e39f' },
-  { key: 'buildingWoodenCabin', x: 850, y: 1150, w: 250, h: 220, label: 'Warung Pecel', color: '#ffad72' },
-  { key: 'buildingOrangeCottage', x: 1430, y: 1150, w: 206, h: 210, label: 'Quest Hut', color: '#f2c866' },
-  { key: 'buildingGuildHouse', x: 1425, y: 620, w: 248, h: 236, label: 'Guild Hall', color: '#78ecff' },
+  { key: 'buildingRialoSign', x: 928, y: 760, w: 360, h: 360, label: 'Rialo Sign', color: '#f2c866' },
+  { key: 'buildingScaleDojo', x: 350, y: 350, w: 250, h: 282, label: 'SCALE Lab', color: '#c886ff' },
+  { key: 'buildingStoneVault', x: 1510, y: 385, w: 258, h: 306, label: 'RWA Vault', color: '#f2c866' },
+  { key: 'buildingTempleLodge', x: 640, y: 1040, w: 318, h: 268, label: 'Agent Camp', color: '#78ecff' },
+  { key: 'buildingMarketHall', x: 1365, y: 1200, w: 278, h: 266, label: 'Signal Tower', color: '#b9ff66' },
+  { key: 'buildingGreenhouseInn', x: 300, y: 1430, w: 230, h: 296, label: 'Privacy Grove', color: '#ff7ad9' },
+  { key: 'buildingOracleHouse', x: 1260, y: 810, w: 248, h: 276, label: 'Bridge Gate', color: '#57e39f' },
+  { key: 'buildingWoodenCabin', x: 980, y: 1315, w: 250, h: 220, label: 'Warung Pecel', color: '#ffad72' },
+  { key: 'buildingOrangeCottage', x: 1660, y: 1320, w: 206, h: 210, label: 'Quest Hut', color: '#f2c866' },
+  { key: 'buildingGuildHouse', x: 1630, y: 735, w: 248, h: 236, label: 'Guild Hall', color: '#78ecff' },
 ]
 
 const RIALO_SIGN_GATHER_SPOTS = [
-  { x: 690, y: 720 },
-  { x: 760, y: 740 },
-  { x: 835, y: 742 },
-  { x: 910, y: 735 },
-  { x: 985, y: 712 },
-  { x: 705, y: 795 },
-  { x: 815, y: 810 },
-  { x: 930, y: 795 },
+  { x: 830, y: 850 },
+  { x: 870, y: 875 },
+  { x: 945, y: 875 },
+  { x: 1030, y: 855 },
+  { x: 840, y: 935 },
+  { x: 915, y: 960 },
+  { x: 1065, y: 930 },
+  { x: 1120, y: 850 },
 ]
 
 const BUILDING_COLLIDERS = BUILDINGS.map((building) => buildingCollider(building))
@@ -997,10 +999,12 @@ function TemplePlayInner() {
   const { address, isConnected } = useAccount()
   const [activeQuest, setActiveQuest] = useState<QuestNpc | null>(null)
   const [activeTalkNpc, setActiveTalkNpc] = useState<AmbientNpc | null>(null)
+  const [activeSignInfo, setActiveSignInfo] = useState(false)
   const [answers, setAnswers] = useState<Record<number, number>>({})
   const [quizDone, setQuizDone] = useState(false)
   const [nearNpcId, setNearNpcId] = useState<number | null>(null)
   const [nearAmbientIndex, setNearAmbientIndex] = useState<number | null>(null)
+  const [nearSign, setNearSign] = useState(false)
   const [showGuide, setShowGuide] = useState(true)
   const [playerSprite, setPlayerSprite] = useState<SpriteKey>(() => initialPlayerSprite())
   const [toast, setToast] = useState('')
@@ -1140,6 +1144,7 @@ function TemplePlayInner() {
   const openQuest = useCallback((quest: QuestNpc) => {
     playTempleSfx('talk')
     setActiveTalkNpc(null)
+    setActiveSignInfo(false)
     setActiveQuest(quest)
     setAnswers({})
     setQuizDone(false)
@@ -1153,7 +1158,16 @@ function TemplePlayInner() {
   const openAmbientTalk = useCallback((npc: AmbientNpc) => {
     playTempleSfx('talk')
     setActiveQuest(null)
+    setActiveSignInfo(false)
     setActiveTalkNpc(npc)
+    setToast('')
+  }, [])
+
+  const openSignInfo = useCallback(() => {
+    playTempleSfx('talk')
+    setActiveQuest(null)
+    setActiveTalkNpc(null)
+    setActiveSignInfo(true)
     setToast('')
   }, [])
 
@@ -1203,6 +1217,7 @@ function TemplePlayInner() {
 
   const nearestQuest = nearNpcId ? QUESTS.find((quest) => quest.id === nearNpcId) : null
   const nearestAmbientNpc = nearAmbientIndex !== null ? AMBIENT_NPCS[nearAmbientIndex] : null
+  const nearestSign = nearSign && !nearestQuest && !nearestAmbientNpc
   const selectedCharacter = CHARACTER_CHOICES.find((choice) => choice.key === playerSprite) ?? CHARACTER_CHOICES[0]
 
   const chooseCharacter = useCallback((sprite: SpriteKey) => {
@@ -1213,7 +1228,7 @@ function TemplePlayInner() {
 
   return (
     <main className="temple-play-page">
-      <section className={`temple-play-shell ${activeQuest || activeTalkNpc ? 'is-dialog-open' : ''}`}>
+      <section className={`temple-play-shell ${activeQuest || activeTalkNpc || activeSignInfo ? 'is-dialog-open' : ''}`}>
         <div className="temple-play-topbar">
           <div>
             <p className="text-xs font-black uppercase tracking-[0.18em] text-[var(--temple-gold)]">Temple Play</p>
@@ -1236,8 +1251,10 @@ function TemplePlayInner() {
             playerSprite={playerSprite}
             onNearQuestChange={setNearNpcId}
             onNearAmbientChange={setNearAmbientIndex}
+            onNearSignChange={setNearSign}
             onOpenQuest={(quest) => openQuestRef.current(quest)}
             onOpenAmbientTalk={openAmbientTalk}
+            onOpenSignInfo={openSignInfo}
           />
 
           <div className="temple-play-audio-control">
@@ -1272,25 +1289,27 @@ function TemplePlayInner() {
           <CharacterPicker selected={playerSprite} selectedLabel={selectedCharacter.label} onSelect={chooseCharacter} />
 
           <div className="temple-play-miniquest">
-            <p>{nearestQuest || nearestAmbientNpc ? 'Talk now' : 'Next destination'}</p>
+            <p>{nearestQuest || nearestAmbientNpc || nearestSign ? 'Interact now' : 'Next destination'}</p>
             <strong>
               {nearestQuest
                 ? `${nearestQuest.npc} / ${nearestQuest.zone}`
                 : nearestAmbientNpc
                   ? `${nearestAmbientNpc.name} / ${nearestAmbientNpc.topic}`
+                  : nearestSign
+                    ? 'RialoSign / Temple Info'
                   : `${nextQuest.zone}`}
             </strong>
             <button
               type="button"
-              disabled={!nearestQuest && !nearestAmbientNpc}
-              onClick={() => nearestQuest ? openQuest(nearestQuest) : nearestAmbientNpc && openAmbientTalk(nearestAmbientNpc)}
+              disabled={!nearestQuest && !nearestAmbientNpc && !nearestSign}
+              onClick={() => nearestQuest ? openQuest(nearestQuest) : nearestAmbientNpc ? openAmbientTalk(nearestAmbientNpc) : nearestSign && openSignInfo()}
             >
-              {nearestQuest || nearestAmbientNpc ? 'Talk' : 'Find NPC'}
+              {nearestQuest || nearestAmbientNpc ? 'Talk' : nearestSign ? 'Open Info' : 'Find NPC'}
             </button>
           </div>
 
           <AnimatePresence>
-            {showGuide && !activeQuest && !activeTalkNpc ? (
+            {showGuide && !activeQuest && !activeTalkNpc && !activeSignInfo ? (
               <GuideOverlay selected={playerSprite} onSelect={chooseCharacter} onClose={() => setShowGuide(false)} />
             ) : null}
           </AnimatePresence>
@@ -1322,6 +1341,12 @@ function TemplePlayInner() {
               <AmbientTalkPanel key={activeTalkNpc.name} npc={activeTalkNpc} onClose={() => setActiveTalkNpc(null)} />
             ) : null}
           </AnimatePresence>
+
+          <AnimatePresence>
+            {activeSignInfo ? (
+              <RialoSignPanel onClose={() => setActiveSignInfo(false)} />
+            ) : null}
+          </AnimatePresence>
         </div>
 
       </section>
@@ -1350,26 +1375,31 @@ function TemplePlayCanvas({
   playerSprite,
   onNearQuestChange,
   onNearAmbientChange,
+  onNearSignChange,
   onOpenQuest,
   onOpenAmbientTalk,
+  onOpenSignInfo,
 }: {
   completedIds: Set<number>
   nextQuest: QuestNpc
   playerSprite: SpriteKey
   onNearQuestChange: (id: number | null) => void
   onNearAmbientChange: (index: number | null) => void
+  onNearSignChange: (near: boolean) => void
   onOpenQuest: (quest: QuestNpc) => void
   onOpenAmbientTalk: (npc: AmbientNpc) => void
+  onOpenSignInfo: () => void
 }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const wrapRef = useRef<HTMLDivElement | null>(null)
   const keys = useRef(new Set<string>())
-  const player = useRef<PlayerState>({ x: 792, y: 840, dir: 'down', moving: false })
+  const player = useRef<PlayerState>({ x: 928, y: 940, dir: 'down', moving: false })
   const nearId = useRef<number | null>(null)
   const nearAmbient = useRef<number | null>(null)
+  const nearSignRef = useRef(false)
   const completedLatest = useRef(completedIds)
   const assetsRef = useRef<TemplePlayAssets | null>(null)
-  const tapTarget = useRef<{ x: number; y: number; questId?: number; ambientIndex?: number } | null>(null)
+  const tapTarget = useRef<{ x: number; y: number; questId?: number; ambientIndex?: number; sign?: boolean } | null>(null)
   const cameraRef = useRef({ x: 0, y: 0, zoom: DESKTOP_CAMERA_ZOOM })
 
   useEffect(() => {
@@ -1419,6 +1449,11 @@ function TemplePlayCanvas({
             playTempleSfx('talk')
             onOpenAmbientTalk(npc)
           }
+          return
+        }
+        if (nearSignRef.current) {
+          playTempleSfx('talk')
+          onOpenSignInfo()
         }
       }
     }
@@ -1465,6 +1500,7 @@ function TemplePlayCanvas({
         if (distance < 10) {
           const arrivedQuest = tapTarget.current.questId
           const arrivedAmbient = tapTarget.current.ambientIndex
+          const arrivedSign = tapTarget.current.sign
           tapTarget.current = null
           input = { x: 0, y: 0 }
           if (arrivedQuest) {
@@ -1479,6 +1515,11 @@ function TemplePlayCanvas({
             if (npc && motion && Math.hypot(current.x - motion.x, current.y - motion.y) < 105) {
               playTempleSfx('talk')
               onOpenAmbientTalk(npc)
+            }
+          } else if (arrivedSign) {
+            if (Math.hypot(current.x - RIALO_SIGN_INTERACT.x, current.y - RIALO_SIGN_INTERACT.y) < 128) {
+              playTempleSfx('talk')
+              onOpenSignInfo()
             }
           }
         } else {
@@ -1514,6 +1555,11 @@ function TemplePlayCanvas({
         nearAmbient.current = ambientIndex
         onNearAmbientChange(nearAmbient.current)
       }
+      const signClose = !nearId.current && !nearAmbient.current && nearestRialoSign(current)
+      if (signClose !== nearSignRef.current) {
+        nearSignRef.current = signClose
+        onNearSignChange(signClose)
+      }
 
       const zoom = cameraZoom(rect.width)
       const viewport = { width: rect.width / zoom, height: rect.height / zoom }
@@ -1528,7 +1574,7 @@ function TemplePlayCanvas({
       }
       cameraRef.current = { ...camera, zoom }
 
-      drawWorld(context, rect.width, rect.height, viewport.width, viewport.height, camera, zoom, frame, current, completedLatest.current, nearId.current, nearAmbient.current, assets, tapTarget.current, nextQuest, playerSprite)
+      drawWorld(context, rect.width, rect.height, viewport.width, viewport.height, camera, zoom, frame, current, completedLatest.current, nearId.current, nearAmbient.current, nearSignRef.current, assets, tapTarget.current, nextQuest, playerSprite)
       window.requestAnimationFrame(tick)
     }
 
@@ -1540,7 +1586,7 @@ function TemplePlayCanvas({
       window.removeEventListener('keydown', keyDown)
       window.removeEventListener('keyup', keyUp)
     }
-  }, [nextQuest, onNearQuestChange, onNearAmbientChange, onOpenQuest, onOpenAmbientTalk, playerSprite])
+  }, [nextQuest, onNearQuestChange, onNearAmbientChange, onNearSignChange, onOpenQuest, onOpenAmbientTalk, onOpenSignInfo, playerSprite])
 
   return (
     <div ref={wrapRef} className="temple-play-canvas-wrap">
@@ -1557,13 +1603,14 @@ function TemplePlayCanvas({
           }
           const tappedQuest = QUESTS.find((quest) => Math.hypot(target.x - quest.x, target.y - quest.y) < 70)
           const tappedAmbient = tappedQuest ? null : tappedAmbientNpc(target)
-          const targetActor = tappedQuest ?? tappedAmbient
+          const tappedSign = !tappedQuest && !tappedAmbient && Math.hypot(target.x - RIALO_SIGN_INTERACT.x, target.y - RIALO_SIGN_INTERACT.y) < 140
+          const targetActor = tappedQuest ?? tappedAmbient ?? (tappedSign ? RIALO_SIGN_INTERACT : null)
           const walkTarget = targetActor
             ? approachPoint(player.current, targetActor, 76)
             : target
           tapTarget.current = isMovementBlocked(walkTarget.x, walkTarget.y)
             ? null
-            : { ...walkTarget, questId: tappedQuest?.id, ambientIndex: tappedAmbient?.index }
+            : { ...walkTarget, questId: tappedQuest?.id, ambientIndex: tappedAmbient?.index, sign: tappedSign }
           playTempleSfx('tap')
         }}
       />
@@ -1743,6 +1790,32 @@ function AmbientTalkPanel({
         >
           {isLast ? 'Done' : 'Next'}
         </button>
+      </div>
+    </motion.section>
+  )
+}
+
+function RialoSignPanel({ onClose }: { onClose: () => void }) {
+  return (
+    <motion.section
+      className="temple-play-talk-panel temple-play-sign-panel"
+      style={{ '--npc': '#f2c866', '--npc-accent': '#57e39f' } as CSSProperties}
+      initial={{ opacity: 0, y: 18, scale: 0.96 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: 12, scale: 0.97 }}
+      transition={{ type: 'spring', stiffness: 260, damping: 24 }}
+    >
+      <div className="temple-play-sign-mark" aria-hidden="true">
+        <span />
+      </div>
+      <div className="temple-play-talk-copy">
+        <p>RialoSign / Temple Info</p>
+        <strong>Rialo Temple is a gamified education experience built for Rialo.</strong>
+        <small>Explore, talk to NPCs, learn real-world blockchain concepts, and collect onchain learning badges.</small>
+      </div>
+      <div className="temple-play-talk-actions">
+        <button type="button" onClick={onClose}>Close</button>
+        <a href={RIALO_SIGN_PROFILE_URL} target="_blank" rel="noreferrer">Visit Nxrskyaa</a>
       </div>
     </motion.section>
   )
@@ -1945,6 +2018,10 @@ function nearestAmbientNpc(player: PlayerState): AmbientHit | null {
   return distance < 112 ? nearest : null
 }
 
+function nearestRialoSign(player: PlayerState) {
+  return Math.hypot(player.x - RIALO_SIGN_INTERACT.x, player.y - RIALO_SIGN_INTERACT.y) < 135
+}
+
 function tappedAmbientNpc(point: { x: number; y: number }): AmbientHit | null {
   let nearest: { index: number; x: number; y: number } | null = null
   let distance = Number.POSITIVE_INFINITY
@@ -2029,6 +2106,7 @@ function drawWorld(
   completedIds: Set<number>,
   nearNpcId: number | null,
   nearAmbientIndex: number | null,
+  nearSign: boolean,
   assets: TemplePlayAssets,
   target: { x: number; y: number } | null,
   nextQuest: QuestNpc,
@@ -2042,8 +2120,10 @@ function drawWorld(
   drawPaths(ctx, time)
   drawWater(ctx, assets)
   drawEnvironmentProps(ctx, time, assets)
+  drawFlyingLanterns(ctx, time)
   drawTapTarget(ctx, time, target)
   drawQuestHint(ctx, time, nextQuest, nearNpcId)
+  drawRialoSignHint(ctx, time, nearSign)
   drawActors(ctx, time, completedIds, nearNpcId, nearAmbientIndex, player, assets, playerSprite)
   drawWeather(ctx, camera, viewportWidth, viewportHeight, time)
   drawShootingStar(ctx, camera, viewportWidth, viewportHeight, time)
@@ -2079,6 +2159,13 @@ function drawQuestHint(
   drawPixelInteractCue(ctx, quest.x, quest.y, 62, 34, time, close ? '#57e39f' : '#f2c866', close)
   if (close) {
     drawPixelNameTag(ctx, quest.x, quest.y - 148, 'Tap / E to talk', '#07100c', true, '#57e39f', true)
+  }
+}
+
+function drawRialoSignHint(ctx: CanvasRenderingContext2D, time: number, active: boolean) {
+  drawPixelInteractCue(ctx, RIALO_SIGN_INTERACT.x, RIALO_SIGN_INTERACT.y, 88, 42, time + 1.2, active ? '#f2c866' : '#57e39f', active)
+  if (active) {
+    drawPixelNameTag(ctx, RIALO_SIGN_INTERACT.x, RIALO_SIGN_INTERACT.y - 112, 'Open RialoSign', '#07100c', true, '#f2c866', true)
   }
 }
 
@@ -2333,9 +2420,48 @@ function drawBuildingAsset(
   building: BuildingSpec,
 ) {
   const { key, x, y, w, h } = building
+  if (key === 'buildingRialoSign') {
+    drawRialoSignPlatform(ctx, x, y, w)
+  }
   ctx.fillStyle = 'rgba(0,0,0,.24)'
   ctx.fillRect(Math.round(x - w * 0.36), Math.round(y - 16), Math.round(w * 0.72), 26)
   drawPropBottomCenter(ctx, assets, key, x, y, w, h)
+}
+
+function drawRialoSignPlatform(ctx: CanvasRenderingContext2D, x: number, y: number, w: number) {
+  const left = Math.round(x - w * 0.58)
+  const top = Math.round(y - 70)
+  const width = Math.round(w * 1.16)
+  const height = 122
+  ctx.save()
+  ctx.fillStyle = 'rgba(10, 16, 14, .38)'
+  ctx.fillRect(left - 8, top + 8, width + 16, height)
+  ctx.fillStyle = 'rgba(75, 75, 86, .88)'
+  ctx.fillRect(left, top, width, height)
+  ctx.strokeStyle = 'rgba(242, 200, 102, .72)'
+  ctx.lineWidth = 4
+  ctx.strokeRect(left + 2, top + 2, width - 4, height - 4)
+  ctx.strokeStyle = 'rgba(245, 239, 218, .16)'
+  ctx.lineWidth = 1
+  for (let yy = top + 18; yy < top + height - 10; yy += 18) {
+    ctx.beginPath()
+    ctx.moveTo(left + 12, yy)
+    ctx.lineTo(left + width - 12, yy)
+    ctx.stroke()
+  }
+  for (let xx = left + 28; xx < left + width - 12; xx += 34) {
+    ctx.beginPath()
+    ctx.moveTo(xx, top + 10)
+    ctx.lineTo(xx - 10, top + height - 10)
+    ctx.stroke()
+  }
+  ctx.fillStyle = '#f2c866'
+  for (let i = 0; i < 8; i++) {
+    const px = left + 20 + i * Math.max(22, Math.floor((width - 40) / 7))
+    ctx.fillRect(px, top - 8, 8, 18)
+    ctx.fillRect(px - 4, top - 12, 16, 5)
+  }
+  ctx.restore()
 }
 
 const FLOWERS: PropKey[] = ['flowerBlue', 'flowerAmber', 'flowerCream', 'flowerYellow', 'flowerRed', 'flowerOrange', 'flowerPink', 'flowerPurple']
@@ -2375,6 +2501,32 @@ function drawEnvironmentProps(ctx: CanvasRenderingContext2D, time: number, asset
   }
 
   drawFloatingLeaves(ctx, time)
+}
+
+function drawFlyingLanterns(ctx: CanvasRenderingContext2D, time: number) {
+  ctx.save()
+  for (let i = 0; i < 12; i++) {
+    const lane = i % 4
+    const xBase = 180 + lane * 410 + (i % 3) * 46
+    const cycle = (time * (18 + lane * 3) + i * 115) % (WORLD.height + 220)
+    const y = WORLD.height + 80 - cycle
+    const x = (xBase + Math.sin(time * 0.55 + i) * 34) % WORLD.width
+    const glow = 0.45 + Math.sin(time * 2.2 + i) * 0.14
+    ctx.globalAlpha = y > 20 && y < WORLD.height + 80 ? 1 : 0
+    ctx.fillStyle = `rgba(242, 200, 102, ${0.18 + glow * 0.2})`
+    ctx.fillRect(Math.round(x - 14), Math.round(y - 16), 28, 32)
+    ctx.fillStyle = 'rgba(7, 16, 12, .72)'
+    ctx.fillRect(Math.round(x - 10), Math.round(y - 13), 20, 3)
+    ctx.fillRect(Math.round(x - 10), Math.round(y + 12), 20, 3)
+    ctx.fillStyle = '#f2c866'
+    ctx.fillRect(Math.round(x - 7), Math.round(y - 8), 14, 18)
+    ctx.fillStyle = '#ffad72'
+    ctx.fillRect(Math.round(x - 4), Math.round(y - 3), 8, 9)
+    ctx.fillStyle = 'rgba(87, 227, 159, .5)'
+    ctx.fillRect(Math.round(x - 2), Math.round(y + 17), 4, 10)
+  }
+  ctx.globalAlpha = 1
+  ctx.restore()
 }
 
 function drawFloatingLeaves(ctx: CanvasRenderingContext2D, time: number) {
@@ -2652,6 +2804,8 @@ function updateAmbientNpcs(dt: number) {
     const step = Math.min(dist, NPC_SPEED * dt)
     const nx = r.x + (dx / dist) * step
     const ny = r.y + (dy / dist) * step
+    const prevX = r.x
+    const prevY = r.y
     let moved = false
     if (!isMovementBlocked(nx, r.y)) { r.x = nx; moved = true }
     if (!isMovementBlocked(r.x, ny)) { r.y = ny; moved = true }
@@ -2663,9 +2817,13 @@ function updateAmbientNpcs(dt: number) {
         r.visitCooldown = 4 + Math.random() * 12
       }
     }
-    r.moving = moved
-    if (Math.abs(dx) > Math.abs(dy)) r.dir = dx < 0 ? 'left' : 'right'
-    else r.dir = dy < 0 ? 'up' : 'down'
+    const movedX = r.x - prevX
+    const movedY = r.y - prevY
+    r.moving = moved && Math.hypot(movedX, movedY) > 0.15
+    if (r.moving) {
+      if (Math.abs(movedX) > Math.abs(movedY)) r.dir = movedX < 0 ? 'left' : 'right'
+      else r.dir = movedY < 0 ? 'up' : 'down'
+    }
   }
 }
 
@@ -2691,10 +2849,9 @@ function drawNpcEventLayer(ctx: CanvasRenderingContext2D, time: number, motions:
   if (kind === 1 && local < 3) {
     const pair = nearestSocialPair(motions)
     if (!pair) return
-    const emotes = ['!', 'note', 'spark', '~', '?']
     const turn = Math.floor(local / 0.75)
     const active = turn % 2 === 0 ? pair.a : pair.b
-    drawMiniBubble(ctx, active.x, active.y - 142, emotes[turn % emotes.length], '#57e39f')
+    drawPixelSignal(ctx, active.x, active.y - 122, '#57e39f', time + turn)
     ctx.save()
     ctx.strokeStyle = 'rgba(87,227,159,.48)'
     ctx.lineWidth = 3
@@ -2836,8 +2993,8 @@ function drawSpriteActor(
   const rotation = player && moving ? walkPhase * 0.06 * facingDir : 0
   const baseDrawW = sprite === 'nxr' && !player ? 58 : sheet.drawW
   const baseDrawH = sprite === 'nxr' && !player ? 82 : sheet.drawH
-  const drawW = player ? baseDrawW * 1.04 : baseDrawW
-  const drawH = player ? baseDrawH * 1.04 : baseDrawH
+  const drawW = baseDrawW
+  const drawH = baseDrawH
 
   ctx.fillStyle = 'rgba(0,0,0,.34)'
   ctx.fillRect(Math.round(x - drawW * 0.28), Math.round(y - 10), Math.round(drawW * 0.56), 12)
@@ -2894,29 +3051,58 @@ function drawActivityCue(
   accent: string,
 ) {
   ctx.save()
-  ctx.font = '900 14px monospace'
-  ctx.textAlign = 'center'
+  const markerX = Math.round(x + drawW * 0.43)
+  const markerY = Math.round(y - drawH * 0.76 + Math.sin(time * 3) * 2)
   if (activity === 'dance') {
     const beat = Math.sin(time * 5)
     ctx.fillStyle = beat > 0 ? accent : tone
-    ctx.fillText('♪', x + drawW * 0.45, y - drawH * 0.82 + beat * 4)
-    ctx.fillText('♪', x - drawW * 0.44, y - drawH * 0.58 - beat * 3)
+    ctx.fillRect(markerX, markerY, 5, 9)
+    ctx.fillRect(markerX + 5, markerY + 6, 6, 4)
+    ctx.fillRect(Math.round(x - drawW * 0.48), Math.round(y - drawH * 0.58 - beat * 2), 5, 5)
   } else if (activity === 'meditate') {
     ctx.fillStyle = 'rgba(242,200,102,.86)'
-    ctx.fillText('✦', x, y - drawH - 28 + Math.sin(time * 2) * 4)
+    ctx.fillRect(Math.round(x - 3), Math.round(y - drawH - 18 + Math.sin(time * 2) * 3), 6, 6)
+    ctx.fillStyle = 'rgba(247,241,223,.72)'
+    ctx.fillRect(Math.round(x - 1), Math.round(y - drawH - 24 + Math.sin(time * 2) * 3), 2, 2)
   } else if (activity === 'tend') {
     ctx.fillStyle = 'rgba(87,227,159,.82)'
-    ctx.fillRect(x + drawW * 0.35, y - drawH * 0.35, 12, 7)
-    ctx.fillRect(x + drawW * 0.48, y - drawH * 0.43, 9, 5)
+    ctx.fillRect(Math.round(x + drawW * 0.35), Math.round(y - drawH * 0.35), 12, 7)
+    ctx.fillRect(Math.round(x + drawW * 0.48), Math.round(y - drawH * 0.43), 9, 5)
   } else if (activity === 'gather') {
-    drawMiniBubble(ctx, x + drawW * 0.42, y - drawH - 20, '...', tone)
+    ctx.fillStyle = tone
+    ctx.fillRect(markerX, markerY, 4, 4)
+    ctx.fillStyle = accent
+    ctx.fillRect(markerX + 7, markerY - 3, 4, 4)
+    ctx.fillStyle = 'rgba(247,241,223,.74)'
+    ctx.fillRect(markerX + 3, markerY + 7, 4, 4)
   } else if (activity === 'couple') {
     ctx.fillStyle = 'rgba(255,122,217,.9)'
-    ctx.fillText('♥', x, y - drawH - 20 + Math.sin(time * 2.6) * 3)
+    const heartY = Math.round(y - drawH - 17 + Math.sin(time * 2.6) * 3)
+    const heartX = Math.round(x - 5)
+    ctx.fillRect(heartX, heartY + 3, 4, 4)
+    ctx.fillRect(heartX + 6, heartY + 3, 4, 4)
+    ctx.fillRect(heartX + 3, heartY + 7, 6, 4)
+    ctx.fillRect(heartX + 5, heartY + 11, 2, 3)
   } else if (activity === 'sit') {
     ctx.fillStyle = 'rgba(247,241,223,.76)'
-    ctx.fillText('~', x + drawW * 0.42, y - drawH * 0.72)
+    ctx.fillRect(markerX, markerY, 10, 3)
+    ctx.fillRect(markerX + 3, markerY + 4, 7, 3)
   }
+  ctx.restore()
+}
+
+function drawPixelSignal(ctx: CanvasRenderingContext2D, x: number, y: number, color: string, time: number) {
+  const lift = Math.round(Math.sin(time * 4) * 2)
+  ctx.save()
+  ctx.fillStyle = 'rgba(7, 16, 12, .72)'
+  ctx.fillRect(Math.round(x - 9), Math.round(y - 9 + lift), 18, 18)
+  ctx.strokeStyle = color
+  ctx.lineWidth = 2
+  ctx.strokeRect(Math.round(x - 9) + 0.5, Math.round(y - 9 + lift) + 0.5, 17, 17)
+  ctx.fillStyle = color
+  ctx.fillRect(Math.round(x - 3), Math.round(y - 4 + lift), 6, 6)
+  ctx.fillStyle = '#f7f1df'
+  ctx.fillRect(Math.round(x - 1), Math.round(y + 4 + lift), 2, 2)
   ctx.restore()
 }
 
