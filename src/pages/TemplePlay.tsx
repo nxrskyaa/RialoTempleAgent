@@ -3404,10 +3404,11 @@ function drawSpriteActor(
   ctx.translate(Math.round(x), Math.round(y))
   ctx.rotate(rotation)
   if (flipX) ctx.scale(-1, 1)
+  const sheetCols = Math.max(1, Math.floor(image.width / sheet.frameW))
   ctx.drawImage(
     image,
-    frame * sheet.frameW,
-    0,
+    (frame % sheetCols) * sheet.frameW,
+    Math.floor(frame / sheetCols) * sheet.frameH,
     sheet.frameW,
     sheet.frameH,
     Math.round(-drawW / 2),
