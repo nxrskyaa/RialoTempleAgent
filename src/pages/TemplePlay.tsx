@@ -244,7 +244,48 @@ const SPRITES: Record<SpriteKey, SpriteSheet> = {
   npcSpider: { src: '/temple-play/characters/rt-spider.png', frameW: 160, frameH: 220, frames: 4, drawW: 48, drawH: 62 },
 }
 
-const RIGHT_WALK_CYCLE_SPRITES = new Set<SpriteKey>()
+// Per-sprite side-facing frame map (frame 0 = down, frame 2 = up).
+// Community sheets are inconsistent: some face left on frame 1, others face right.
+// Derived from per-pixel face-centroid analysis of each sheet.
+const SIDE_FRAMES: Partial<Record<SpriteKey, { left: number; right: number }>> = {
+  npcAlchemist: { left: 1, right: 3 },
+  npcAli: { left: 1, right: 3 },
+  npcAqc: { left: 3, right: 1 },
+  npcBjoestar: { left: 1, right: 3 },
+  npcBuilder: { left: 1, right: 3 },
+  npcCaptain: { left: 3, right: 1 },
+  npcDarma: { left: 3, right: 1 },
+  npcDora: { left: 3, right: 1 },
+  npcDp: { left: 1, right: 3 },
+  npcEcelannister: { left: 1, right: 3 },
+  npcElias: { left: 1, right: 3 },
+  npcFlippedFace: { left: 1, right: 3 },
+  npcForestGuide: { left: 3, right: 1 },
+  npcHerbalist: { left: 3, right: 1 },
+  npcIshu: { left: 3, right: 1 },
+  npcJeams: { left: 1, right: 3 },
+  npcJepanya: { left: 3, right: 1 },
+  npcKGufran: { left: 1, right: 3 },
+  npcKeep: { left: 1, right: 3 },
+  npcKingJ: { left: 3, right: 1 },
+  npcKoushik: { left: 1, right: 3 },
+  npcLongLife: { left: 1, right: 3 },
+  npcLuka: { left: 1, right: 3 },
+  npcNavigator: { left: 3, right: 1 },
+  npcOracle: { left: 1, right: 3 },
+  npcRaka: { left: 1, right: 3 },
+  npcRichard12: { left: 3, right: 1 },
+  npcRikky: { left: 3, right: 1 },
+  npcSage: { left: 3, right: 1 },
+  npcShadowAgent: { left: 3, right: 1 },
+  npcSilverwave: { left: 1, right: 3 },
+  npcSpider: { left: 3, right: 1 },
+  npcSukanto: { left: 1, right: 3 },
+  npcSuleyman: { left: 3, right: 1 },
+  npcVibevortex: { left: 3, right: 1 },
+  npcWisnu: { left: 3, right: 1 },
+  npcYozi: { left: 1, right: 3 },
+}
 
 const CHARACTER_CHOICES: Array<{ key: SpriteKey; label: string }> = [
   { key: 'nxr', label: 'NXR' },
@@ -3488,17 +3529,19 @@ function chooseSpriteFrame(
     return Math.min(frameCount - 1, row * 4 + step)
   }
   if (frameCount === 4) {
-    if (direction === 'left' || direction === 'right') {
-      if (RIGHT_WALK_CYCLE_SPRITES.has(sprite) && moving) return Math.floor(time * 6.2 + seed) % 4
-      return 1
-    }
-    return direction === 'up' && !RIGHT_WALK_CYCLE_SPRITES.has(sprite) ? 2 : 0
+    const side = SIDE_FRAMES[sprite]
+    if (direction === 'left') return side ? side.left : 1
+    if (direction === 'right') return side ? side.right : 3
+    if (direction === 'up') return 2
+    return 0
   }
   return 0
 }
 
-function shouldFlipSprite(sprite: SpriteKey, frameCount: number, direction: PlayerState['dir']) {
-  return sprite !== 'nxr' && frameCount === 4 && direction === 'right'
+function shouldFlipSprite(_sprite: SpriteKey, _frameCount: number, _direction: PlayerState['dir']) {
+  // Every 4-frame sheet has dedicated left AND right frames (see SIDE_FRAMES).
+  // Mirroring caused wrong-facing sprites and asymmetric-outfit artifacts.
+  return false
 }
 
 function characterName(sprite: SpriteKey) {
