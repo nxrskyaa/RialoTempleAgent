@@ -2754,7 +2754,7 @@ function drawGardenCrops(ctx: CanvasRenderingContext2D, time: number) {
 }
 
 // ── Leafy crop (lettuce/cabbage style) — 4 growth stages ──
-function drawPixelCropLeafy(ctx: CanvasRenderingContext2D, cx: number, cy: number, stage: number, time: number, seed: number) {
+function drawPixelCropLeafy(ctx: CanvasRenderingContext2D, cx: number, cy: number, stage: number, _time: number, _seed: number) {
   const p = (x: number, y: number, w: number, h: number, color: string) => {
     ctx.fillStyle = color
     ctx.fillRect(Math.round(cx + x), Math.round(cy + y), w, h)
@@ -2808,7 +2808,7 @@ function drawPixelCropLeafy(ctx: CanvasRenderingContext2D, cx: number, cy: numbe
 }
 
 // ── Root crop (carrot/turnip style) — 4 growth stages ──
-function drawPixelCropRoot(ctx: CanvasRenderingContext2D, cx: number, cy: number, stage: number, time: number, seed: number) {
+function drawPixelCropRoot(ctx: CanvasRenderingContext2D, cx: number, cy: number, stage: number, _time: number, _seed: number) {
   const p = (x: number, y: number, w: number, h: number, color: string) => {
     ctx.fillStyle = color
     ctx.fillRect(Math.round(cx + x), Math.round(cy + y), w, h)
