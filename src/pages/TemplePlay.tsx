@@ -77,7 +77,6 @@ type SpriteKey =
   | 'npcForestGuide'
   | 'npcBuilder'
   | 'npcCaptain'
-  | 'npcNavigator'
   | 'npcShadowAgent'
   | 'npcSage'
   | 'npcHerbalist'
@@ -111,6 +110,9 @@ type SpriteKey =
   | 'npcElias'
   | 'npcSza'
   | 'npcSpider'
+  | 'npcGoat'
+  | 'npcCryptondo'
+  | 'npcLuzzy'
 
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000' as const
 const MAP_W = 58
@@ -158,6 +160,7 @@ type SpriteSheet = {
   frames: number
   drawW: number
   drawH: number
+  cols?: number
 }
 
 type TemplePlayAssets = {
@@ -205,46 +208,58 @@ type PropKey =
   | 'buildingNenMatcha'
   | 'buildingRialoSign'
 
+const mappedNpc = (src: string, drawW = 58, drawH = 82): SpriteSheet => ({
+  src,
+  frameW: 96,
+  frameH: 96,
+  frames: 48,
+  cols: 6,
+  drawW,
+  drawH,
+})
+
 const SPRITES: Record<SpriteKey, SpriteSheet> = {
-  nxr: { src: '/temple-play/sprites/nxr-v2.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  nxr: { src: '/temple-play/sprites/nxr-v2.png', frameW: 210, frameH: 280, frames: 16, cols: 16, drawW: 58, drawH: 82 },
   npcOracle: { src: '/temple-play/characters/walk/vika-joestar.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
   npcForestGuide: { src: '/temple-play/characters/walk/ade.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
   npcBuilder: { src: '/temple-play/characters/walk/barong.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
   npcCaptain: { src: '/temple-play/characters/walk/eric-argent.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
-  npcNavigator: { src: '/temple-play/characters/walk/garuda.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
   npcShadowAgent: { src: '/temple-play/characters/walk/rollins.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
   npcSage: { src: '/temple-play/characters/walk/pinkeu.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
   npcHerbalist: { src: '/temple-play/characters/walk/blond.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
   npcAlchemist: { src: '/temple-play/characters/walk/dikzzy.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
-  npcKGufran: { src: '/temple-play/characters/walk/k-gufran.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
-  npcRikky: { src: '/temple-play/characters/walk/rikky.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcKGufran: mappedNpc('/temple-play/characters/walk/k-gufran.png'),
+  npcRikky: mappedNpc('/temple-play/characters/walk/rikky.png'),
   npcVibevortex: { src: '/temple-play/characters/walk/vibevortex.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
   npcWisnu: { src: '/temple-play/characters/walk/wisnu.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
   npcRaka: { src: '/temple-play/characters/walk/raka.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
   npcJepanya: { src: '/temple-play/characters/walk/jepanya.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
-  npcAqc: { src: '/temple-play/characters/walk/aqc.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcAqc: mappedNpc('/temple-play/characters/walk/aqc.png'),
   npcDp: { src: '/temple-play/characters/walk/dp.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
   npcIshu: { src: '/temple-play/characters/walk/ishu.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
-  npcJeams: { src: '/temple-play/characters/walk/jeams.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
-  npcKoushik: { src: '/temple-play/characters/walk/koushik.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
-  npcKingJ: { src: '/temple-play/characters/walk/kingj.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcJeams: mappedNpc('/temple-play/characters/walk/jeams.png'),
+  npcKoushik: mappedNpc('/temple-play/characters/walk/koushik.png'),
+  npcKingJ: mappedNpc('/temple-play/characters/walk/kingj.png'),
   npcRichard12: { src: '/temple-play/characters/walk/richard12.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
   npcLuka: { src: '/temple-play/characters/walk/luka.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
   npcSilverwave: { src: '/temple-play/characters/walk/silverwave.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
-  npcSuleyman: { src: '/temple-play/characters/walk/suleyman.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
-  npcYozi: { src: '/temple-play/characters/walk/yozi.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
-  npcDora: { src: '/temple-play/characters/walk/dora.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcSuleyman: mappedNpc('/temple-play/characters/walk/suleyman.png'),
+  npcYozi: mappedNpc('/temple-play/characters/walk/yozi.png'),
+  npcDora: mappedNpc('/temple-play/characters/walk/dora.png'),
   npcDarma: { src: '/temple-play/characters/walk/darma.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
-  npcFlippedFace: { src: '/temple-play/characters/walk/flippedface.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcFlippedFace: mappedNpc('/temple-play/characters/walk/flippedface.png'),
   npcEcelannister: { src: '/temple-play/characters/walk/ecelannister.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
   npcAli: { src: '/temple-play/characters/walk/ali.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
-  npcLongLife: { src: '/temple-play/characters/walk/longlife.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcLongLife: mappedNpc('/temple-play/characters/walk/longlife.png'),
   npcBjoestar: { src: '/temple-play/characters/walk/bjoestar.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
   npcKeep: { src: '/temple-play/characters/walk/keep.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
-  npcSukanto: { src: '/temple-play/characters/walk/sukanto.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
-  npcElias: { src: '/temple-play/characters/walk/elias.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
-  npcSza: { src: '/temple-play/characters/walk/sza.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
-  npcSpider: { src: '/temple-play/characters/walk/spider.png', frameW: 210, frameH: 280, frames: 16, drawW: 48, drawH: 62 },
+  npcSukanto: mappedNpc('/temple-play/characters/walk/sukanto.png'),
+  npcElias: mappedNpc('/temple-play/characters/walk/elias.png'),
+  npcSza: mappedNpc('/temple-play/characters/walk/sza.png'),
+  npcSpider: mappedNpc('/temple-play/characters/walk/spider.png', 48, 62),
+  npcGoat: mappedNpc('/temple-play/characters/walk/goat.png'),
+  npcCryptondo: mappedNpc('/temple-play/characters/walk/cryptondo.png'),
+  npcLuzzy: mappedNpc('/temple-play/characters/walk/luzzy.png'),
 }
 
 const CHARACTER_CHOICES: Array<{ key: SpriteKey; label: string }> = [
@@ -253,7 +268,6 @@ const CHARACTER_CHOICES: Array<{ key: SpriteKey; label: string }> = [
   { key: 'npcForestGuide', label: 'Ade' },
   { key: 'npcBuilder', label: 'Barong' },
   { key: 'npcCaptain', label: 'Eric Argent' },
-  { key: 'npcNavigator', label: 'Garuda' },
   { key: 'npcShadowAgent', label: 'Rollins' },
   { key: 'npcSage', label: 'Pinkeu' },
   { key: 'npcHerbalist', label: 'Blond' },
@@ -287,6 +301,9 @@ const CHARACTER_CHOICES: Array<{ key: SpriteKey; label: string }> = [
   { key: 'npcElias', label: 'Elias' },
   { key: 'npcSza', label: 'Sza' },
   { key: 'npcSpider', label: 'Spider' },
+  { key: 'npcGoat', label: 'Goat' },
+  { key: 'npcCryptondo', label: 'Cryptondo' },
+  { key: 'npcLuzzy', label: 'Luzzy' },
 ]
 
 const RIALO_TEAM_HELPER_KEYS = new Set<SpriteKey>([
@@ -330,9 +347,9 @@ function initialPlayerSprite(): SpriteKey {
   return stored && CHARACTER_CHOICES.some((choice) => choice.key === stored) ? stored : 'nxr'
 }
 
-// Walk sheets are 4x4 grids (row 0=down, 1=up, 2=left, 3=right); nxr-v2 is a 16-frame horizontal strip.
+// Walk sheets can be legacy 4x4 grids or MappingCharacter 6x8 grids; nxr-v2 is a 16-frame horizontal strip.
 function spriteSheetGrid(sheet: SpriteSheet) {
-  const cols = sheet.src.includes('/characters/walk/') ? 4 : sheet.frames
+  const cols = sheet.cols ?? (sheet.src.includes('/characters/walk/') ? 4 : sheet.frames)
   const rows = Math.max(1, Math.ceil(sheet.frames / cols))
   return { cols, rows }
 }
@@ -496,9 +513,9 @@ const QUESTS: QuestNpc[] = [
     id: 4,
     quizId: 4,
     zone: 'Signal Tower',
-    npc: 'Garuda',
+    npc: 'Cryptondo',
     role: 'Signal Runner',
-    sprite: 'npcNavigator',
+    sprite: 'npcCryptondo',
     x: 1365,
     y: 1328,
     color: '#b9ff66',
@@ -1148,6 +1165,40 @@ const AMBIENT_NPCS: AmbientNpc[] = [
     ],
     activity: 'wander',
     persona: 'pacer',
+  },
+  {
+    name: 'Goat',
+    sprite: 'npcGoat',
+    x: 1540,
+    y: 1080,
+    color: '#f2c866',
+    accent: '#57e39f',
+    line: 'I chew through confusing docs and leave simple Rialo lessons.',
+    topic: 'Beginner Paths',
+    dialogue: [
+      'A good learning world makes the first step obvious.',
+      'Rialo Temple turns hard concepts into quests, signs, and characters.',
+      'If the player can explain it after walking here, the map did its job.',
+    ],
+    activity: 'dance',
+    persona: 'homebody',
+  },
+  {
+    name: 'Luzzy',
+    sprite: 'npcLuzzy',
+    x: 500,
+    y: 760,
+    color: '#88d7ff',
+    accent: '#f2c866',
+    line: 'I light the route between real-world data and useful app actions.',
+    topic: 'Live Data Routes',
+    dialogue: [
+      'Real-world data matters when apps can use it at the right time.',
+      'Prices, delivery status, ratings, and identity signals can all guide app behavior.',
+      'Rialo is interesting because those signals can become usable rails for apps and agents.',
+    ],
+    activity: 'stroll',
+    persona: 'wanderer',
   },
 ]
 
@@ -3379,8 +3430,8 @@ function drawSpriteActor(
 ) {
   const sheet = SPRITES[sprite]
   const image = assets.sprites[sprite]
-  const frame = chooseSpriteFrame(sprite, sheet.frames, time, seed, moving, near, completed, player, direction)
-  const flipX = shouldFlipSprite(sprite, sheet.frames, direction)
+  const frame = chooseSpriteFrame(sheet, time, seed, moving, direction)
+  const flipX = shouldFlipSprite(sprite, sheet, direction)
   const walkPhase = Math.sin(time * 10 + seed)
   const bodyOffset = player
     ? moving ? -Math.abs(walkPhase) * 3.2 : -Math.abs(Math.sin(time * 2.4 + seed)) * 1
@@ -3403,7 +3454,7 @@ function drawSpriteActor(
   ctx.translate(Math.round(x), Math.round(y))
   ctx.rotate(rotation)
   if (flipX) ctx.scale(-1, 1)
-  const sheetCols = Math.max(1, Math.floor(image.width / sheet.frameW))
+  const sheetCols = sheet.cols ?? Math.max(1, Math.floor(image.width / sheet.frameW))
   ctx.drawImage(
     image,
     (frame % sheetCols) * sheet.frameW,
@@ -3491,28 +3542,30 @@ function drawPixelSignal(ctx: CanvasRenderingContext2D, x: number, y: number, co
   ctx.restore()
 }
 
-function chooseSpriteFrame(
-  _sprite: SpriteKey,
-  frameCount: number,
-  time: number,
-  seed: number,
-  moving: boolean,
-  _near: boolean,
-  _completed: boolean,
-  _player: boolean,
-  direction: PlayerState['dir'],
-) {
-  if (frameCount <= 1) return 0
-  if (frameCount >= 16) {
-    // Unified 4x4 sheet: row 0=down, 1=up, 2=left, 3=right; 4 walk frames per row.
+function chooseSpriteFrame(sheet: SpriteSheet, time: number, seed: number, moving: boolean, direction: PlayerState['dir']) {
+  if (sheet.frames <= 1) return 0
+  if (sheet.frames === 16 && sheet.cols === 16) {
+    const row = direction === 'up' ? 1 : direction === 'right' ? 2 : direction === 'left' ? 3 : 0
+    const step = moving ? Math.floor(time * 6.4 + seed) % 4 : Math.floor(time * 1.6 + seed) % 2
+    return row * 4 + step
+  }
+  if (sheet.frames >= 48 && sheet.cols === 6) {
+    const idleRow = direction === 'up' ? 1 : direction === 'left' ? 2 : direction === 'right' ? 3 : 0
+    const walkRow = direction === 'up' ? 5 : direction === 'left' ? 6 : direction === 'right' ? 7 : 4
+    const row = moving ? walkRow : idleRow
+    const step = Math.floor(time * (moving ? 8.5 : 2.8) + seed) % 6
+    return Math.min(sheet.frames - 1, row * 6 + step)
+  }
+  if (sheet.frames >= 16) {
+    // Legacy 4x4 sheets: row 0=down, 1=up, 2=left, 3=right; 4 animation frames per row.
     const row = direction === 'up' ? 1 : direction === 'left' ? 2 : direction === 'right' ? 3 : 0
     const step = moving ? Math.floor(time * 6.4 + seed) % 4 : Math.floor(time * 1.6 + seed) % 2
-    return Math.min(frameCount - 1, row * 4 + step)
+    return Math.min(sheet.frames - 1, row * 4 + step)
   }
   return 0
 }
 
-function shouldFlipSprite(_sprite: SpriteKey, _frameCount: number, _direction: PlayerState['dir']) {
+function shouldFlipSprite(_sprite: SpriteKey, _sheet: SpriteSheet, _direction: PlayerState['dir']) {
   // All sheets now ship dedicated left AND right rows — no mirroring needed.
   return false
 }
