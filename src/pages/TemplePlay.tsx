@@ -150,6 +150,7 @@ const PLAYER_SPEED = 245
 const DESKTOP_CAMERA_ZOOM = 0.78
 const TABLET_CAMERA_ZOOM = 0.68
 const MOBILE_CAMERA_ZOOM = 0.52
+const TEMPLE_PLAY_SPRITE_VERSION = '20260703-clean-sprites-v2'
 const RIALO_SIGN_INTERACT = { x: 928, y: 860 }
 const RIALO_SIGN_PROFILE_URL = 'https://x.com/nxrskyaa'
 
@@ -207,6 +208,11 @@ type PropKey =
   | 'buildingOrangeCottage'
   | 'buildingNenMatcha'
   | 'buildingRialoSign'
+
+function spriteAssetUrl(src: string) {
+  const separator = src.includes('?') ? '&' : '?'
+  return `${src}${separator}v=${TEMPLE_PLAY_SPRITE_VERSION}`
+}
 
 const mappedNpc = (src: string, drawW = 58, drawH = 82): SpriteSheet => ({
   src,
@@ -360,7 +366,7 @@ function spritePreviewStyle(sheet: SpriteSheet, frame = 0) {
   const col = frame % cols
   const row = Math.floor(frame / cols)
   return {
-    backgroundImage: `url(${sheet.src})`,
+    backgroundImage: `url(${spriteAssetUrl(sheet.src)})`,
     backgroundSize: `${cols * 100}% ${rows * 100}%`,
     backgroundPosition: `${cols > 1 ? (col / (cols - 1)) * 100 : 0}% ${rows > 1 ? (row / (rows - 1)) * 100 : 0}%`,
   }
@@ -2212,7 +2218,7 @@ function GuideOverlay({
 
 async function loadTemplePlayAssets(): Promise<TemplePlayAssets> {
   const spriteEntries = await Promise.all(
-    Object.entries(SPRITES).map(async ([key, sheet]) => [key, await loadImage(sheet.src)] as const),
+    Object.entries(SPRITES).map(async ([key, sheet]) => [key, await loadImage(spriteAssetUrl(sheet.src))] as const),
   )
   const propEntries = await Promise.all(
     Object.entries(PROPS).map(async ([key, src]) => [key, await loadImage(src)] as const),
