@@ -185,15 +185,6 @@ type PropKey =
   | 'flowerOrange'
   | 'flowerPink'
   | 'flowerPurple'
-  // garden crops (growth stages)
-  | 'cropLeafy0'
-  | 'cropLeafy1'
-  | 'cropLeafy2'
-  | 'cropLeafy3'
-  | 'cropRoot0'
-  | 'cropRoot1'
-  | 'cropRoot2'
-  | 'cropRoot3'
   // park set
   | 'parkBench'
   | 'parkLantern'
@@ -355,14 +346,6 @@ const PROPS: Record<PropKey, string> = {
   flowerOrange: '/temple-play/world/flower/flower-orange.png',
   flowerPink: '/temple-play/world/flower/flower-pink.png',
   flowerPurple: '/temple-play/world/flower/flower-purple.png',
-  cropLeafy0: '/temple-play/world/crop/crop-leafy-0.png',
-  cropLeafy1: '/temple-play/world/crop/crop-leafy-1.png',
-  cropLeafy2: '/temple-play/world/crop/crop-leafy-2.png',
-  cropLeafy3: '/temple-play/world/crop/crop-leafy-3.png',
-  cropRoot0: '/temple-play/world/crop/crop-root-0.png',
-  cropRoot1: '/temple-play/world/crop/crop-root-1.png',
-  cropRoot2: '/temple-play/world/crop/crop-root-2.png',
-  cropRoot3: '/temple-play/world/crop/crop-root-3.png',
   parkBench: '/temple-play/world/park/park-bench.png',
   parkLantern: '/temple-play/world/park/park-lantern.png',
   parkBush: '/temple-play/world/park/park-bush.png',
@@ -2682,10 +2665,6 @@ function drawRialoSignPlatform(ctx: CanvasRenderingContext2D, x: number, y: numb
 
 const FLOWERS: PropKey[] = ['flowerBlue', 'flowerAmber', 'flowerCream', 'flowerYellow', 'flowerRed', 'flowerOrange', 'flowerPink', 'flowerPurple']
 const GRASSES: PropKey[] = ['grass1', 'grass2', 'grass3']
-const CROP_STAGES: PropKey[][] = [
-  ['cropLeafy0', 'cropLeafy1', 'cropLeafy2', 'cropLeafy3'],
-  ['cropRoot0', 'cropRoot1', 'cropRoot2', 'cropRoot3'],
-]
 
 function drawEnvironmentProps(ctx: CanvasRenderingContext2D, time: number, assets: TemplePlayAssets) {
   // grass tufts scattered across open ground
@@ -2705,18 +2684,180 @@ function drawEnvironmentProps(ctx: CanvasRenderingContext2D, time: number, asset
     drawProp(ctx, assets, FLOWERS[i % FLOWERS.length], x, y + bob, 34, 33)
   }
 
-  // garden crop rows on the tilled soil plot (varied growth stages)
+  // garden crop rows — canvas-drawn pixel art with VFX (sway, sparkle, growth shimmer)
+  drawGardenCrops(ctx, time)
+
+  drawFloatingLeaves(ctx, time)
+}
+
+// ═══════════════════════════════════════════════════════════
+// Canvas-drawn pixel art crops with VFX — replaces image-based crops
+// ═══════════════════════════════════════════════════════════
+
+function drawGardenCrops(ctx: CanvasRenderingContext2D, time: number) {
+  ctx.save()
+
+  // 3 rows x 4 cols, alternating leafy and root crops
   for (let row = 0; row < 3; row++) {
     for (let col = 0; col < 4; col++) {
-      const stages = CROP_STAGES[row % CROP_STAGES.length]
-      const key = stages[(col + row) % stages.length]
-      const x = GARDEN.x + 32 + col * 48
-      const y = GARDEN.y + 40 + row * 48
-      drawPropBottomCenter(ctx, assets, key, x, y, 40, 44)
+      const cx = GARDEN.x + 32 + col * 48
+      const cy = GARDEN.y + 40 + row * 48
+      const isLeafy = row % 2 === 0
+      const stage = (col + row) % 4  // 0=sprout, 1=small, 2=medium, 3=mature
+
+      // gentle sway — each crop has a phase offset for organic feel
+      const sway = Math.sin(time * 1.4 + col * 0.7 + row * 1.3) * 2.2
+
+      if (isLeafy) {
+        drawPixelCropLeafy(ctx, cx + sway, cy, stage, time, row * 4 + col)
+      } else {
+        drawPixelCropRoot(ctx, cx + sway, cy, stage, time, row * 4 + col)
+      }
+
+      // sparkle VFX on mature crops
+      if (stage === 3) {
+        const sparklePhase = time * 2.5 + row * 4 + col * 3
+        const sparkleAlpha = 0.3 + Math.sin(sparklePhase) * 0.3
+        if (sparkleAlpha > 0.15) {
+          ctx.globalAlpha = sparkleAlpha
+          ctx.fillStyle = '#ffeb6b'
+          // 3 sparkle dots around the crop
+          const sx = cx + sway + Math.sin(time * 1.8 + col) * 8
+          const sy = cy - 30 + Math.cos(time * 2.1 + row) * 6
+          ctx.fillRect(Math.round(sx), Math.round(sy), 3, 3)
+          ctx.fillRect(Math.round(sx + 12), Math.round(sy + 5), 2, 2)
+          ctx.fillRect(Math.round(sx - 10), Math.round(sy + 8), 2, 2)
+          ctx.globalAlpha = 1
+        }
+      }
+
+      // growth shimmer — subtle green glow on stages 1-2
+      if (stage === 1 || stage === 2) {
+        const shimmerAlpha = 0.08 + Math.sin(time * 3 + col * 2 + row) * 0.06
+        ctx.globalAlpha = Math.max(0, shimmerAlpha)
+        ctx.fillStyle = '#b9ff66'
+        ctx.fillRect(cx - 14, cy - 24, 28, 24)
+        ctx.globalAlpha = 1
+      }
     }
   }
 
-  drawFloatingLeaves(ctx, time)
+  // soil moisture shimmer — subtle blue tint that sweeps across the plot
+  const moisturePhase = (time * 0.3) % 1
+  const moistureX = GARDEN.x + moisturePhase * GARDEN.w
+  ctx.globalAlpha = 0.06
+  ctx.fillStyle = '#5fc6ee'
+  ctx.fillRect(moistureX - 20, GARDEN.y, 40, GARDEN.h)
+  ctx.globalAlpha = 1
+
+  ctx.restore()
+}
+
+// ── Leafy crop (lettuce/cabbage style) — 4 growth stages ──
+function drawPixelCropLeafy(ctx: CanvasRenderingContext2D, cx: number, cy: number, stage: number, time: number, seed: number) {
+  const p = (x: number, y: number, w: number, h: number, color: string) => {
+    ctx.fillStyle = color
+    ctx.fillRect(Math.round(cx + x), Math.round(cy + y), w, h)
+  }
+
+  // soil mound (always present)
+  p(-14, -4, 28, 4, '#6b4423')
+  p(-12, -3, 24, 3, '#7a5030')
+
+  if (stage === 0) {
+    // sprout — 2 tiny leaves poking out
+    p(-3, -8, 6, 5, '#5fb84e')
+    p(-5, -6, 4, 3, '#7fd45f')
+    p(1, -6, 4, 3, '#7fd45f')
+    p(-1, -10, 2, 3, '#b9ff66')
+  } else if (stage === 1) {
+    // small — cluster of leaves
+    p(-7, -12, 14, 9, '#5fb84e')
+    p(-5, -14, 10, 6, '#7fd45f')
+    p(-3, -15, 6, 4, '#b9ff66')
+    p(-8, -8, 4, 4, '#4a9e3e')
+    p(4, -8, 4, 4, '#4a9e3e')
+  } else if (stage === 2) {
+    // medium — fuller bush with detail
+    p(-10, -18, 20, 14, '#5fb84e')
+    p(-8, -22, 16, 8, '#7fd45f')
+    p(-6, -24, 12, 5, '#b9ff66')
+    p(-12, -14, 6, 8, '#4a9e3e')
+    p(6, -14, 6, 8, '#4a9e3e')
+    // leaf veins
+    p(-2, -20, 1, 8, '#3d8a32')
+    p(2, -18, 1, 6, '#3d8a32')
+  } else {
+    // mature — full canopy with fruit/flower
+    p(-14, -26, 28, 22, '#5fb84e')
+    p(-12, -30, 24, 10, '#7fd45f')
+    p(-8, -32, 16, 6, '#b9ff66')
+    p(-16, -20, 6, 12, '#4a9e3e')
+    p(10, -20, 6, 12, '#4a9e3e')
+    // fruit (small red berries)
+    p(-6, -22, 4, 4, '#e85d5d')
+    p(3, -24, 4, 4, '#e85d5d')
+    p(-1, -18, 3, 3, '#ff7676')
+    // highlight
+    p(-5, -23, 2, 2, '#ffaaaa')
+    p(4, -25, 2, 2, '#ffaaaa')
+    // leaf veins
+    p(-2, -24, 1, 12, '#3d8a32')
+    p(3, -22, 1, 10, '#3d8a32')
+  }
+}
+
+// ── Root crop (carrot/turnip style) — 4 growth stages ──
+function drawPixelCropRoot(ctx: CanvasRenderingContext2D, cx: number, cy: number, stage: number, time: number, seed: number) {
+  const p = (x: number, y: number, w: number, h: number, color: string) => {
+    ctx.fillStyle = color
+    ctx.fillRect(Math.round(cx + x), Math.round(cy + y), w, h)
+  }
+
+  // soil mound
+  p(-14, -4, 28, 4, '#6b4423')
+  p(-12, -3, 24, 3, '#7a5030')
+
+  if (stage === 0) {
+    // sprout — single stem with 2 tiny leaves
+    p(-1, -10, 2, 6, '#5fb84e')
+    p(-4, -8, 3, 3, '#7fd45f')
+    p(1, -8, 3, 3, '#7fd45f')
+  } else if (stage === 1) {
+    // small — taller stem with leaf clusters
+    p(-1, -14, 2, 10, '#5fb84e')
+    p(-5, -12, 4, 4, '#7fd45f')
+    p(1, -12, 4, 4, '#7fd45f')
+    p(-3, -14, 3, 3, '#b9ff66')
+    p(0, -15, 3, 3, '#b9ff66')
+  } else if (stage === 2) {
+    // medium — bushy top, slight root visible
+    p(-1, -18, 2, 14, '#5fb84e')
+    p(-7, -16, 6, 5, '#7fd45f')
+    p(1, -16, 6, 5, '#7fd45f')
+    p(-4, -19, 4, 4, '#b9ff66')
+    p(0, -20, 4, 4, '#b9ff66')
+    // root top poking out
+    p(-3, -2, 6, 3, '#e8821e')
+    p(-2, 0, 4, 2, '#d4740e')
+  } else {
+    // mature — full leafy top + exposed carrot
+    p(-1, -24, 2, 20, '#5fb84e')
+    p(-9, -22, 8, 7, '#7fd45f')
+    p(1, -22, 8, 7, '#7fd45f')
+    p(-5, -25, 5, 5, '#b9ff66')
+    p(0, -26, 5, 5, '#b9ff66')
+    // leaf detail
+    p(-6, -23, 1, 6, '#3d8a32')
+    p(5, -23, 1, 6, '#3d8a32')
+    // exposed carrot root
+    p(-4, -4, 8, 6, '#e8821e')
+    p(-3, 2, 6, 4, '#d4740e')
+    p(-2, 6, 4, 3, '#b8650a')
+    p(-1, 9, 2, 2, '#9a5208')
+    // highlight on carrot
+    p(-3, -3, 2, 4, '#ffb050')
+  }
 }
 
 function drawFlyingLanterns(ctx: CanvasRenderingContext2D, time: number) {
