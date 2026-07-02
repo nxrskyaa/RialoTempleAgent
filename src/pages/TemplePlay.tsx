@@ -109,6 +109,7 @@ type SpriteKey =
   | 'npcKeep'
   | 'npcSukanto'
   | 'npcElias'
+  | 'npcSza'
   | 'npcSpider'
 
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000' as const
@@ -201,90 +202,49 @@ type PropKey =
   | 'buildingScaleDojo'
   | 'buildingGreenhouseInn'
   | 'buildingOrangeCottage'
+  | 'buildingNenMatcha'
   | 'buildingRialoSign'
 
 const SPRITES: Record<SpriteKey, SpriteSheet> = {
   nxr: { src: '/temple-play/sprites/nxr-v2.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
-  npcOracle: { src: '/temple-play/characters/rt-vika-joestar.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
-  npcForestGuide: { src: '/temple-play/characters/rt-ade.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
-  npcBuilder: { src: '/temple-play/characters/rt-barong.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
-  npcCaptain: { src: '/temple-play/characters/rt-eric-argent.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
-  npcNavigator: { src: '/temple-play/characters/rt-garuda.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
-  npcShadowAgent: { src: '/temple-play/characters/rt-rollins.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
-  npcSage: { src: '/temple-play/characters/rt-pinkeu.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
-  npcHerbalist: { src: '/temple-play/characters/rt-blond.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
-  npcAlchemist: { src: '/temple-play/characters/rt-dikzzy.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
-  npcKGufran: { src: '/temple-play/characters/rt-k-gufran.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
-  npcRikky: { src: '/temple-play/characters/rt-rikky.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
-  npcVibevortex: { src: '/temple-play/characters/rt-vibevortex.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
-  npcWisnu: { src: '/temple-play/characters/rt-wisnu.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
-  npcRaka: { src: '/temple-play/characters/rt-raka.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
-  npcJepanya: { src: '/temple-play/characters/rt-jepanya.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
-  npcAqc: { src: '/temple-play/characters/rt-aqc.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
-  npcDp: { src: '/temple-play/characters/rt-dp.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
-  npcIshu: { src: '/temple-play/characters/rt-ishu.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
-  npcJeams: { src: '/temple-play/characters/rt-jeams.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
-  npcKoushik: { src: '/temple-play/characters/rt-koushik.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
-  npcKingJ: { src: '/temple-play/characters/rt-kingj.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
-  npcRichard12: { src: '/temple-play/characters/rt-richard12.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
-  npcLuka: { src: '/temple-play/characters/rt-luka.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
-  npcSilverwave: { src: '/temple-play/characters/rt-silverwave.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
-  npcSuleyman: { src: '/temple-play/characters/rt-suleyman.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
-  npcYozi: { src: '/temple-play/characters/rt-yozi.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
-  npcDora: { src: '/temple-play/characters/rt-dora.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
-  npcDarma: { src: '/temple-play/characters/rt-darma.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
-  npcFlippedFace: { src: '/temple-play/characters/rt-flippedface.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
-  npcEcelannister: { src: '/temple-play/characters/rt-ecelannister.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
-  npcAli: { src: '/temple-play/characters/rt-ali.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
-  npcLongLife: { src: '/temple-play/characters/rt-longlife.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
-  npcBjoestar: { src: '/temple-play/characters/rt-bjoestar.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
-  npcKeep: { src: '/temple-play/characters/rt-keep.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
-  npcSukanto: { src: '/temple-play/characters/rt-sukanto.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
-  npcElias: { src: '/temple-play/characters/rt-elias.png', frameW: 160, frameH: 220, frames: 4, drawW: 58, drawH: 82 },
-  npcSpider: { src: '/temple-play/characters/rt-spider.png', frameW: 160, frameH: 220, frames: 4, drawW: 48, drawH: 62 },
-}
-
-// Per-sprite side-facing frame map (frame 0 = down, frame 2 = up).
-// Community sheets are inconsistent: some face left on frame 1, others face right.
-// Derived from per-pixel face-centroid analysis of each sheet.
-const SIDE_FRAMES: Partial<Record<SpriteKey, { left: number; right: number }>> = {
-  npcAlchemist: { left: 1, right: 3 },
-  npcAli: { left: 1, right: 3 },
-  npcAqc: { left: 3, right: 1 },
-  npcBjoestar: { left: 1, right: 3 },
-  npcBuilder: { left: 1, right: 3 },
-  npcCaptain: { left: 3, right: 1 },
-  npcDarma: { left: 3, right: 1 },
-  npcDora: { left: 3, right: 1 },
-  npcDp: { left: 1, right: 3 },
-  npcEcelannister: { left: 1, right: 3 },
-  npcElias: { left: 1, right: 3 },
-  npcFlippedFace: { left: 1, right: 3 },
-  npcForestGuide: { left: 3, right: 1 },
-  npcHerbalist: { left: 3, right: 1 },
-  npcIshu: { left: 3, right: 1 },
-  npcJeams: { left: 1, right: 3 },
-  npcJepanya: { left: 3, right: 1 },
-  npcKGufran: { left: 1, right: 3 },
-  npcKeep: { left: 1, right: 3 },
-  npcKingJ: { left: 3, right: 1 },
-  npcKoushik: { left: 1, right: 3 },
-  npcLongLife: { left: 1, right: 3 },
-  npcLuka: { left: 1, right: 3 },
-  npcNavigator: { left: 3, right: 1 },
-  npcOracle: { left: 1, right: 3 },
-  npcRaka: { left: 1, right: 3 },
-  npcRichard12: { left: 3, right: 1 },
-  npcRikky: { left: 3, right: 1 },
-  npcSage: { left: 3, right: 1 },
-  npcShadowAgent: { left: 3, right: 1 },
-  npcSilverwave: { left: 1, right: 3 },
-  npcSpider: { left: 3, right: 1 },
-  npcSukanto: { left: 1, right: 3 },
-  npcSuleyman: { left: 3, right: 1 },
-  npcVibevortex: { left: 3, right: 1 },
-  npcWisnu: { left: 3, right: 1 },
-  npcYozi: { left: 1, right: 3 },
+  npcOracle: { src: '/temple-play/characters/walk/vika-joestar.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcForestGuide: { src: '/temple-play/characters/walk/ade.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcBuilder: { src: '/temple-play/characters/walk/barong.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcCaptain: { src: '/temple-play/characters/walk/eric-argent.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcNavigator: { src: '/temple-play/characters/walk/garuda.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcShadowAgent: { src: '/temple-play/characters/walk/rollins.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcSage: { src: '/temple-play/characters/walk/pinkeu.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcHerbalist: { src: '/temple-play/characters/walk/blond.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcAlchemist: { src: '/temple-play/characters/walk/dikzzy.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcKGufran: { src: '/temple-play/characters/walk/k-gufran.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcRikky: { src: '/temple-play/characters/walk/rikky.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcVibevortex: { src: '/temple-play/characters/walk/vibevortex.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcWisnu: { src: '/temple-play/characters/walk/wisnu.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcRaka: { src: '/temple-play/characters/walk/raka.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcJepanya: { src: '/temple-play/characters/walk/jepanya.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcAqc: { src: '/temple-play/characters/walk/aqc.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcDp: { src: '/temple-play/characters/walk/dp.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcIshu: { src: '/temple-play/characters/walk/ishu.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcJeams: { src: '/temple-play/characters/walk/jeams.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcKoushik: { src: '/temple-play/characters/walk/koushik.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcKingJ: { src: '/temple-play/characters/walk/kingj.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcRichard12: { src: '/temple-play/characters/walk/richard12.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcLuka: { src: '/temple-play/characters/walk/luka.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcSilverwave: { src: '/temple-play/characters/walk/silverwave.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcSuleyman: { src: '/temple-play/characters/walk/suleyman.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcYozi: { src: '/temple-play/characters/walk/yozi.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcDora: { src: '/temple-play/characters/walk/dora.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcDarma: { src: '/temple-play/characters/walk/darma.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcFlippedFace: { src: '/temple-play/characters/walk/flippedface.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcEcelannister: { src: '/temple-play/characters/walk/ecelannister.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcAli: { src: '/temple-play/characters/walk/ali.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcLongLife: { src: '/temple-play/characters/walk/longlife.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcBjoestar: { src: '/temple-play/characters/walk/bjoestar.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcKeep: { src: '/temple-play/characters/walk/keep.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcSukanto: { src: '/temple-play/characters/walk/sukanto.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcElias: { src: '/temple-play/characters/walk/elias.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcSza: { src: '/temple-play/characters/walk/sza.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcSpider: { src: '/temple-play/characters/walk/spider.png', frameW: 210, frameH: 280, frames: 16, drawW: 48, drawH: 62 },
 }
 
 const CHARACTER_CHOICES: Array<{ key: SpriteKey; label: string }> = [
@@ -325,6 +285,7 @@ const CHARACTER_CHOICES: Array<{ key: SpriteKey; label: string }> = [
   { key: 'npcKeep', label: 'Keep' },
   { key: 'npcSukanto', label: 'Sukanto' },
   { key: 'npcElias', label: 'Elias' },
+  { key: 'npcSza', label: 'Sza' },
   { key: 'npcSpider', label: 'Spider' },
 ]
 
@@ -399,7 +360,8 @@ const PROPS: Record<PropKey, string> = {
   buildingMarketHall: '/temple-play/world/building/building-2.png',
   buildingGreenhouseInn: '/temple-play/world/building/building-3.png',
   buildingOracleHouse: '/temple-play/world/building/building-1.png',
-  buildingWoodenCabin: '/temple-play/world/building/warungpecel.png',
+  buildingWoodenCabin: '/temple-play/world/building/warungpecel-v2.png',
+  buildingNenMatcha: '/temple-play/world/building/nenmatcha.png',
   buildingOrangeCottage: '/temple-play/world/building/building-1.png',
   buildingGuildHouse: '/temple-play/world/building/building-2.png',
   buildingRialoSign: '/temple-play/world/building/rialo-sign.png',
@@ -1135,6 +1097,23 @@ const AMBIENT_NPCS: AmbientNpc[] = [
     persona: 'homebody',
   },
   {
+    name: 'Sza',
+    sprite: 'npcSza',
+    x: 1105,
+    y: 1520,
+    color: '#ff7ad9',
+    accent: '#78ecff',
+    line: 'Matcha first, then we talk protocols.',
+    topic: 'Nen Matcha',
+    dialogue: [
+      'Welcome to Nen Matcha, the calmest corner of the temple grounds.',
+      'Builders think better with warm matcha — even agents queue here between quests.',
+      'Real-world commerce like this little shop is exactly what Rialo wants onchain: simple, verifiable, useful.',
+    ],
+    activity: 'tend',
+    persona: 'homebody',
+  },
+  {
     name: 'Spider',
     sprite: 'npcSpider',
     x: 1238,
@@ -1175,6 +1154,7 @@ const BUILDINGS: BuildingSpec[] = [
   { key: 'buildingGreenhouseInn', x: 285, y: 1400, w: 230, h: 296, label: 'Privacy Grove', color: '#ff7ad9' },
   { key: 'buildingOracleHouse', x: 1300, y: 900, w: 248, h: 276, label: 'Bridge Gate', color: '#57e39f' },
   { key: 'buildingWoodenCabin', x: 970, y: 1345, w: 250, h: 220, label: 'Warung Pecel', color: '#ffad72' },
+  { key: 'buildingNenMatcha', x: 1220, y: 1500, w: 235, h: 235, label: 'Nen Matcha', color: '#a8e05f' },
   { key: 'buildingOrangeCottage', x: 1660, y: 1370, w: 206, h: 210, label: 'Quest Hut', color: '#f2c866' },
   { key: 'buildingGuildHouse', x: 1650, y: 760, w: 248, h: 236, label: 'Guild Hall', color: '#78ecff' },
 ]
@@ -3512,7 +3492,7 @@ function drawPixelSignal(ctx: CanvasRenderingContext2D, x: number, y: number, co
 }
 
 function chooseSpriteFrame(
-  sprite: SpriteKey,
+  _sprite: SpriteKey,
   frameCount: number,
   time: number,
   seed: number,
@@ -3523,24 +3503,17 @@ function chooseSpriteFrame(
   direction: PlayerState['dir'],
 ) {
   if (frameCount <= 1) return 0
-  if (sprite === 'nxr' && frameCount >= 16) {
+  if (frameCount >= 16) {
+    // Unified 4x4 sheet: row 0=down, 1=up, 2=left, 3=right; 4 walk frames per row.
     const row = direction === 'up' ? 1 : direction === 'left' ? 2 : direction === 'right' ? 3 : 0
-    const step = moving ? Math.floor(time * 6.4 + seed) % 4 : 0
+    const step = moving ? Math.floor(time * 6.4 + seed) % 4 : Math.floor(time * 1.6 + seed) % 2
     return Math.min(frameCount - 1, row * 4 + step)
-  }
-  if (frameCount === 4) {
-    const side = SIDE_FRAMES[sprite]
-    if (direction === 'left') return side ? side.left : 1
-    if (direction === 'right') return side ? side.right : 3
-    if (direction === 'up') return 2
-    return 0
   }
   return 0
 }
 
 function shouldFlipSprite(_sprite: SpriteKey, _frameCount: number, _direction: PlayerState['dir']) {
-  // Every 4-frame sheet has dedicated left AND right frames (see SIDE_FRAMES).
-  // Mirroring caused wrong-facing sprites and asymmetric-outfit artifacts.
+  // All sheets now ship dedicated left AND right rows — no mirroring needed.
   return false
 }
 
