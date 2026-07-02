@@ -151,7 +151,6 @@ const DESKTOP_CAMERA_ZOOM = 0.78
 const TABLET_CAMERA_ZOOM = 0.68
 const MOBILE_CAMERA_ZOOM = 0.52
 const TEMPLE_PLAY_SPRITE_VERSION = '20260703-clean-sprites-v2'
-const MOBILE_FRAME_MS = 1000 / 36
 const RIALO_SIGN_INTERACT = { x: 928, y: 860 }
 const RIALO_SIGN_PROFILE_URL = 'https://x.com/nxrskyaa'
 
@@ -1704,6 +1703,7 @@ function TemplePlayCanvas({
   const assetsRef = useRef<TemplePlayAssets | null>(null)
   const tapTarget = useRef<{ x: number; y: number; questId?: number; ambientIndex?: number; sign?: boolean } | null>(null)
   const cameraRef = useRef({ x: 0, y: 0, zoom: DESKTOP_CAMERA_ZOOM })
+  const canvasSizeRef = useRef({ width: 1, height: 1 })
 
   useEffect(() => {
     completedLatest.current = completedIds
@@ -1719,12 +1719,12 @@ function TemplePlayCanvas({
 
     let frame = 0
     let last = performance.now()
-    let lastPaint = 0
     let disposed = false
 
     function resize() {
       if (!canvas || !wrap) return
       const rect = wrap.getBoundingClientRect()
+      canvasSizeRef.current = { width: Math.max(1, rect.width), height: Math.max(1, rect.height) }
       const dpr = canvasDpr(rect.width)
       canvas.width = Math.max(1, Math.floor(rect.width * dpr))
       canvas.height = Math.max(1, Math.floor(rect.height * dpr))
@@ -1778,13 +1778,8 @@ function TemplePlayCanvas({
 
     function tick(now: number) {
       if (disposed || !canvas || !context || !wrap) return
-      const rect = wrap.getBoundingClientRect()
+      const rect = canvasSizeRef.current
       const lowPower = isLowPowerViewport(rect.width)
-      if (lowPower && now - lastPaint < MOBILE_FRAME_MS) {
-        window.requestAnimationFrame(tick)
-        return
-      }
-      lastPaint = now
       const dt = Math.min(0.033, (now - last) / 1000)
       last = now
       frame += dt
@@ -2242,7 +2237,14 @@ async function loadTemplePlayAssets(): Promise<TemplePlayAssets> {
 function loadImage(src: string) {
   return new Promise<HTMLImageElement>((resolve, reject) => {
     const image = new Image()
-    image.onload = () => resolve(image)
+    image.decoding = 'async'
+    image.onload = () => {
+      if (typeof image.decode === 'function') {
+        void image.decode().catch(() => undefined).finally(() => resolve(image))
+      } else {
+        resolve(image)
+      }
+    }
     image.onerror = () => reject(new Error(`Failed to load ${src}`))
     image.src = src
   })
@@ -2355,6 +2357,24 @@ function rectsOverlap(a: { x: number; y: number; w: number; h: number }, b: { x:
   return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y
 }
 
+function paddedView(view: { x: number; y: number; w: number; h: number }, pad: number) {
+  return {
+    x: view.x - pad,
+    y: view.y - pad,
+    w: view.w + pad * 2,
+    h: view.h + pad * 2,
+  }
+}
+
+function visibleTileRange(view: { x: number; y: number; w: number; h: number }, padTiles = 1) {
+  return {
+    startX: clamp(Math.floor(view.x / TILE_SIZE) - padTiles, 0, MAP_W - 1),
+    endX: clamp(Math.ceil((view.x + view.w) / TILE_SIZE) + padTiles, 0, MAP_W),
+    startY: clamp(Math.floor(view.y / TILE_SIZE) - padTiles, 0, MAP_H - 1),
+    endY: clamp(Math.ceil((view.y + view.h) / TILE_SIZE) + padTiles, 0, MAP_H),
+  }
+}
+
 function expandRect(rect: { x: number; y: number; w: number; h: number }, margin: number) {
   return {
     x: rect.x - margin,
@@ -2443,15 +2463,21 @@ function drawWorld(
   playerSprite: SpriteKey,
   lowPower: boolean,
 ) {
+  const view = {
+    x: camera.x,
+    y: camera.y,
+    w: viewportWidth,
+    h: viewportHeight,
+  }
   ctx.clearRect(0, 0, width, height)
   ctx.save()
   ctx.scale(zoom, zoom)
   ctx.translate(-camera.x, -camera.y)
-  drawGround(ctx, time, assets)
-  drawPaths(ctx, time)
-  drawWater(ctx, assets)
-  drawEnvironmentProps(ctx, time, assets, lowPower)
-  drawFlyingLanterns(ctx, time, lowPower)
+  drawGround(ctx, time, assets, view)
+  drawPaths(ctx, time, view)
+  drawWater(ctx, assets, view)
+  drawEnvironmentProps(ctx, time, assets, view, lowPower)
+  drawFlyingLanterns(ctx, time, view, lowPower)
   drawTapTarget(ctx, time, target)
   drawQuestHint(ctx, time, nextQuest, nearNpcId)
   drawRialoSignHint(ctx, time, nearSign)
@@ -2619,12 +2645,13 @@ function tilePattern(ctx: CanvasRenderingContext2D, image: HTMLImageElement | un
   return pattern
 }
 
-function drawCobblePulse(ctx: CanvasRenderingContext2D, time: number) {
+function drawCobblePulse(ctx: CanvasRenderingContext2D, time: number, view: { x: number; y: number; w: number; h: number }) {
   ctx.save()
   const pulseTile = Math.floor(time * 7) % 120
   let seen = 0
-  for (let ty = 0; ty < MAP_H; ty++) {
-    for (let tx = 0; tx < MAP_W; tx++) {
+  const range = visibleTileRange(view, 1)
+  for (let ty = range.startY; ty < range.endY; ty++) {
+    for (let tx = range.startX; tx < range.endX; tx++) {
       if (WORLD_TILES[ty][tx] !== T.PATH) continue
       if (seen % 120 === pulseTile) {
         ctx.fillStyle = 'rgba(242,200,102,.32)'
@@ -2670,18 +2697,20 @@ function lerp(a: number, b: number, t: number) {
 }
 
 
-function drawGround(ctx: CanvasRenderingContext2D, _time: number, assets: TemplePlayAssets) {
+function drawGround(ctx: CanvasRenderingContext2D, _time: number, assets: TemplePlayAssets, view: { x: number; y: number; w: number; h: number }) {
+  const drawView = paddedView(view, TILE_SIZE * 2)
   // grass base across the whole world
   const grass = tilePattern(ctx, assets.props.groundGrass)
   ctx.fillStyle = grass ?? '#2d4a2d'
-  ctx.fillRect(0, 0, WORLD.width, WORLD.height)
+  ctx.fillRect(drawView.x, drawView.y, drawView.w, drawView.h)
 
   // stone road on path tiles (pattern is world-anchored, so cells stay seamless)
   const road = tilePattern(ctx, assets.props.groundRoad)
   if (road) {
     ctx.fillStyle = road
-    for (let ty = 0; ty < MAP_H; ty++) {
-      for (let tx = 0; tx < MAP_W; tx++) {
+    const range = visibleTileRange(drawView, 1)
+    for (let ty = range.startY; ty < range.endY; ty++) {
+      for (let tx = range.startX; tx < range.endX; tx++) {
         if (WORLD_TILES[ty][tx] === T.PATH) {
           ctx.fillRect(tx * TILE_SIZE, ty * TILE_SIZE, TILE_SIZE, TILE_SIZE)
         }
@@ -2691,19 +2720,20 @@ function drawGround(ctx: CanvasRenderingContext2D, _time: number, assets: Temple
 
   // tilled garden soil plot
   const soil = tilePattern(ctx, assets.props.groundSoil)
-  if (soil) {
+  if (soil && rectsOverlap(GARDEN, drawView)) {
     ctx.fillStyle = soil
     ctx.fillRect(GARDEN.x, GARDEN.y, GARDEN.w, GARDEN.h)
   }
 }
 
-function drawPaths(ctx: CanvasRenderingContext2D, time: number) {
-  drawCobblePulse(ctx, time)
+function drawPaths(ctx: CanvasRenderingContext2D, time: number, view: { x: number; y: number; w: number; h: number }) {
+  drawCobblePulse(ctx, time, view)
 }
 
-function drawWater(ctx: CanvasRenderingContext2D, assets: TemplePlayAssets) {
+function drawWater(ctx: CanvasRenderingContext2D, assets: TemplePlayAssets, view: { x: number; y: number; w: number; h: number }) {
   const img = assets.props.pond
   if (!img) return
+  if (!rectsOverlap(POND_RECT, paddedView(view, 120))) return
   const cx = POND_RECT.x + POND_RECT.w / 2
   const cy = POND_RECT.y + POND_RECT.h / 2
   const w = POND_RECT.w + 96
@@ -2767,12 +2797,14 @@ function drawRialoSignPlatform(ctx: CanvasRenderingContext2D, x: number, y: numb
 const FLOWERS: PropKey[] = ['flowerBlue', 'flowerAmber', 'flowerCream', 'flowerYellow', 'flowerRed', 'flowerOrange', 'flowerPink', 'flowerPurple']
 const GRASSES: PropKey[] = ['grass1', 'grass2', 'grass3']
 
-function drawEnvironmentProps(ctx: CanvasRenderingContext2D, time: number, assets: TemplePlayAssets, lowPower = false) {
+function drawEnvironmentProps(ctx: CanvasRenderingContext2D, time: number, assets: TemplePlayAssets, view: { x: number; y: number; w: number; h: number }, lowPower = false) {
+  const drawView = paddedView(view, 96)
   // grass tufts scattered across open ground
   const grassCount = lowPower ? 42 : 90
   for (let i = 0; i < grassCount; i++) {
     const x = 90 + ((i * 257) % (WORLD.width - 180))
     const y = 120 + ((i * 181) % (WORLD.height - 240))
+    if (!pointInRect(x, y, drawView)) continue
     if (isNearMainPlaySpace(x, y)) continue
     drawProp(ctx, assets, GRASSES[i % GRASSES.length], x, y, 38, 30)
   }
@@ -2782,15 +2814,16 @@ function drawEnvironmentProps(ctx: CanvasRenderingContext2D, time: number, asset
   for (let i = 0; i < flowerCount; i++) {
     const x = 120 + ((i * 293) % (WORLD.width - 240))
     const y = 140 + ((i * 211) % (WORLD.height - 280))
+    if (!pointInRect(x, y, drawView)) continue
     if (isNearMainPlaySpace(x, y) && i % 3 !== 0) continue
     const bob = Math.sin(time * 1.7 + i) * 1.5
     drawProp(ctx, assets, FLOWERS[i % FLOWERS.length], x, y + bob, 34, 33)
   }
 
   // garden crop rows — canvas-drawn pixel art with VFX (sway, sparkle, growth shimmer)
-  drawGardenCrops(ctx, time)
+  if (rectsOverlap(GARDEN, drawView)) drawGardenCrops(ctx, time)
 
-  drawFloatingLeaves(ctx, time, lowPower)
+  drawFloatingLeaves(ctx, time, view, lowPower)
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -2963,9 +2996,10 @@ function drawPixelCropRoot(ctx: CanvasRenderingContext2D, cx: number, cy: number
   }
 }
 
-function drawFlyingLanterns(ctx: CanvasRenderingContext2D, time: number, lowPower = false) {
+function drawFlyingLanterns(ctx: CanvasRenderingContext2D, time: number, view: { x: number; y: number; w: number; h: number }, lowPower = false) {
   ctx.save()
   const count = lowPower ? 4 : 10
+  const drawView = paddedView(view, 80)
   for (let i = 0; i < count; i++) {
     const lane = i % 5
     const loop = 18 + lane * 1.9
@@ -2975,7 +3009,7 @@ function drawFlyingLanterns(ctx: CanvasRenderingContext2D, time: number, lowPowe
     const x = (xBase + Math.sin(time * 0.32 + i) * 28 + WORLD.width) % WORLD.width
     const fade = clamp(Math.min(progress * 8, (1 - progress) * 8), 0, 1)
     const glow = 0.42 + Math.sin(time * 1.6 + i) * 0.1
-    if (y < -90 || y > WORLD.height + 130) continue
+    if (!pointInRect(x, y, drawView)) continue
     ctx.globalAlpha = 0.22 + fade * 0.58
     ctx.fillStyle = `rgba(242, 200, 102, ${0.16 + glow * 0.2})`
     ctx.fillRect(x - 14, y - 16, 28, 32)
@@ -2993,13 +3027,15 @@ function drawFlyingLanterns(ctx: CanvasRenderingContext2D, time: number, lowPowe
   ctx.restore()
 }
 
-function drawFloatingLeaves(ctx: CanvasRenderingContext2D, time: number, lowPower = false) {
+function drawFloatingLeaves(ctx: CanvasRenderingContext2D, time: number, view: { x: number; y: number; w: number; h: number }, lowPower = false) {
   ctx.save()
   const count = lowPower ? 14 : 42
+  const drawView = paddedView(view, 80)
   for (let i = 0; i < count; i++) {
     const drift = Math.sin(time * 0.8 + i * 1.9) * 18
     const x = (i * 197 + time * (14 + (i % 4) * 5) + drift) % WORLD.width
     const y = (i * 113 + time * (8 + (i % 3) * 4)) % WORLD.height
+    if (!pointInRect(x, y, drawView)) continue
     const size = 6 + (i % 4) * 2
     ctx.save()
     ctx.translate(x, y)
