@@ -114,7 +114,7 @@ type SpriteKey =
 
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000' as const
 const MAP_W = 58
-const MAP_H = 46
+const MAP_H = 50
 const TILE_SIZE = 32
 const WORLD = { width: MAP_W * TILE_SIZE, height: MAP_H * TILE_SIZE }
 const CENTER_HUB = { tx: 29, ty: 23 }
