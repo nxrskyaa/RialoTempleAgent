@@ -1180,7 +1180,7 @@ const SCENERY: ScenerySpec[] = [
   { key: 'tree', x: 90, y: 470, w: 120, h: 132, solid: true },
   { key: 'tree', x: 300, y: 660, w: 132, h: 144, solid: true },
   { key: 'tree', x: 110, y: 1010, w: 132, h: 144, solid: true },
-  { key: 'tree', x: 500, y: 1250, w: 120, h: 132, solid: true },
+  { key: 'tree', x: 200, y: 1340, w: 120, h: 132, solid: true },
   { key: 'tree', x: 1230, y: 1460, w: 132, h: 144, solid: true },
   { key: 'tree', x: 1465, y: 1440, w: 132, h: 144, solid: true },
   { key: 'tree', x: 1450, y: 560, w: 120, h: 132, solid: true },
@@ -1209,6 +1209,8 @@ const WORLD_BLOCKERS = [
   ...BUILDING_COLLIDERS,
   ...SCENERY.filter((s) => s.solid).map(sceneryCollider),
   { x: POND_RECT.x + 10, y: POND_RECT.y + 8, w: POND_RECT.w - 20, h: POND_RECT.h - 16 },
+  // garden plot collider — prevent walking through crops (values match GARDEN const defined later)
+  { x: 478, y: 1128, w: 208, h: 144 },
 ]
 
 export default function TemplePlay() {
@@ -2725,22 +2727,22 @@ function drawFlyingLanterns(ctx: CanvasRenderingContext2D, time: number) {
     const progress = (time / loop + i * 0.173) % 1
     const y = WORLD.height + 110 - progress * (WORLD.height + 240)
     const xBase = 150 + lane * 340 + (i % 2) * 70
-    const x = Math.round((xBase + Math.sin(time * 0.32 + i) * 28 + WORLD.width) % WORLD.width)
+    const x = (xBase + Math.sin(time * 0.32 + i) * 28 + WORLD.width) % WORLD.width
     const fade = clamp(Math.min(progress * 8, (1 - progress) * 8), 0, 1)
     const glow = 0.42 + Math.sin(time * 1.6 + i) * 0.1
     if (y < -90 || y > WORLD.height + 130) continue
     ctx.globalAlpha = 0.22 + fade * 0.58
     ctx.fillStyle = `rgba(242, 200, 102, ${0.16 + glow * 0.2})`
-    ctx.fillRect(Math.round(x - 14), Math.round(y - 16), 28, 32)
+    ctx.fillRect(x - 14, y - 16, 28, 32)
     ctx.fillStyle = 'rgba(7, 16, 12, .72)'
-    ctx.fillRect(Math.round(x - 10), Math.round(y - 13), 20, 3)
-    ctx.fillRect(Math.round(x - 10), Math.round(y + 12), 20, 3)
+    ctx.fillRect(x - 10, y - 13, 20, 3)
+    ctx.fillRect(x - 10, y + 12, 20, 3)
     ctx.fillStyle = '#f2c866'
-    ctx.fillRect(Math.round(x - 7), Math.round(y - 8), 14, 18)
+    ctx.fillRect(x - 7, y - 8, 14, 18)
     ctx.fillStyle = '#ffad72'
-    ctx.fillRect(Math.round(x - 4), Math.round(y - 3), 8, 9)
+    ctx.fillRect(x - 4, y - 3, 8, 9)
     ctx.fillStyle = 'rgba(87, 227, 159, .5)'
-    ctx.fillRect(Math.round(x - 2), Math.round(y + 17), 4, 10)
+    ctx.fillRect(x - 2, y + 17, 4, 10)
   }
   ctx.globalAlpha = 1
   ctx.restore()
@@ -2769,7 +2771,7 @@ function isNearMainPlaySpace(x: number, y: number) {
     [230, 40, 950, 660],
     [900, 40, 1560, 660],
     [400, 600, 960, 940],
-    [470, 940, 1010, 1210],
+    [440, 940, 1010, 1300],
     [1010, 760, 1560, 1190],
     [POND_RECT.x - 90, POND_RECT.y - 90, POND_RECT.x + POND_RECT.w + 90, POND_RECT.y + POND_RECT.h + 320],
   ]
@@ -3340,7 +3342,7 @@ function chooseSpriteFrame(
 ) {
   if (frameCount <= 1) return 0
   if (sprite === 'nxr' && frameCount >= 16) {
-    const row = direction === 'up' ? 1 : direction === 'left' ? 3 : direction === 'right' ? 2 : 0
+    const row = direction === 'up' ? 1 : direction === 'left' ? 2 : direction === 'right' ? 3 : 0
     const step = moving ? Math.floor(time * 6.4 + seed) % 4 : 0
     return Math.min(frameCount - 1, row * 4 + step)
   }
@@ -3355,7 +3357,7 @@ function chooseSpriteFrame(
 }
 
 function shouldFlipSprite(sprite: SpriteKey, frameCount: number, direction: PlayerState['dir']) {
-  return sprite !== 'nxr' && frameCount === 4 && direction === 'left'
+  return sprite !== 'nxr' && frameCount === 4 && direction === 'right'
 }
 
 function characterName(sprite: SpriteKey) {
@@ -3378,24 +3380,26 @@ function drawPixelNameTag(ctx: CanvasRenderingContext2D, x: number, y: number, t
 function drawWeather(ctx: CanvasRenderingContext2D, camera: { x: number; y: number }, width: number, height: number, time: number) {
   ctx.save()
   ctx.translate(camera.x, camera.y)
+  // drifting cloud shapes (soft alpha, no pixel snapping for smooth float)
   for (let i = 0; i < 16; i++) {
-    const x = Math.round(((i * 190 + time * (12 + (i % 3) * 4)) % (width + 300)) - 170)
-    const y = Math.round(28 + (i * 47 + Math.sin(time * 0.32 + i) * 14) % Math.max(120, height * 0.46))
+    const x = ((i * 190 + time * (12 + (i % 3) * 4)) % (width + 300)) - 170
+    const y = 28 + (i * 47 + Math.sin(time * 0.32 + i) * 14) % Math.max(120, height * 0.46)
     ctx.fillStyle = 'rgba(247,241,223,.13)'
     ctx.fillRect(x, y, 104, 18)
     ctx.fillRect(x + 22, y - 12, 66, 18)
     ctx.fillRect(x + 52, y + 11, 46, 12)
   }
-  const wind = Math.round(Math.sin(time * 0.36) * 14)
+  const wind = Math.sin(time * 0.36) * 14
+  // rain — two layers with sub-pixel positioning for buttery motion
   for (let layer = 0; layer < 2; layer++) {
     ctx.strokeStyle = layer === 0 ? 'rgba(210,232,255,.19)' : 'rgba(247,241,223,.14)'
     ctx.lineWidth = layer === 0 ? 2 : 1
     const count = layer === 0 ? 44 : 32
     for (let i = 0; i < count; i++) {
       const speed = layer === 0 ? 245 : 170
-      const x = Math.round((i * 79 + time * (speed + (i % 5) * 9) + wind * 4) % (width + 160) - 80)
-      const y = Math.round((i * 101 + time * (285 + (i % 4) * 24)) % (height + 190) - 40)
-      const slant = Math.round(-7 + wind * 0.18 + Math.sin(time * 0.7 + i) * 2)
+      const x = (i * 79 + time * (speed + (i % 5) * 9) + wind * 4) % (width + 160) - 80
+      const y = (i * 101 + time * (285 + (i % 4) * 24)) % (height + 190) - 40
+      const slant = -7 + wind * 0.18 + Math.sin(time * 0.7 + i) * 2
       const length = layer === 0 ? 28 + (i % 3) * 7 : 18 + (i % 4) * 4
       ctx.beginPath()
       ctx.moveTo(x, y)
@@ -3404,18 +3408,20 @@ function drawWeather(ctx: CanvasRenderingContext2D, camera: { x: number; y: numb
     }
   }
 
+  // floating fireflies / pollen
   for (let i = 0; i < 18; i++) {
-    const x = Math.round((i * 131 + time * 42) % (width + 80) - 40)
-    const y = Math.round((i * 73 + time * 28) % (height + 120) - 20)
+    const x = (i * 131 + time * 42) % (width + 80) - 40
+    const y = (i * 73 + time * 28) % (height + 120) - 20
     ctx.fillStyle = i % 2 === 0 ? 'rgba(185,255,102,.34)' : 'rgba(87,227,159,.28)'
-    ctx.fillRect(Math.round(x + Math.sin(time + i) * 7), y, 9, 5)
+    ctx.fillRect(x + Math.sin(time + i) * 7, y, 9, 5)
   }
 
+  // pond ripples — smooth float ellipses
   ctx.strokeStyle = 'rgba(210, 251, 255, .3)'
   ctx.lineWidth = 2
   for (let i = 0; i < 10; i++) {
-    const x = Math.round(POND_RECT.x - camera.x + 24 + ((i * 31 + time * 24) % Math.max(40, POND_RECT.w - 48)))
-    const y = Math.round(POND_RECT.y - camera.y + 24 + ((i * 23) % Math.max(40, POND_RECT.h - 48)))
+    const x = POND_RECT.x - camera.x + 24 + ((i * 31 + time * 24) % Math.max(40, POND_RECT.w - 48))
+    const y = POND_RECT.y - camera.y + 24 + ((i * 23) % Math.max(40, POND_RECT.h - 48))
     ctx.beginPath()
     ctx.ellipse(x, y, 12 + Math.sin(time * 3 + i) * 4, 5, 0, 0, Math.PI * 2)
     ctx.stroke()
