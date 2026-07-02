@@ -330,6 +330,25 @@ function initialPlayerSprite(): SpriteKey {
   return stored && CHARACTER_CHOICES.some((choice) => choice.key === stored) ? stored : 'nxr'
 }
 
+// Walk sheets are 4x4 grids (row 0=down, 1=up, 2=left, 3=right); nxr-v2 is a 16-frame horizontal strip.
+function spriteSheetGrid(sheet: SpriteSheet) {
+  const cols = sheet.src.includes('/characters/walk/') ? 4 : sheet.frames
+  const rows = Math.max(1, Math.ceil(sheet.frames / cols))
+  return { cols, rows }
+}
+
+// CSS background props that show exactly one frame of a sheet (grid-aware).
+function spritePreviewStyle(sheet: SpriteSheet, frame = 0) {
+  const { cols, rows } = spriteSheetGrid(sheet)
+  const col = frame % cols
+  const row = Math.floor(frame / cols)
+  return {
+    backgroundImage: `url(${sheet.src})`,
+    backgroundSize: `${cols * 100}% ${rows * 100}%`,
+    backgroundPosition: `${cols > 1 ? (col / (cols - 1)) * 100 : 0}% ${rows > 1 ? (row / (rows - 1)) * 100 : 0}%`,
+  }
+}
+
 const PROPS: Record<PropKey, string> = {
   groundGrass: '/temple-play/world/tile/ground-grass.png',
   groundRoad: '/temple-play/world/tile/ground-road.png',
@@ -1878,7 +1897,7 @@ function QuizOverlay({
   onClaim: () => void
 }) {
   const portrait = SPRITES[quest.sprite]
-  const portraitFrame = portrait.frames > 6 ? 6 : 0
+  const portraitFrame = 0 // row 0 = facing down/camera on 4x4 walk sheets
   const currentQuestionIndex = Math.min(answeredCount, quest.questions.length - 1)
   const currentQuestion = quest.questions[currentQuestionIndex]
   const selectedAnswer = answers[currentQuestionIndex]
@@ -1895,11 +1914,7 @@ function QuizOverlay({
           <div className="temple-play-npc-portrait" style={{ '--npc': quest.color, '--npc-accent': quest.accent } as CSSProperties}>
             <span
               className="temple-play-npc-sprite"
-              style={{
-                backgroundImage: `url(${portrait.src})`,
-                backgroundSize: `${portrait.frames * 100}% 100%`,
-                backgroundPosition: portrait.frames > 1 ? `${(portraitFrame / (portrait.frames - 1)) * 100}% 0` : '0 0',
-              }}
+              style={spritePreviewStyle(portrait, portraitFrame)}
             />
           </div>
           <div>
@@ -1988,13 +2003,7 @@ function AmbientTalkPanel({
       transition={{ type: 'spring', stiffness: 260, damping: 24 }}
     >
       <div className="temple-play-talk-portrait">
-        <span
-          style={{
-            backgroundImage: `url(${portrait.src})`,
-            backgroundSize: `${portrait.frames * 100}% 100%`,
-            backgroundPosition: '0 0',
-          }}
-        />
+        <span style={spritePreviewStyle(portrait)} />
       </div>
       <div className="temple-play-talk-copy">
         <p>{npc.name} / {npc.topic}</p>
@@ -2091,13 +2100,7 @@ function CharacterChoiceSections({
                   className={choice.key === selected ? 'is-selected' : ''}
                   onClick={() => onSelect(choice.key)}
                 >
-                  <span
-                    style={{
-                      backgroundImage: `url(${sheet.src})`,
-                      backgroundSize: `${sheet.frames * 100}% 100%`,
-                      backgroundPosition: '0 0',
-                    }}
-                  />
+                  <span style={spritePreviewStyle(sheet)} />
                   {choice.label}
                 </button>
               )
@@ -2132,11 +2135,7 @@ function GuideOverlay({
         <div className="temple-play-guide-avatar" style={{ '--npc': '#f2c866', '--npc-accent': '#57e39f' } as CSSProperties}>
           <span
             className="temple-play-guide-sprite"
-            style={{
-              backgroundImage: `url(${portrait.src})`,
-              backgroundSize: `${portrait.frames * 100}% 100%`,
-              backgroundPosition: '0 0',
-            }}
+            style={spritePreviewStyle(portrait)}
           />
         </div>
         <div className="temple-play-guide-copy">
