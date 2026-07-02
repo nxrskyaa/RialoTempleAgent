@@ -151,6 +151,7 @@ const DESKTOP_CAMERA_ZOOM = 0.78
 const TABLET_CAMERA_ZOOM = 0.68
 const MOBILE_CAMERA_ZOOM = 0.52
 const TEMPLE_PLAY_SPRITE_VERSION = '20260703-clean-sprites-v2'
+const MOBILE_FRAME_MS = 1000 / 36
 const RIALO_SIGN_INTERACT = { x: 928, y: 860 }
 const RIALO_SIGN_PROFILE_URL = 'https://x.com/nxrskyaa'
 
@@ -1713,22 +1714,23 @@ function TemplePlayCanvas({
     const wrap = wrapRef.current
     if (!canvas || !wrap) return
 
-    const context = canvas.getContext('2d')
+    const context = canvas.getContext('2d', { alpha: false })
     if (!context) return
 
     let frame = 0
     let last = performance.now()
+    let lastPaint = 0
     let disposed = false
 
     function resize() {
       if (!canvas || !wrap) return
       const rect = wrap.getBoundingClientRect()
-      const dpr = Math.min(window.devicePixelRatio || 1, 2)
+      const dpr = canvasDpr(rect.width)
       canvas.width = Math.max(1, Math.floor(rect.width * dpr))
       canvas.height = Math.max(1, Math.floor(rect.height * dpr))
       canvas.style.width = `${rect.width}px`
       canvas.style.height = `${rect.height}px`
-      const ctx = canvas.getContext('2d')
+      const ctx = canvas.getContext('2d', { alpha: false })
       if (ctx) {
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
         ctx.imageSmoothingEnabled = false
@@ -1777,6 +1779,12 @@ function TemplePlayCanvas({
     function tick(now: number) {
       if (disposed || !canvas || !context || !wrap) return
       const rect = wrap.getBoundingClientRect()
+      const lowPower = isLowPowerViewport(rect.width)
+      if (lowPower && now - lastPaint < MOBILE_FRAME_MS) {
+        window.requestAnimationFrame(tick)
+        return
+      }
+      lastPaint = now
       const dt = Math.min(0.033, (now - last) / 1000)
       last = now
       frame += dt
@@ -1876,7 +1884,7 @@ function TemplePlayCanvas({
       }
       cameraRef.current = { ...camera, zoom }
 
-      drawWorld(context, rect.width, rect.height, viewport.width, viewport.height, camera, zoom, frame, current, completedLatest.current, nearId.current, nearAmbient.current, nearSignRef.current, assets, tapTarget.current, nextQuest, playerSprite)
+      drawWorld(context, rect.width, rect.height, viewport.width, viewport.height, camera, zoom, frame, current, completedLatest.current, nearId.current, nearAmbient.current, nearSignRef.current, assets, tapTarget.current, nextQuest, playerSprite, lowPower)
       window.requestAnimationFrame(tick)
     }
 
@@ -2273,6 +2281,17 @@ function cameraZoom(width: number) {
   return Math.max(baseZoom, fillWidthZoom)
 }
 
+function isLowPowerViewport(width: number) {
+  return width < 760
+}
+
+function canvasDpr(width: number) {
+  const deviceDpr = typeof window === 'undefined' ? 1 : window.devicePixelRatio || 1
+  if (isLowPowerViewport(width)) return Math.min(deviceDpr, 1.1)
+  if (width < 1100) return Math.min(deviceDpr, 1.35)
+  return Math.min(deviceDpr, 1.75)
+}
+
 function nearestQuest(player: PlayerState) {
   let nearest: QuestNpc | null = null
   let distance = Number.POSITIVE_INFINITY
@@ -2330,6 +2349,10 @@ function isNpcMovementBlocked(x: number, y: number) {
 
 function pointInRect(x: number, y: number, rect: { x: number; y: number; w: number; h: number }) {
   return x > rect.x && x < rect.x + rect.w && y > rect.y && y < rect.y + rect.h
+}
+
+function rectsOverlap(a: { x: number; y: number; w: number; h: number }, b: { x: number; y: number; w: number; h: number }) {
+  return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y
 }
 
 function expandRect(rect: { x: number; y: number; w: number; h: number }, margin: number) {
@@ -2418,6 +2441,7 @@ function drawWorld(
   target: { x: number; y: number } | null,
   nextQuest: QuestNpc,
   playerSprite: SpriteKey,
+  lowPower: boolean,
 ) {
   ctx.clearRect(0, 0, width, height)
   ctx.save()
@@ -2426,16 +2450,16 @@ function drawWorld(
   drawGround(ctx, time, assets)
   drawPaths(ctx, time)
   drawWater(ctx, assets)
-  drawEnvironmentProps(ctx, time, assets)
-  drawFlyingLanterns(ctx, time)
+  drawEnvironmentProps(ctx, time, assets, lowPower)
+  drawFlyingLanterns(ctx, time, lowPower)
   drawTapTarget(ctx, time, target)
   drawQuestHint(ctx, time, nextQuest, nearNpcId)
   drawRialoSignHint(ctx, time, nearSign)
-  drawActors(ctx, time, completedIds, nearNpcId, nearAmbientIndex, player, assets, playerSprite)
-  drawWeather(ctx, camera, viewportWidth, viewportHeight, time)
+  drawActors(ctx, time, completedIds, nearNpcId, nearAmbientIndex, player, assets, playerSprite, camera, viewportWidth, viewportHeight)
+  drawWeather(ctx, camera, viewportWidth, viewportHeight, time, lowPower)
   drawShootingStar(ctx, camera, viewportWidth, viewportHeight, time)
   ctx.restore()
-  drawScanlines(ctx, width, height)
+  if (!lowPower) drawScanlines(ctx, width, height)
 }
 
 function drawTapTarget(ctx: CanvasRenderingContext2D, time: number, target: { x: number; y: number } | null) {
@@ -2743,9 +2767,10 @@ function drawRialoSignPlatform(ctx: CanvasRenderingContext2D, x: number, y: numb
 const FLOWERS: PropKey[] = ['flowerBlue', 'flowerAmber', 'flowerCream', 'flowerYellow', 'flowerRed', 'flowerOrange', 'flowerPink', 'flowerPurple']
 const GRASSES: PropKey[] = ['grass1', 'grass2', 'grass3']
 
-function drawEnvironmentProps(ctx: CanvasRenderingContext2D, time: number, assets: TemplePlayAssets) {
+function drawEnvironmentProps(ctx: CanvasRenderingContext2D, time: number, assets: TemplePlayAssets, lowPower = false) {
   // grass tufts scattered across open ground
-  for (let i = 0; i < 90; i++) {
+  const grassCount = lowPower ? 42 : 90
+  for (let i = 0; i < grassCount; i++) {
     const x = 90 + ((i * 257) % (WORLD.width - 180))
     const y = 120 + ((i * 181) % (WORLD.height - 240))
     if (isNearMainPlaySpace(x, y)) continue
@@ -2753,7 +2778,8 @@ function drawEnvironmentProps(ctx: CanvasRenderingContext2D, time: number, asset
   }
 
   // wildflowers (8 colours) sprinkled around, denser off the play space
-  for (let i = 0; i < 46; i++) {
+  const flowerCount = lowPower ? 22 : 46
+  for (let i = 0; i < flowerCount; i++) {
     const x = 120 + ((i * 293) % (WORLD.width - 240))
     const y = 140 + ((i * 211) % (WORLD.height - 280))
     if (isNearMainPlaySpace(x, y) && i % 3 !== 0) continue
@@ -2764,7 +2790,7 @@ function drawEnvironmentProps(ctx: CanvasRenderingContext2D, time: number, asset
   // garden crop rows — canvas-drawn pixel art with VFX (sway, sparkle, growth shimmer)
   drawGardenCrops(ctx, time)
 
-  drawFloatingLeaves(ctx, time)
+  drawFloatingLeaves(ctx, time, lowPower)
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -2937,9 +2963,10 @@ function drawPixelCropRoot(ctx: CanvasRenderingContext2D, cx: number, cy: number
   }
 }
 
-function drawFlyingLanterns(ctx: CanvasRenderingContext2D, time: number) {
+function drawFlyingLanterns(ctx: CanvasRenderingContext2D, time: number, lowPower = false) {
   ctx.save()
-  for (let i = 0; i < 10; i++) {
+  const count = lowPower ? 4 : 10
+  for (let i = 0; i < count; i++) {
     const lane = i % 5
     const loop = 18 + lane * 1.9
     const progress = (time / loop + i * 0.173) % 1
@@ -2966,9 +2993,10 @@ function drawFlyingLanterns(ctx: CanvasRenderingContext2D, time: number) {
   ctx.restore()
 }
 
-function drawFloatingLeaves(ctx: CanvasRenderingContext2D, time: number) {
+function drawFloatingLeaves(ctx: CanvasRenderingContext2D, time: number, lowPower = false) {
   ctx.save()
-  for (let i = 0; i < 42; i++) {
+  const count = lowPower ? 14 : 42
+  for (let i = 0; i < count; i++) {
     const drift = Math.sin(time * 0.8 + i * 1.9) * 18
     const x = (i * 197 + time * (14 + (i % 4) * 5) + drift) % WORLD.width
     const y = (i * 113 + time * (8 + (i % 3) * 4)) % WORLD.height
@@ -3033,14 +3061,25 @@ function drawActors(
   player: PlayerState,
   assets: TemplePlayAssets,
   playerSprite: SpriteKey,
+  camera: { x: number; y: number },
+  viewportWidth: number,
+  viewportHeight: number,
 ) {
-  const actors: Array<{ y: number; draw: () => void }> = BUILDINGS.map((building) => ({
+  const visible = {
+    x: camera.x - 140,
+    y: camera.y - 260,
+    w: viewportWidth + 280,
+    h: viewportHeight + 460,
+  }
+  const actors: Array<{ y: number; bounds: { x: number; y: number; w: number; h: number }; draw: () => void }> = BUILDINGS.map((building) => ({
     y: building.y,
+    bounds: { x: building.x - building.w / 2, y: building.y - building.h, w: building.w, h: building.h },
     draw: () => drawBuildingAsset(ctx, assets, building),
   }))
   SCENERY.forEach((s) => {
     actors.push({
       y: s.y,
+      bounds: { x: s.x - s.w / 2, y: s.y - s.h, w: s.w, h: s.h },
       draw: () => {
         drawPropBottomCenter(ctx, assets, s.key, s.x, s.y, s.w, s.h)
       },
@@ -3050,8 +3089,10 @@ function drawActors(
 
   AMBIENT_NPCS.forEach((npc, index) => {
     const motion = ambientMotions[index]
+    const sheet = SPRITES[npc.sprite]
     actors.push({
       y: motion.y,
+      bounds: { x: motion.x - sheet.drawW / 2, y: motion.y - sheet.drawH - 170, w: sheet.drawW, h: sheet.drawH + 190 },
       draw: () => {
         drawSpriteActor(ctx, assets, {
           sprite: npc.sprite,
@@ -3084,8 +3125,10 @@ function drawActors(
   QUESTS.forEach((quest) => {
     const completed = completedIds.has(quest.quizId)
     const action = questNpcMotion(quest, time)
+    const sheet = SPRITES[quest.sprite]
     actors.push({
       y: action.y,
+      bounds: { x: action.x - sheet.drawW / 2, y: action.y - sheet.drawH - 170, w: sheet.drawW, h: sheet.drawH + 190 },
       draw: () => {
         drawSpriteActor(ctx, assets, {
           sprite: quest.sprite,
@@ -3107,6 +3150,7 @@ function drawActors(
 
   actors.push({
     y: player.y,
+    bounds: { x: player.x - 60, y: player.y - 160, w: 120, h: 190 },
     draw: () => drawSpriteActor(ctx, assets, {
       sprite: playerSprite,
       x: player.x,
@@ -3122,7 +3166,9 @@ function drawActors(
     }),
   })
 
-  actors.sort((a, b) => a.y - b.y).forEach((actor) => actor.draw())
+  actors.sort((a, b) => a.y - b.y).forEach((actor) => {
+    if (rectsOverlap(actor.bounds, visible)) actor.draw()
+  })
   drawCompletedBadges(ctx, time, completedIds)
   drawNpcEventLayer(ctx, time, ambientMotions)
 }
@@ -3593,11 +3639,12 @@ function drawPixelNameTag(ctx: CanvasRenderingContext2D, x: number, y: number, t
   ctx.fillText(text, Math.round(x - width / 2 + 8), Math.round(y + (compact ? 14 : 16)))
 }
 
-function drawWeather(ctx: CanvasRenderingContext2D, camera: { x: number; y: number }, width: number, height: number, time: number) {
+function drawWeather(ctx: CanvasRenderingContext2D, camera: { x: number; y: number }, width: number, height: number, time: number, lowPower = false) {
   ctx.save()
   ctx.translate(camera.x, camera.y)
   // drifting cloud shapes (soft alpha, no pixel snapping for smooth float)
-  for (let i = 0; i < 16; i++) {
+  const cloudCount = lowPower ? 6 : 16
+  for (let i = 0; i < cloudCount; i++) {
     const x = ((i * 190 + time * (12 + (i % 3) * 4)) % (width + 300)) - 170
     const y = 28 + (i * 47 + Math.sin(time * 0.32 + i) * 14) % Math.max(120, height * 0.46)
     ctx.fillStyle = 'rgba(247,241,223,.13)'
@@ -3610,7 +3657,7 @@ function drawWeather(ctx: CanvasRenderingContext2D, camera: { x: number; y: numb
   for (let layer = 0; layer < 2; layer++) {
     ctx.strokeStyle = layer === 0 ? 'rgba(210,232,255,.19)' : 'rgba(247,241,223,.14)'
     ctx.lineWidth = layer === 0 ? 2 : 1
-    const count = layer === 0 ? 44 : 32
+    const count = lowPower ? (layer === 0 ? 18 : 10) : (layer === 0 ? 44 : 32)
     for (let i = 0; i < count; i++) {
       const speed = layer === 0 ? 245 : 170
       const x = (i * 79 + time * (speed + (i % 5) * 9) + wind * 4) % (width + 160) - 80
@@ -3625,7 +3672,8 @@ function drawWeather(ctx: CanvasRenderingContext2D, camera: { x: number; y: numb
   }
 
   // floating fireflies / pollen
-  for (let i = 0; i < 18; i++) {
+  const pollenCount = lowPower ? 7 : 18
+  for (let i = 0; i < pollenCount; i++) {
     const x = (i * 131 + time * 42) % (width + 80) - 40
     const y = (i * 73 + time * 28) % (height + 120) - 20
     ctx.fillStyle = i % 2 === 0 ? 'rgba(185,255,102,.34)' : 'rgba(87,227,159,.28)'
@@ -3635,7 +3683,8 @@ function drawWeather(ctx: CanvasRenderingContext2D, camera: { x: number; y: numb
   // pond ripples — smooth float ellipses
   ctx.strokeStyle = 'rgba(210, 251, 255, .3)'
   ctx.lineWidth = 2
-  for (let i = 0; i < 10; i++) {
+  const rippleCount = lowPower ? 4 : 10
+  for (let i = 0; i < rippleCount; i++) {
     const x = POND_RECT.x - camera.x + 24 + ((i * 31 + time * 24) % Math.max(40, POND_RECT.w - 48))
     const y = POND_RECT.y - camera.y + 24 + ((i * 23) % Math.max(40, POND_RECT.h - 48))
     ctx.beginPath()
