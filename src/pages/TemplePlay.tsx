@@ -150,7 +150,7 @@ const PLAYER_SPEED = 245
 const DESKTOP_CAMERA_ZOOM = 0.78
 const TABLET_CAMERA_ZOOM = 0.68
 const MOBILE_CAMERA_ZOOM = 0.52
-const TEMPLE_PLAY_SPRITE_VERSION = '20260703-ground-anchor-v4'
+const TEMPLE_PLAY_SPRITE_VERSION = '20260704-source-normalized-v5'
 const MAX_ACTIVE_SPRITE_FRAME_LOADS = 2
 const RIALO_SIGN_INTERACT = { x: 928, y: 860 }
 const RIALO_SIGN_PROFILE_URL = 'https://x.com/nxrskyaa'
@@ -2314,7 +2314,7 @@ async function loadSpriteFrameSet(sheet: SpriteSheet): Promise<SpriteFrameSet> {
     const canvas = document.createElement('canvas')
     canvas.width = sheet.drawW
     canvas.height = sheet.drawH
-    const context = canvas.getContext('2d')
+    const context = canvas.getContext('2d', { willReadFrequently: true })
     if (context) {
       context.imageSmoothingEnabled = false
       context.clearRect(0, 0, sheet.drawW, sheet.drawH)
