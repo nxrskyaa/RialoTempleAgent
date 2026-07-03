@@ -163,7 +163,6 @@ type SpriteSheet = {
   drawW: number
   drawH: number
   cols?: number
-  normalizeFrames?: boolean
 }
 
 type SpriteFrameSet = {
@@ -230,7 +229,6 @@ const mappedNpc = (src: string, drawW = 58, drawH = 82): SpriteSheet => ({
   cols: 6,
   drawW,
   drawH,
-  normalizeFrames: true,
 })
 
 const SPRITES: Record<SpriteKey, SpriteSheet> = {
@@ -2310,9 +2308,6 @@ function ensureSpriteFrames(assets: TemplePlayAssets, sprite: SpriteKey) {
 async function loadSpriteFrameSet(sheet: SpriteSheet): Promise<SpriteFrameSet> {
   const image = await loadImage(spriteAssetUrl(sheet.src))
   const cols = sheet.cols ?? Math.max(1, Math.floor(image.width / sheet.frameW))
-  if (sheet.normalizeFrames) {
-    return loadNormalizedSpriteFrameSet(image, sheet, cols)
-  }
   const frames: HTMLCanvasElement[] = []
 
   for (let frame = 0; frame < sheet.frames; frame++) {
@@ -2334,6 +2329,7 @@ async function loadSpriteFrameSet(sheet: SpriteSheet): Promise<SpriteFrameSet> {
         sheet.drawW,
         sheet.drawH,
       )
+      clearSpriteBackgroundPixels(context, sheet.drawW, sheet.drawH)
     }
     frames.push(canvas)
   }
@@ -2342,110 +2338,23 @@ async function loadSpriteFrameSet(sheet: SpriteSheet): Promise<SpriteFrameSet> {
   return { frames }
 }
 
-type FrameBounds = {
-  frame: number
-  x: number
-  y: number
-  w: number
-  h: number
-}
-
-function loadNormalizedSpriteFrameSet(image: HTMLImageElement, sheet: SpriteSheet, cols: number): SpriteFrameSet {
-  const source = document.createElement('canvas')
-  source.width = image.width
-  source.height = image.height
-  const sourceContext = source.getContext('2d')
-  if (!sourceContext) return { frames: [] }
-  sourceContext.imageSmoothingEnabled = false
-  sourceContext.drawImage(image, 0, 0)
-  const imageData = sourceContext.getImageData(0, 0, source.width, source.height)
-  const bounds = Array.from({ length: sheet.frames }, (_, frame) => spriteFrameBounds(imageData, source.width, sheet, cols, frame))
-  const contentBounds = bounds.filter((bound): bound is FrameBounds => Boolean(bound))
-  const maxContentW = Math.max(1, ...contentBounds.map((bound) => bound.w))
-  const maxContentH = Math.max(1, ...contentBounds.map((bound) => bound.h))
-  const scale = Math.min(sheet.drawW / maxContentW, sheet.drawH / maxContentH)
-
-  return {
-    frames: bounds.map((bound, frame) => {
-      const canvas = document.createElement('canvas')
-      canvas.width = sheet.drawW
-      canvas.height = sheet.drawH
-      const context = canvas.getContext('2d')
-      if (context) {
-        context.imageSmoothingEnabled = false
-        context.clearRect(0, 0, sheet.drawW, sheet.drawH)
-        if (bound) {
-          const destW = Math.max(1, Math.round(bound.w * scale))
-          const destH = Math.max(1, Math.round(bound.h * scale))
-          context.drawImage(
-            image,
-            bound.x,
-            bound.y,
-            bound.w,
-            bound.h,
-            Math.round((sheet.drawW - destW) / 2),
-            Math.round(sheet.drawH - destH),
-            destW,
-            destH,
-          )
-        } else {
-          const col = frame % cols
-          const row = Math.floor(frame / cols)
-          context.drawImage(
-            image,
-            col * sheet.frameW,
-            row * sheet.frameH,
-            sheet.frameW,
-            sheet.frameH,
-            0,
-            0,
-            sheet.drawW,
-            sheet.drawH,
-          )
-        }
-      }
-      return canvas
-    }),
-  }
-}
-
-function spriteFrameBounds(
-  imageData: ImageData,
-  imageWidth: number,
-  sheet: SpriteSheet,
-  cols: number,
-  frame: number,
-): FrameBounds | null {
-  const col = frame % cols
-  const row = Math.floor(frame / cols)
-  const startX = col * sheet.frameW
-  const startY = row * sheet.frameH
-  let minX = sheet.frameW
-  let minY = sheet.frameH
-  let maxX = -1
-  let maxY = -1
-
-  for (let y = 0; y < sheet.frameH; y++) {
-    for (let x = 0; x < sheet.frameW; x++) {
-      const alpha = imageData.data[((startY + y) * imageWidth + startX + x) * 4 + 3]
-      if (alpha > 12) {
-        if (x < minX) minX = x
-        if (y < minY) minY = y
-        if (x > maxX) maxX = x
-        if (y > maxY) maxY = y
-      }
+function clearSpriteBackgroundPixels(context: CanvasRenderingContext2D, width: number, height: number) {
+  const imageData = context.getImageData(0, 0, width, height)
+  const data = imageData.data
+  for (let index = 0; index < data.length; index += 4) {
+    const red = data[index]
+    const green = data[index + 1]
+    const blue = data[index + 2]
+    const alpha = data[index + 3]
+    const hotPinkMatte = red > 185 && blue > 150 && green < 105
+    const palePinkMatte = red > 215 && blue > 190 && green < 175 && red - green > 45
+    if (alpha < 8 || hotPinkMatte || palePinkMatte) {
+      data[index + 3] = 0
     }
   }
-
-  if (maxX < minX || maxY < minY) return null
-  return {
-    frame,
-    x: startX + minX,
-    y: startY + minY,
-    w: maxX - minX + 1,
-    h: maxY - minY + 1,
-  }
+  context.putImageData(imageData, 0, 0)
 }
+
 
 function loadImage(src: string) {
   return new Promise<HTMLImageElement>((resolve, reject) => {
@@ -3878,8 +3787,8 @@ function chooseSpriteFrame(sheet: SpriteSheet, time: number, seed: number, movin
     return Math.min(sheet.frames - 1, row * 6 + step)
   }
   if (sheet.frames >= 16) {
-    // Legacy 4x4 sheets: row 0=down, 1=up, 2=left, 3=right; 4 animation frames per row.
-    const row = direction === 'up' ? 1 : direction === 'left' ? 2 : direction === 'right' ? 3 : 0
+    // Legacy 4x4 sheets follow the same row order as NXR: down, up, right, left.
+    const row = direction === 'up' ? 1 : direction === 'right' ? 2 : direction === 'left' ? 3 : 0
     const step = moving ? Math.floor(time * 6.4 + seed) % 4 : 0
     return Math.min(sheet.frames - 1, row * 4 + step)
   }
