@@ -164,8 +164,13 @@ type SpriteSheet = {
   cols?: number
 }
 
+type SpriteFrameSet = {
+  frames: HTMLCanvasElement[]
+}
+
 type TemplePlayAssets = {
-  sprites: Record<SpriteKey, HTMLImageElement>
+  sprites: Partial<Record<SpriteKey, SpriteFrameSet>>
+  spritePromises: Partial<Record<SpriteKey, Promise<void>>>
   props: Record<PropKey, HTMLImageElement>
   loaded: boolean
 }
@@ -1771,7 +1776,7 @@ function TemplePlayCanvas({
     window.addEventListener('keydown', keyDown)
     window.addEventListener('keyup', keyUp)
 
-    void loadTemplePlayAssets().then((assets) => {
+    void loadTemplePlayAssets(playerSprite).then((assets) => {
       if (disposed) return
       assetsRef.current = assets
     })
@@ -2125,15 +2130,23 @@ function CharacterPicker({
   selectedLabel: string
   onSelect: (sprite: SpriteKey) => void
 }) {
+  const [open, setOpen] = useState(false)
+
   return (
-    <details className="temple-play-character-picker">
+    <details
+      className="temple-play-character-picker"
+      open={open}
+      onToggle={(event) => setOpen(event.currentTarget.open)}
+    >
       <summary>
         <span>Character</span>
         <strong>{selectedLabel}</strong>
       </summary>
-      <div className="temple-play-character-sections">
-        <CharacterChoiceSections selected={selected} onSelect={onSelect} />
-      </div>
+      {open ? (
+        <div className="temple-play-character-sections">
+          <CharacterChoiceSections selected={selected} onSelect={onSelect} />
+        </div>
+      ) : null}
     </details>
   )
 }
@@ -2182,6 +2195,7 @@ function GuideOverlay({
   onClose: () => void
 }) {
   const portrait = SPRITES[selected]
+  const [showChoices, setShowChoices] = useState(false)
 
   return (
     <motion.div className="temple-play-guide-layer" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
@@ -2209,9 +2223,14 @@ function GuideOverlay({
             <small>Near NPC: talk</small>
             <small>E key: talk nearby</small>
           </div>
-          <div className="temple-play-guide-characters" aria-label="Choose player character">
-            <CharacterChoiceSections selected={selected} onSelect={onSelect} />
-          </div>
+          <button type="button" className="temple-play-guide-switch" onClick={() => setShowChoices((current) => !current)}>
+            {showChoices ? 'Hide characters' : 'Choose character'}
+          </button>
+          {showChoices ? (
+            <div className="temple-play-guide-characters" aria-label="Choose player character">
+              <CharacterChoiceSections selected={selected} onSelect={onSelect} />
+            </div>
+          ) : null}
         </div>
         <button type="button" onClick={onClose}>Start</button>
       </motion.section>
@@ -2219,19 +2238,68 @@ function GuideOverlay({
   )
 }
 
-async function loadTemplePlayAssets(): Promise<TemplePlayAssets> {
-  const spriteEntries = await Promise.all(
-    Object.entries(SPRITES).map(async ([key, sheet]) => [key, await loadImage(spriteAssetUrl(sheet.src))] as const),
-  )
+async function loadTemplePlayAssets(initialSprite: SpriteKey): Promise<TemplePlayAssets> {
   const propEntries = await Promise.all(
     Object.entries(PROPS).map(async ([key, src]) => [key, await loadImage(src)] as const),
   )
-
-  return {
-    sprites: Object.fromEntries(spriteEntries) as Record<SpriteKey, HTMLImageElement>,
+  const assets: TemplePlayAssets = {
+    sprites: {},
+    spritePromises: {},
     props: Object.fromEntries(propEntries) as Record<PropKey, HTMLImageElement>,
     loaded: true,
   }
+
+  await Promise.all([
+    ensureSpriteFrames(assets, 'nxr'),
+    ensureSpriteFrames(assets, initialSprite),
+  ])
+
+  return assets
+}
+
+function ensureSpriteFrames(assets: TemplePlayAssets, sprite: SpriteKey) {
+  if (assets.sprites[sprite]) return Promise.resolve()
+  if (assets.spritePromises[sprite]) return assets.spritePromises[sprite]
+  const promise = loadSpriteFrameSet(SPRITES[sprite])
+    .then((frames) => {
+      assets.sprites[sprite] = frames
+    })
+    .catch(() => {
+      delete assets.spritePromises[sprite]
+    })
+  assets.spritePromises[sprite] = promise
+  return promise
+}
+
+async function loadSpriteFrameSet(sheet: SpriteSheet): Promise<SpriteFrameSet> {
+  const image = await loadImage(spriteAssetUrl(sheet.src))
+  const cols = sheet.cols ?? Math.max(1, Math.floor(image.width / sheet.frameW))
+  const frames: HTMLCanvasElement[] = []
+
+  for (let frame = 0; frame < sheet.frames; frame++) {
+    const canvas = document.createElement('canvas')
+    canvas.width = sheet.drawW
+    canvas.height = sheet.drawH
+    const context = canvas.getContext('2d')
+    if (context) {
+      context.imageSmoothingEnabled = false
+      context.clearRect(0, 0, sheet.drawW, sheet.drawH)
+      context.drawImage(
+        image,
+        (frame % cols) * sheet.frameW,
+        Math.floor(frame / cols) * sheet.frameH,
+        sheet.frameW,
+        sheet.frameH,
+        0,
+        0,
+        sheet.drawW,
+        sheet.drawH,
+      )
+    }
+    frames.push(canvas)
+  }
+
+  return { frames }
 }
 
 function loadImage(src: string) {
@@ -3479,6 +3547,23 @@ function questNpcMotion(quest: QuestNpc, time: number) {
   }
 }
 
+function drawSpriteStandIn(ctx: CanvasRenderingContext2D, x: number, y: number, drawW: number, drawH: number, tone: string) {
+  ctx.save()
+  ctx.fillStyle = 'rgba(0,0,0,.22)'
+  ctx.fillRect(Math.round(x - drawW * 0.24), Math.round(y - 8), Math.round(drawW * 0.48), 8)
+  ctx.fillStyle = 'rgba(7,16,12,.86)'
+  ctx.fillRect(Math.round(x - drawW * 0.34), Math.round(y - drawH * 0.72), Math.round(drawW * 0.68), Math.round(drawH * 0.72))
+  ctx.strokeStyle = tone
+  ctx.lineWidth = 2
+  ctx.strokeRect(Math.round(x - drawW * 0.34) + 0.5, Math.round(y - drawH * 0.72) + 0.5, Math.round(drawW * 0.68) - 1, Math.round(drawH * 0.72) - 1)
+  ctx.fillStyle = tone
+  ctx.fillRect(Math.round(x - 8), Math.round(y - drawH * 0.45), 16, 12)
+  ctx.fillStyle = '#f7f1df'
+  ctx.fillRect(Math.round(x - 5), Math.round(y - drawH * 0.42), 3, 3)
+  ctx.fillRect(Math.round(x + 3), Math.round(y - drawH * 0.42), 3, 3)
+  ctx.restore()
+}
+
 function drawSpriteActor(
   ctx: CanvasRenderingContext2D,
   assets: TemplePlayAssets,
@@ -3517,8 +3602,16 @@ function drawSpriteActor(
   },
 ) {
   const sheet = SPRITES[sprite]
-  const image = assets.sprites[sprite]
+  const spriteFrames = assets.sprites[sprite]
+  if (!spriteFrames) {
+    void ensureSpriteFrames(assets, sprite)
+    drawSpriteStandIn(ctx, x, y, sheet.drawW, sheet.drawH, tone)
+    drawPixelNameTag(ctx, x, y - sheet.drawH - (compact ? 18 : 24), name, completed ? '#57e39f' : '#f7f1df', compact, tone)
+    return
+  }
   const frame = chooseSpriteFrame(sheet, time, seed, moving, direction)
+  const frameImage = spriteFrames.frames[frame] ?? spriteFrames.frames[0]
+  if (!frameImage) return
   const flipX = shouldFlipSprite(sprite, sheet, direction)
   const walkPhase = Math.sin(time * 10 + seed)
   const bodyOffset = player
@@ -3542,13 +3635,8 @@ function drawSpriteActor(
   ctx.translate(Math.round(x), Math.round(y))
   ctx.rotate(rotation)
   if (flipX) ctx.scale(-1, 1)
-  const sheetCols = sheet.cols ?? Math.max(1, Math.floor(image.width / sheet.frameW))
   ctx.drawImage(
-    image,
-    (frame % sheetCols) * sheet.frameW,
-    Math.floor(frame / sheetCols) * sheet.frameH,
-    sheet.frameW,
-    sheet.frameH,
+    frameImage,
     Math.round(-drawW / 2),
     Math.round(-drawH + bodyOffset),
     drawW,

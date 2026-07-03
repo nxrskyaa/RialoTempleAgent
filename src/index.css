@@ -2713,6 +2713,19 @@
     font-weight: 950;
   }
 
+  .temple-play-guide-switch {
+    display: inline-flex;
+    width: max-content;
+    margin-top: 8px;
+    border: 2px solid rgba(242, 200, 102, 0.44);
+    border-radius: 7px;
+    background: rgba(242, 200, 102, 0.12);
+    color: var(--temple-gold);
+    padding: 6px 9px;
+    font-size: 10px;
+    font-weight: 950;
+  }
+
   .temple-play-guide-card > button {
     border: 2px solid #171009;
     border-radius: 5px;
