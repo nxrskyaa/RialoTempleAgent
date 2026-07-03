@@ -150,7 +150,7 @@ const PLAYER_SPEED = 245
 const DESKTOP_CAMERA_ZOOM = 0.78
 const TABLET_CAMERA_ZOOM = 0.68
 const MOBILE_CAMERA_ZOOM = 0.52
-const TEMPLE_PLAY_SPRITE_VERSION = '20260703-mapped-sprites-v3'
+const TEMPLE_PLAY_SPRITE_VERSION = '20260703-ground-anchor-v4'
 const MAX_ACTIVE_SPRITE_FRAME_LOADS = 2
 const RIALO_SIGN_INTERACT = { x: 928, y: 860 }
 const RIALO_SIGN_PROFILE_URL = 'https://x.com/nxrskyaa'
@@ -2330,6 +2330,7 @@ async function loadSpriteFrameSet(sheet: SpriteSheet): Promise<SpriteFrameSet> {
         sheet.drawH,
       )
       clearSpriteBackgroundPixels(context, sheet.drawW, sheet.drawH)
+      alignSpriteFrameToGround(context, sheet.drawW, sheet.drawH)
     }
     frames.push(canvas)
   }
@@ -2353,6 +2354,51 @@ function clearSpriteBackgroundPixels(context: CanvasRenderingContext2D, width: n
     }
   }
   context.putImageData(imageData, 0, 0)
+}
+
+function alignSpriteFrameToGround(context: CanvasRenderingContext2D, width: number, height: number) {
+  const imageData = context.getImageData(0, 0, width, height)
+  const bounds = spriteCanvasBounds(imageData, width, height)
+  if (!bounds) return
+  const shiftY = height - bounds.bottom
+  if (shiftY <= 0) return
+
+  const shifted = context.createImageData(width, height)
+  for (let y = 0; y < height; y++) {
+    const destY = y + shiftY
+    if (destY < 0 || destY >= height) continue
+    for (let x = 0; x < width; x++) {
+      const sourceIndex = (y * width + x) * 4
+      const destIndex = (destY * width + x) * 4
+      shifted.data[destIndex] = imageData.data[sourceIndex]
+      shifted.data[destIndex + 1] = imageData.data[sourceIndex + 1]
+      shifted.data[destIndex + 2] = imageData.data[sourceIndex + 2]
+      shifted.data[destIndex + 3] = imageData.data[sourceIndex + 3]
+    }
+  }
+
+  context.putImageData(shifted, 0, 0)
+}
+
+function spriteCanvasBounds(imageData: ImageData, width: number, height: number) {
+  let left = width
+  let top = height
+  let right = -1
+  let bottom = -1
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const alpha = imageData.data[(y * width + x) * 4 + 3]
+      if (alpha <= 12) continue
+      if (x < left) left = x
+      if (x > right) right = x
+      if (y < top) top = y
+      if (y > bottom) bottom = y
+    }
+  }
+
+  if (right < left || bottom < top) return null
+  return { left, top, right: right + 1, bottom: bottom + 1 }
 }
 
 
