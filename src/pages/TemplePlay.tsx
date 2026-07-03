@@ -172,6 +172,7 @@ type SpriteFrameSet = {
 type TemplePlayAssets = {
   sprites: Partial<Record<SpriteKey, SpriteFrameSet>>
   spritePromises: Partial<Record<SpriteKey, Promise<void>>>
+  spritePreviews: Partial<Record<SpriteKey, HTMLImageElement>>
   props: Record<PropKey, HTMLImageElement>
   loaded: boolean
 }
@@ -2236,12 +2237,23 @@ function GuideOverlay({
 }
 
 async function loadTemplePlayAssets(initialSprite: SpriteKey): Promise<TemplePlayAssets> {
-  const propEntries = await Promise.all(
-    Object.entries(PROPS).map(async ([key, src]) => [key, await loadImage(src)] as const),
-  )
+  const [propEntries, previewEntries] = await Promise.all([
+    Promise.all(
+      Object.entries(PROPS).map(async ([key, src]) => [key, await loadImage(src)] as const),
+    ),
+    Promise.all(
+      Object.entries(SPRITES).map(async ([key, sheet]) => {
+        const preview = await loadImage(spritePreviewUrl(sheet)).catch(() => undefined)
+        return [key, preview] as const
+      }),
+    ),
+  ])
   const assets: TemplePlayAssets = {
     sprites: {},
     spritePromises: {},
+    spritePreviews: Object.fromEntries(
+      previewEntries.filter((entry): entry is readonly [string, HTMLImageElement] => Boolean(entry[1])),
+    ) as Partial<Record<SpriteKey, HTMLImageElement>>,
     props: Object.fromEntries(propEntries) as Record<PropKey, HTMLImageElement>,
     loaded: true,
   }
@@ -3570,20 +3582,26 @@ function questNpcMotion(quest: QuestNpc, time: number) {
   }
 }
 
-function drawSpriteStandIn(ctx: CanvasRenderingContext2D, x: number, y: number, drawW: number, drawH: number, tone: string) {
+function drawSpritePreviewFallback(
+  ctx: CanvasRenderingContext2D,
+  preview: HTMLImageElement | undefined,
+  x: number,
+  y: number,
+  drawW: number,
+  drawH: number,
+) {
+  if (!preview) return
   ctx.save()
   ctx.fillStyle = 'rgba(0,0,0,.22)'
   ctx.fillRect(Math.round(x - drawW * 0.24), Math.round(y - 8), Math.round(drawW * 0.48), 8)
-  ctx.fillStyle = 'rgba(7,16,12,.86)'
-  ctx.fillRect(Math.round(x - drawW * 0.34), Math.round(y - drawH * 0.72), Math.round(drawW * 0.68), Math.round(drawH * 0.72))
-  ctx.strokeStyle = tone
-  ctx.lineWidth = 2
-  ctx.strokeRect(Math.round(x - drawW * 0.34) + 0.5, Math.round(y - drawH * 0.72) + 0.5, Math.round(drawW * 0.68) - 1, Math.round(drawH * 0.72) - 1)
-  ctx.fillStyle = tone
-  ctx.fillRect(Math.round(x - 8), Math.round(y - drawH * 0.45), 16, 12)
-  ctx.fillStyle = '#f7f1df'
-  ctx.fillRect(Math.round(x - 5), Math.round(y - drawH * 0.42), 3, 3)
-  ctx.fillRect(Math.round(x + 3), Math.round(y - drawH * 0.42), 3, 3)
+  ctx.imageSmoothingEnabled = false
+  ctx.drawImage(
+    preview,
+    Math.round(x - drawW / 2),
+    Math.round(y - drawH),
+    drawW,
+    drawH,
+  )
   ctx.restore()
 }
 
@@ -3628,8 +3646,10 @@ function drawSpriteActor(
   const spriteFrames = assets.sprites[sprite]
   if (!spriteFrames) {
     void ensureSpriteFrames(assets, sprite)
-    drawSpriteStandIn(ctx, x, y, sheet.drawW, sheet.drawH, tone)
-    drawPixelNameTag(ctx, x, y - sheet.drawH - (compact ? 18 : 24), name, completed ? '#57e39f' : '#f7f1df', compact, tone)
+    const baseDrawW = sprite === 'nxr' && !player ? 58 : sheet.drawW
+    const baseDrawH = sprite === 'nxr' && !player ? 82 : sheet.drawH
+    drawSpritePreviewFallback(ctx, assets.spritePreviews[sprite], x, y, baseDrawW, baseDrawH)
+    drawPixelNameTag(ctx, x, y - baseDrawH - (compact ? 18 : 24), name, completed ? '#57e39f' : '#f7f1df', compact, tone)
     return
   }
   const frame = chooseSpriteFrame(sheet, time, seed, moving, direction)
