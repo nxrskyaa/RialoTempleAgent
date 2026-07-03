@@ -150,7 +150,8 @@ const PLAYER_SPEED = 245
 const DESKTOP_CAMERA_ZOOM = 0.78
 const TABLET_CAMERA_ZOOM = 0.68
 const MOBILE_CAMERA_ZOOM = 0.52
-const TEMPLE_PLAY_SPRITE_VERSION = '20260703-clean-sprites-v2'
+const TEMPLE_PLAY_SPRITE_VERSION = '20260703-mapped-sprites-v3'
+const MAX_ACTIVE_SPRITE_FRAME_LOADS = 2
 const RIALO_SIGN_INTERACT = { x: 928, y: 860 }
 const RIALO_SIGN_PROFILE_URL = 'https://x.com/nxrskyaa'
 
@@ -358,22 +359,19 @@ function initialPlayerSprite(): SpriteKey {
   return stored && CHARACTER_CHOICES.some((choice) => choice.key === stored) ? stored : 'nxr'
 }
 
-// Walk sheets can be legacy 4x4 grids or MappingCharacter 6x8 grids; nxr-v2 is a 16-frame horizontal strip.
-function spriteSheetGrid(sheet: SpriteSheet) {
-  const cols = sheet.cols ?? (sheet.src.includes('/characters/walk/') ? 4 : sheet.frames)
-  const rows = Math.max(1, Math.ceil(sheet.frames / cols))
-  return { cols, rows }
+function spritePreviewUrl(sheet: SpriteSheet) {
+  const filename = sheet.src.split('/').pop() ?? 'nxr-v2.png'
+  return spriteAssetUrl(`/temple-play/characters/preview/${filename}`)
 }
 
-// CSS background props that show exactly one frame of a sheet (grid-aware).
-function spritePreviewStyle(sheet: SpriteSheet, frame = 0) {
-  const { cols, rows } = spriteSheetGrid(sheet)
-  const col = frame % cols
-  const row = Math.floor(frame / cols)
+// Preview UI must use tiny thumbnails, not full sprite sheets. The regression
+// started when small portraits sampled 840x1120/576x768 sheets as CSS backgrounds.
+function spritePreviewStyle(sheet: SpriteSheet) {
   return {
-    backgroundImage: `url(${spriteAssetUrl(sheet.src)})`,
-    backgroundSize: `${cols * 100}% ${rows * 100}%`,
-    backgroundPosition: `${cols > 1 ? (col / (cols - 1)) * 100 : 0}% ${rows > 1 ? (row / (rows - 1)) * 100 : 0}%`,
+    backgroundImage: `url(${spritePreviewUrl(sheet)})`,
+    backgroundPosition: 'center bottom',
+    backgroundRepeat: 'no-repeat',
+    backgroundSize: 'contain',
   }
 }
 
@@ -1962,7 +1960,6 @@ function QuizOverlay({
   onClaim: () => void
 }) {
   const portrait = SPRITES[quest.sprite]
-  const portraitFrame = 0 // row 0 = facing down/camera on 4x4 walk sheets
   const currentQuestionIndex = Math.min(answeredCount, quest.questions.length - 1)
   const currentQuestion = quest.questions[currentQuestionIndex]
   const selectedAnswer = answers[currentQuestionIndex]
@@ -1979,7 +1976,7 @@ function QuizOverlay({
           <div className="temple-play-npc-portrait" style={{ '--npc': quest.color, '--npc-accent': quest.accent } as CSSProperties}>
             <span
               className="temple-play-npc-sprite"
-              style={spritePreviewStyle(portrait, portraitFrame)}
+              style={spritePreviewStyle(portrait)}
             />
           </div>
           <div>
@@ -2257,16 +2254,41 @@ async function loadTemplePlayAssets(initialSprite: SpriteKey): Promise<TemplePla
   return assets
 }
 
+let activeSpriteFrameLoads = 0
+const spriteFrameLoadQueue: Array<() => void> = []
+
+function pumpSpriteFrameLoadQueue() {
+  while (activeSpriteFrameLoads < MAX_ACTIVE_SPRITE_FRAME_LOADS) {
+    const next = spriteFrameLoadQueue.shift()
+    if (!next) return
+    activeSpriteFrameLoads += 1
+    next()
+  }
+}
+
+function enqueueSpriteFrameLoad(task: () => Promise<void>) {
+  return new Promise<void>((resolve, reject) => {
+    spriteFrameLoadQueue.push(() => {
+      task()
+        .then(resolve, reject)
+        .finally(() => {
+          activeSpriteFrameLoads = Math.max(0, activeSpriteFrameLoads - 1)
+          pumpSpriteFrameLoadQueue()
+        })
+    })
+    pumpSpriteFrameLoadQueue()
+  })
+}
+
 function ensureSpriteFrames(assets: TemplePlayAssets, sprite: SpriteKey) {
   if (assets.sprites[sprite]) return Promise.resolve()
   if (assets.spritePromises[sprite]) return assets.spritePromises[sprite]
-  const promise = loadSpriteFrameSet(SPRITES[sprite])
-    .then((frames) => {
+  const promise = enqueueSpriteFrameLoad(async () => {
+    const frames = await loadSpriteFrameSet(SPRITES[sprite])
       assets.sprites[sprite] = frames
-    })
-    .catch(() => {
-      delete assets.spritePromises[sprite]
-    })
+  }).catch(() => {
+    delete assets.spritePromises[sprite]
+  })
   assets.spritePromises[sprite] = promise
   return promise
 }
@@ -2299,6 +2321,7 @@ async function loadSpriteFrameSet(sheet: SpriteSheet): Promise<SpriteFrameSet> {
     frames.push(canvas)
   }
 
+  image.src = ''
   return { frames }
 }
 
