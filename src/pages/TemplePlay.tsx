@@ -2499,30 +2499,6 @@ function removeSpriteArtifactPixels(context: CanvasRenderingContext2D, width: nu
   context.putImageData(imageData, 0, 0)
 }
 
-function alignSpriteFrameToGround(context: CanvasRenderingContext2D, width: number, height: number) {
-  const imageData = context.getImageData(0, 0, width, height)
-  const bounds = spriteCanvasBounds(imageData, width, height)
-  if (!bounds) return
-  const shiftY = height - bounds.bottom
-  if (shiftY <= 0) return
-
-  const shifted = context.createImageData(width, height)
-  for (let y = 0; y < height; y++) {
-    const destY = y + shiftY
-    if (destY < 0 || destY >= height) continue
-    for (let x = 0; x < width; x++) {
-      const sourceIndex = (y * width + x) * 4
-      const destIndex = (destY * width + x) * 4
-      shifted.data[destIndex] = imageData.data[sourceIndex]
-      shifted.data[destIndex + 1] = imageData.data[sourceIndex + 1]
-      shifted.data[destIndex + 2] = imageData.data[sourceIndex + 2]
-      shifted.data[destIndex + 3] = imageData.data[sourceIndex + 3]
-    }
-  }
-
-  context.putImageData(shifted, 0, 0)
-}
-
 function spriteCanvasBounds(imageData: ImageData, width: number, height: number) {
   let left = width
   let top = height
