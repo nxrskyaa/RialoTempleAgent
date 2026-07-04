@@ -150,7 +150,7 @@ const PLAYER_SPEED = 245
 const DESKTOP_CAMERA_ZOOM = 0.78
 const TABLET_CAMERA_ZOOM = 0.68
 const MOBILE_CAMERA_ZOOM = 0.52
-const TEMPLE_PLAY_SPRITE_VERSION = '20260704-source-normalized-v5'
+const TEMPLE_PLAY_SPRITE_VERSION = '20260704-runtime-normalized-v7'
 const MAX_ACTIVE_SPRITE_FRAME_LOADS = 2
 const RIALO_SIGN_INTERACT = { x: 928, y: 860 }
 const RIALO_SIGN_PROFILE_URL = 'https://x.com/nxrskyaa'
@@ -163,6 +163,8 @@ type SpriteSheet = {
   drawW: number
   drawH: number
   cols?: number
+  flipRight?: boolean
+  flipLeft?: boolean
 }
 
 type SpriteFrameSet = {
@@ -234,38 +236,38 @@ const mappedNpc = (src: string, drawW = 58, drawH = 82): SpriteSheet => ({
 const SPRITES: Record<SpriteKey, SpriteSheet> = {
   nxr: { src: '/temple-play/sprites/nxr-v2.png', frameW: 210, frameH: 280, frames: 16, cols: 16, drawW: 58, drawH: 82 },
   npcOracle: { src: '/temple-play/characters/walk/vika-joestar.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
-  npcForestGuide: { src: '/temple-play/characters/walk/ade.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcForestGuide: { src: '/temple-play/characters/walk/ade.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82, flipRight: true },
   npcBuilder: { src: '/temple-play/characters/walk/barong.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
   npcCaptain: { src: '/temple-play/characters/walk/eric-argent.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
-  npcShadowAgent: { src: '/temple-play/characters/walk/rollins.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcShadowAgent: { src: '/temple-play/characters/walk/rollins.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82, flipRight: true },
   npcSage: { src: '/temple-play/characters/walk/pinkeu.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
   npcHerbalist: { src: '/temple-play/characters/walk/blond.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
-  npcAlchemist: { src: '/temple-play/characters/walk/dikzzy.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcAlchemist: { src: '/temple-play/characters/walk/dikzzy.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82, flipLeft: true },
   npcKGufran: mappedNpc('/temple-play/characters/walk/k-gufran.png'),
   npcRikky: mappedNpc('/temple-play/characters/walk/rikky.png'),
-  npcVibevortex: { src: '/temple-play/characters/walk/vibevortex.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
-  npcWisnu: { src: '/temple-play/characters/walk/wisnu.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcVibevortex: { src: '/temple-play/characters/walk/vibevortex.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82, flipRight: true },
+  npcWisnu: { src: '/temple-play/characters/walk/wisnu.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82, flipRight: true },
   npcRaka: { src: '/temple-play/characters/walk/raka.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
   npcJepanya: { src: '/temple-play/characters/walk/jepanya.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
   npcAqc: mappedNpc('/temple-play/characters/walk/aqc.png'),
   npcDp: { src: '/temple-play/characters/walk/dp.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
-  npcIshu: { src: '/temple-play/characters/walk/ishu.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcIshu: { src: '/temple-play/characters/walk/ishu.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82, flipRight: true, flipLeft: true },
   npcJeams: mappedNpc('/temple-play/characters/walk/jeams.png'),
   npcKoushik: mappedNpc('/temple-play/characters/walk/koushik.png'),
   npcKingJ: mappedNpc('/temple-play/characters/walk/kingj.png'),
   npcRichard12: { src: '/temple-play/characters/walk/richard12.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
   npcLuka: { src: '/temple-play/characters/walk/luka.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
-  npcSilverwave: { src: '/temple-play/characters/walk/silverwave.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcSilverwave: { src: '/temple-play/characters/walk/silverwave.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82, flipRight: true, flipLeft: true },
   npcSuleyman: mappedNpc('/temple-play/characters/walk/suleyman.png'),
   npcYozi: mappedNpc('/temple-play/characters/walk/yozi.png'),
   npcDora: mappedNpc('/temple-play/characters/walk/dora.png'),
-  npcDarma: { src: '/temple-play/characters/walk/darma.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcDarma: { src: '/temple-play/characters/walk/darma.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82, flipRight: true, flipLeft: true },
   npcFlippedFace: mappedNpc('/temple-play/characters/walk/flippedface.png'),
-  npcEcelannister: { src: '/temple-play/characters/walk/ecelannister.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
-  npcAli: { src: '/temple-play/characters/walk/ali.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcEcelannister: { src: '/temple-play/characters/walk/ecelannister.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82, flipRight: true },
+  npcAli: { src: '/temple-play/characters/walk/ali.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82, flipRight: true, flipLeft: true },
   npcLongLife: mappedNpc('/temple-play/characters/walk/longlife.png'),
-  npcBjoestar: { src: '/temple-play/characters/walk/bjoestar.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
-  npcKeep: { src: '/temple-play/characters/walk/keep.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcBjoestar: { src: '/temple-play/characters/walk/bjoestar.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82, flipRight: true, flipLeft: true },
+  npcKeep: { src: '/temple-play/characters/walk/keep.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82, flipRight: true, flipLeft: true },
   npcSukanto: mappedNpc('/temple-play/characters/walk/sukanto.png'),
   npcElias: mappedNpc('/temple-play/characters/walk/elias.png'),
   npcSza: mappedNpc('/temple-play/characters/walk/sza.png'),
@@ -2308,16 +2310,16 @@ function ensureSpriteFrames(assets: TemplePlayAssets, sprite: SpriteKey) {
 async function loadSpriteFrameSet(sheet: SpriteSheet): Promise<SpriteFrameSet> {
   const image = await loadImage(spriteAssetUrl(sheet.src))
   const cols = sheet.cols ?? Math.max(1, Math.floor(image.width / sheet.frameW))
-  const frames: HTMLCanvasElement[] = []
+  const rawFrames: Array<{ canvas: HTMLCanvasElement; bounds: ReturnType<typeof spriteCanvasBounds> }> = []
 
   for (let frame = 0; frame < sheet.frames; frame++) {
-    const canvas = document.createElement('canvas')
-    canvas.width = sheet.drawW
-    canvas.height = sheet.drawH
-    const context = canvas.getContext('2d', { willReadFrequently: true })
+    const rawCanvas = document.createElement('canvas')
+    rawCanvas.width = sheet.frameW
+    rawCanvas.height = sheet.frameH
+    const context = rawCanvas.getContext('2d', { willReadFrequently: true })
     if (context) {
       context.imageSmoothingEnabled = false
-      context.clearRect(0, 0, sheet.drawW, sheet.drawH)
+      context.clearRect(0, 0, sheet.frameW, sheet.frameH)
       context.drawImage(
         image,
         (frame % cols) * sheet.frameW,
@@ -2326,14 +2328,50 @@ async function loadSpriteFrameSet(sheet: SpriteSheet): Promise<SpriteFrameSet> {
         sheet.frameH,
         0,
         0,
-        sheet.drawW,
-        sheet.drawH,
+        sheet.frameW,
+        sheet.frameH,
       )
-      clearSpriteBackgroundPixels(context, sheet.drawW, sheet.drawH)
-      alignSpriteFrameToGround(context, sheet.drawW, sheet.drawH)
+      clearSpriteBackgroundPixels(context, sheet.frameW, sheet.frameH)
+      removeSpriteArtifactPixels(context, sheet.frameW, sheet.frameH)
+      rawFrames.push({
+        canvas: rawCanvas,
+        bounds: spriteCanvasBounds(context.getImageData(0, 0, sheet.frameW, sheet.frameH), sheet.frameW, sheet.frameH),
+      })
+    } else {
+      rawFrames.push({ canvas: rawCanvas, bounds: null })
     }
-    frames.push(canvas)
   }
+
+  const frameBounds = rawFrames.map((frame) => frame.bounds).filter((bounds): bounds is NonNullable<typeof bounds> => Boolean(bounds))
+  const maxFrameWidth = Math.max(1, ...frameBounds.map((bounds) => bounds.right - bounds.left))
+  const maxFrameHeight = Math.max(1, ...frameBounds.map((bounds) => bounds.bottom - bounds.top))
+  const sharedScale = Math.min(sheet.drawW / maxFrameWidth, sheet.drawH / maxFrameHeight, 1)
+  const frames: HTMLCanvasElement[] = rawFrames.map(({ canvas: rawCanvas, bounds }) => {
+    const canvas = document.createElement('canvas')
+    canvas.width = sheet.drawW
+    canvas.height = sheet.drawH
+    const context = canvas.getContext('2d', { willReadFrequently: true })
+    if (context && bounds) {
+      context.imageSmoothingEnabled = false
+      context.clearRect(0, 0, sheet.drawW, sheet.drawH)
+      const sourceWidth = bounds.right - bounds.left
+      const sourceHeight = bounds.bottom - bounds.top
+      const drawWidth = Math.max(1, Math.round(sourceWidth * sharedScale))
+      const drawHeight = Math.max(1, Math.round(sourceHeight * sharedScale))
+      context.drawImage(
+        rawCanvas,
+        bounds.left,
+        bounds.top,
+        sourceWidth,
+        sourceHeight,
+        Math.round((sheet.drawW - drawWidth) / 2),
+        Math.round(sheet.drawH - drawHeight),
+        drawWidth,
+        drawHeight,
+      )
+    }
+    return canvas
+  })
 
   image.src = ''
   return { frames }
@@ -2342,17 +2380,122 @@ async function loadSpriteFrameSet(sheet: SpriteSheet): Promise<SpriteFrameSet> {
 function clearSpriteBackgroundPixels(context: CanvasRenderingContext2D, width: number, height: number) {
   const imageData = context.getImageData(0, 0, width, height)
   const data = imageData.data
-  for (let index = 0; index < data.length; index += 4) {
-    const red = data[index]
-    const green = data[index + 1]
-    const blue = data[index + 2]
-    const alpha = data[index + 3]
-    const hotPinkMatte = red > 185 && blue > 150 && green < 105
-    const palePinkMatte = red > 215 && blue > 190 && green < 175 && red - green > 45
-    if (alpha < 8 || hotPinkMatte || palePinkMatte) {
-      data[index + 3] = 0
+  const visited = new Uint8Array(width * height)
+  const stack: number[] = []
+
+  for (let x = 0; x < width; x++) {
+    stack.push(x, (height - 1) * width + x)
+  }
+  for (let y = 0; y < height; y++) {
+    stack.push(y * width, y * width + width - 1)
+  }
+
+  while (stack.length > 0) {
+    const point = stack.pop()
+    if (point === undefined || visited[point]) continue
+    visited[point] = 1
+    const index = point * 4
+    if (!isSpriteBackgroundPixel(data[index], data[index + 1], data[index + 2], data[index + 3])) continue
+
+    data[index + 3] = 0
+    const x = point % width
+    const y = Math.floor(point / width)
+    if (x > 0) stack.push(point - 1)
+    if (x < width - 1) stack.push(point + 1)
+    if (y > 0) stack.push(point - width)
+    if (y < height - 1) stack.push(point + width)
+  }
+
+  context.putImageData(imageData, 0, 0)
+}
+
+function isSpriteBackgroundPixel(red: number, green: number, blue: number, alpha: number) {
+  if (alpha < 8) return true
+  const hotPinkMatte = red > 175 && blue > 160 && green < 120
+  const brightChecker = red > 218 && green > 218 && blue > 218 && Math.max(red, green, blue) - Math.min(red, green, blue) < 38
+  const grayChecker = red > 198 && green > 198 && blue > 198 && Math.max(red, green, blue) - Math.min(red, green, blue) < 18
+  return hotPinkMatte || brightChecker || grayChecker
+}
+
+function removeSpriteArtifactPixels(context: CanvasRenderingContext2D, width: number, height: number) {
+  const imageData = context.getImageData(0, 0, width, height)
+  const data = imageData.data
+  const visited = new Uint8Array(width * height)
+  type Component = {
+    points: number[]
+    left: number
+    right: number
+    top: number
+    bottom: number
+  }
+  const components: Component[] = []
+
+  for (let start = 0; start < width * height; start++) {
+    if (visited[start] || data[start * 4 + 3] <= 12) continue
+    const stack = [start]
+    const points: number[] = []
+    visited[start] = 1
+    let left = width
+    let right = -1
+    let top = height
+    let bottom = -1
+
+    while (stack.length > 0) {
+      const point = stack.pop()
+      if (point === undefined) continue
+      points.push(point)
+      const x = point % width
+      const y = Math.floor(point / width)
+      if (x < left) left = x
+      if (x > right) right = x
+      if (y < top) top = y
+      if (y > bottom) bottom = y
+
+      const neighbors = [point - 1, point + 1, point - width, point + width]
+      for (const next of neighbors) {
+        if (next < 0 || next >= width * height || visited[next]) continue
+        const nx = next % width
+        if ((next === point - 1 && nx === width - 1) || (next === point + 1 && nx === 0)) continue
+        if (data[next * 4 + 3] <= 12) continue
+        visited[next] = 1
+        stack.push(next)
+      }
+    }
+
+    components.push({ points, left, right, top, bottom })
+  }
+
+  if (components.length === 0) {
+    context.putImageData(imageData, 0, 0)
+    return
+  }
+
+  const main = components.reduce((largest, component) => (component.points.length > largest.points.length ? component : largest), components[0])
+  const mainHeight = Math.max(1, main.bottom - main.top + 1)
+  const mainWidth = Math.max(1, main.right - main.left + 1)
+
+  for (const component of components) {
+    if (component === main) continue
+    const componentWidth = component.right - component.left + 1
+    const componentHeight = component.bottom - component.top + 1
+    const touchesEdge = component.left <= 1 || component.top <= 1 || component.right >= width - 2 || component.bottom >= height - 2
+    const tinySpeck = component.points.length <= 14
+    const edgeScratch = touchesEdge && component.points.length <= 160 && (componentWidth <= 4 || componentHeight <= 4)
+    const separatedAbove = component.bottom < main.top - 4 && component.points.length < main.points.length * 0.55
+    const topRowBleed =
+      component.top <= 2 &&
+      component.bottom < main.top + mainHeight * 0.35 &&
+      component.points.length < main.points.length * 0.7
+    const sideBleed =
+      touchesEdge &&
+      component.points.length < main.points.length * 0.25 &&
+      (componentWidth > mainWidth * 0.65 || componentHeight > mainHeight * 0.55)
+
+    if (tinySpeck || edgeScratch || separatedAbove || topRowBleed || sideBleed) {
+      for (const point of component.points) data[point * 4 + 3] = 0
     }
   }
+
   context.putImageData(imageData, 0, 0)
 }
 
@@ -3842,7 +3985,8 @@ function chooseSpriteFrame(sheet: SpriteSheet, time: number, seed: number, movin
 }
 
 function shouldFlipSprite(_sprite: SpriteKey, _sheet: SpriteSheet, _direction: PlayerState['dir']) {
-  // All sheets now ship dedicated left AND right rows — no mirroring needed.
+  if (_direction === 'right' && _sheet.flipRight) return true
+  if (_direction === 'left' && _sheet.flipLeft) return true
   return false
 }
 
