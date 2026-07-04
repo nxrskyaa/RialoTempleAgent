@@ -150,7 +150,7 @@ const PLAYER_SPEED = 245
 const DESKTOP_CAMERA_ZOOM = 0.78
 const TABLET_CAMERA_ZOOM = 0.68
 const MOBILE_CAMERA_ZOOM = 0.52
-const TEMPLE_PLAY_SPRITE_VERSION = '20260704-runtime-normalized-v7'
+const TEMPLE_PLAY_SPRITE_VERSION = '20260704-unified-sprite-grid-v1'
 const MAX_ACTIVE_SPRITE_FRAME_LOADS = 2
 const RIALO_SIGN_INTERACT = { x: 928, y: 860 }
 const RIALO_SIGN_PROFILE_URL = 'https://x.com/nxrskyaa'
@@ -163,8 +163,6 @@ type SpriteSheet = {
   drawW: number
   drawH: number
   cols?: number
-  flipRight?: boolean
-  flipLeft?: boolean
 }
 
 type SpriteFrameSet = {
@@ -234,44 +232,44 @@ const mappedNpc = (src: string, drawW = 58, drawH = 82): SpriteSheet => ({
 })
 
 const SPRITES: Record<SpriteKey, SpriteSheet> = {
-  nxr: { src: '/temple-play/sprites/nxr-v2.png', frameW: 210, frameH: 280, frames: 16, cols: 16, drawW: 58, drawH: 82 },
-  npcOracle: { src: '/temple-play/characters/walk/vika-joestar.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
-  npcForestGuide: { src: '/temple-play/characters/walk/ade.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82, flipRight: true },
-  npcBuilder: { src: '/temple-play/characters/walk/barong.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
-  npcCaptain: { src: '/temple-play/characters/walk/eric-argent.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
-  npcShadowAgent: { src: '/temple-play/characters/walk/rollins.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82, flipRight: true },
-  npcSage: { src: '/temple-play/characters/walk/pinkeu.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
-  npcHerbalist: { src: '/temple-play/characters/walk/blond.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
-  npcAlchemist: { src: '/temple-play/characters/walk/dikzzy.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82, flipLeft: true },
+  nxr: mappedNpc('/temple-play/characters/walk/nxr.png'),
+  npcOracle: mappedNpc('/temple-play/characters/walk/vika-joestar.png'),
+  npcForestGuide: mappedNpc('/temple-play/characters/walk/ade.png'),
+  npcBuilder: mappedNpc('/temple-play/characters/walk/barong.png'),
+  npcCaptain: mappedNpc('/temple-play/characters/walk/eric-argent.png'),
+  npcShadowAgent: mappedNpc('/temple-play/characters/walk/rollins.png'),
+  npcSage: mappedNpc('/temple-play/characters/walk/pinkeu.png'),
+  npcHerbalist: mappedNpc('/temple-play/characters/walk/blond.png'),
+  npcAlchemist: mappedNpc('/temple-play/characters/walk/dikzzy.png'),
   npcKGufran: mappedNpc('/temple-play/characters/walk/k-gufran.png'),
   npcRikky: mappedNpc('/temple-play/characters/walk/rikky.png'),
-  npcVibevortex: { src: '/temple-play/characters/walk/vibevortex.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82, flipRight: true },
-  npcWisnu: { src: '/temple-play/characters/walk/wisnu.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82, flipRight: true },
-  npcRaka: { src: '/temple-play/characters/walk/raka.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
-  npcJepanya: { src: '/temple-play/characters/walk/jepanya.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
+  npcVibevortex: mappedNpc('/temple-play/characters/walk/vibevortex.png'),
+  npcWisnu: mappedNpc('/temple-play/characters/walk/wisnu.png'),
+  npcRaka: mappedNpc('/temple-play/characters/walk/raka.png'),
+  npcJepanya: mappedNpc('/temple-play/characters/walk/jepanya.png'),
   npcAqc: mappedNpc('/temple-play/characters/walk/aqc.png'),
-  npcDp: { src: '/temple-play/characters/walk/dp.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
-  npcIshu: { src: '/temple-play/characters/walk/ishu.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82, flipRight: true, flipLeft: true },
+  npcDp: mappedNpc('/temple-play/characters/walk/dp.png'),
+  npcIshu: mappedNpc('/temple-play/characters/walk/ishu.png'),
   npcJeams: mappedNpc('/temple-play/characters/walk/jeams.png'),
   npcKoushik: mappedNpc('/temple-play/characters/walk/koushik.png'),
   npcKingJ: mappedNpc('/temple-play/characters/walk/kingj.png'),
-  npcRichard12: { src: '/temple-play/characters/walk/richard12.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
-  npcLuka: { src: '/temple-play/characters/walk/luka.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82 },
-  npcSilverwave: { src: '/temple-play/characters/walk/silverwave.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82, flipRight: true, flipLeft: true },
+  npcRichard12: mappedNpc('/temple-play/characters/walk/richard12.png'),
+  npcLuka: mappedNpc('/temple-play/characters/walk/luka.png'),
+  npcSilverwave: mappedNpc('/temple-play/characters/walk/silverwave.png'),
   npcSuleyman: mappedNpc('/temple-play/characters/walk/suleyman.png'),
   npcYozi: mappedNpc('/temple-play/characters/walk/yozi.png'),
   npcDora: mappedNpc('/temple-play/characters/walk/dora.png'),
-  npcDarma: { src: '/temple-play/characters/walk/darma.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82, flipRight: true, flipLeft: true },
+  npcDarma: mappedNpc('/temple-play/characters/walk/darma.png'),
   npcFlippedFace: mappedNpc('/temple-play/characters/walk/flippedface.png'),
-  npcEcelannister: { src: '/temple-play/characters/walk/ecelannister.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82, flipRight: true },
-  npcAli: { src: '/temple-play/characters/walk/ali.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82, flipRight: true, flipLeft: true },
+  npcEcelannister: mappedNpc('/temple-play/characters/walk/ecelannister.png'),
+  npcAli: mappedNpc('/temple-play/characters/walk/ali.png'),
   npcLongLife: mappedNpc('/temple-play/characters/walk/longlife.png'),
-  npcBjoestar: { src: '/temple-play/characters/walk/bjoestar.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82, flipRight: true, flipLeft: true },
-  npcKeep: { src: '/temple-play/characters/walk/keep.png', frameW: 210, frameH: 280, frames: 16, drawW: 58, drawH: 82, flipRight: true, flipLeft: true },
+  npcBjoestar: mappedNpc('/temple-play/characters/walk/bjoestar.png'),
+  npcKeep: mappedNpc('/temple-play/characters/walk/keep.png'),
   npcSukanto: mappedNpc('/temple-play/characters/walk/sukanto.png'),
   npcElias: mappedNpc('/temple-play/characters/walk/elias.png'),
   npcSza: mappedNpc('/temple-play/characters/walk/sza.png'),
-  npcSpider: mappedNpc('/temple-play/characters/walk/spider.png', 48, 62),
+  npcSpider: mappedNpc('/temple-play/characters/walk/spider.png'),
   npcGoat: mappedNpc('/temple-play/characters/walk/goat.png'),
   npcCryptondo: mappedNpc('/temple-play/characters/walk/cryptondo.png'),
   npcLuzzy: mappedNpc('/temple-play/characters/walk/luzzy.png'),
@@ -363,7 +361,7 @@ function initialPlayerSprite(): SpriteKey {
 }
 
 function spritePreviewUrl(sheet: SpriteSheet) {
-  const filename = sheet.src.split('/').pop() ?? 'nxr-v2.png'
+  const filename = sheet.src.split('/').pop() ?? 'nxr.png'
   return spriteAssetUrl(`/temple-play/characters/preview/${filename}`)
 }
 
@@ -3961,8 +3959,6 @@ function chooseSpriteFrame(sheet: SpriteSheet, time: number, seed: number, movin
 }
 
 function shouldFlipSprite(_sprite: SpriteKey, _sheet: SpriteSheet, _direction: PlayerState['dir']) {
-  if (_direction === 'right' && _sheet.flipRight) return true
-  if (_direction === 'left' && _sheet.flipLeft) return true
   return false
 }
 
