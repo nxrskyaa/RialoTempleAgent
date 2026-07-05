@@ -2839,6 +2839,216 @@
     padding: 0 8px 8px;
   }
 
+  .temple-play-pets-dock {
+    position: absolute;
+    right: 12px;
+    top: 132px;
+    z-index: 5;
+    width: min(248px, calc(100% - 24px));
+    border: 2px solid rgba(120, 236, 255, 0.4);
+    border-radius: 13px;
+    background: rgba(5, 8, 7, 0.72);
+    box-shadow: 0 12px 26px rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(10px);
+  }
+
+  .temple-play-pets-dock summary {
+    display: flex;
+    cursor: pointer;
+    list-style: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 10px;
+    color: var(--temple-muted);
+    font-size: 10px;
+    font-weight: 950;
+    text-transform: uppercase;
+  }
+
+  .temple-play-pets-dock summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .temple-play-pets-dock summary strong {
+    color: #78ecff;
+    font-size: 10px;
+  }
+
+  .temple-play-pets-body {
+    max-height: 300px;
+    overflow: auto;
+    padding: 4px 10px 10px;
+  }
+
+  .temple-play-pets-stats {
+    margin-bottom: 8px;
+    color: var(--temple-gold);
+    font-size: 10px;
+    font-weight: 950;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .temple-play-pets-empty,
+  .temple-play-pets-hint {
+    color: var(--temple-muted);
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.5;
+  }
+
+  .temple-play-pets-hint {
+    margin-top: 8px;
+  }
+
+  .temple-play-pets-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+
+  .temple-play-pets-grid button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    border: 2px solid rgba(245, 239, 218, 0.12);
+    border-radius: 8px;
+    background: rgba(245, 239, 218, 0.06);
+    color: var(--temple-muted);
+    padding: 6px 4px;
+    font-size: 9px;
+    font-weight: 950;
+    transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+  }
+
+  .temple-play-pets-grid button:hover {
+    transform: translateY(-1px);
+    border-color: var(--rarity, rgba(242, 200, 102, 0.58));
+  }
+
+  .temple-play-pets-grid button.is-selected {
+    border-color: var(--rarity, #f2c866);
+    background: rgba(120, 236, 255, 0.12);
+    color: var(--temple-text);
+  }
+
+  .temple-play-pets-grid button img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    image-rendering: pixelated;
+  }
+
+  .temple-play-pets-grid button small {
+    color: var(--rarity, var(--temple-muted));
+    font-size: 8px;
+    text-transform: uppercase;
+  }
+
+  .temple-play-fish-panel .temple-play-fish-sprite {
+    display: grid;
+    place-items: center;
+    width: 84px;
+    height: 84px;
+    flex: none;
+    border: 2px solid rgba(120, 236, 255, 0.4);
+    border-radius: 12px;
+    background: rgba(20, 46, 60, 0.65);
+  }
+
+  .temple-play-fish-sprite img {
+    width: 68px;
+    image-rendering: pixelated;
+  }
+
+  .temple-play-rarity-stars {
+    letter-spacing: 0.12em;
+  }
+
+  .temple-play-gacha-chest {
+    width: 132px;
+    image-rendering: pixelated;
+    filter: drop-shadow(0 0 26px rgba(255, 233, 160, 0.55));
+  }
+
+  .temple-play-gacha-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: min(320px, calc(100% - 40px));
+    border: 3px solid var(--rarity, #f2c866);
+    border-radius: 16px;
+    background: rgba(5, 8, 7, 0.94);
+    box-shadow: 0 0 44px color-mix(in srgb, var(--rarity, #f2c866) 45%, transparent), 0 18px 36px rgba(0, 0, 0, 0.5);
+    padding: 22px 18px 18px;
+    text-align: center;
+  }
+
+  .temple-play-gacha-card img {
+    width: 108px;
+    image-rendering: pixelated;
+    filter: drop-shadow(0 6px 0 rgba(0, 0, 0, 0.3));
+  }
+
+  .temple-play-gacha-card strong {
+    color: var(--temple-text);
+    font-size: 19px;
+    font-weight: 950;
+  }
+
+  .temple-play-gacha-rarity {
+    color: var(--rarity, #f2c866);
+    font-size: 11px;
+    font-weight: 950;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+  }
+
+  .temple-play-gacha-line {
+    color: var(--temple-muted);
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.5;
+  }
+
+  .temple-play-gacha-card small {
+    color: var(--temple-gold);
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 1.5;
+  }
+
+  .temple-play-gacha-card button {
+    margin-top: 6px;
+    border: 2px solid var(--rarity, #f2c866);
+    border-radius: 10px;
+    background: rgba(242, 200, 102, 0.2);
+    color: var(--temple-text);
+    padding: 7px 22px;
+    font-size: 12px;
+    font-weight: 950;
+    text-transform: uppercase;
+  }
+
+  .temple-play-gacha-new {
+    position: absolute;
+    top: -12px;
+    right: -10px;
+    rotate: 8deg;
+    border: 2px solid #07100c;
+    border-radius: 8px;
+    background: #ff7ad9;
+    color: #07100c;
+    padding: 3px 8px;
+    font-size: 11px;
+    font-weight: 950;
+    letter-spacing: 0.08em;
+  }
+
   .temple-play-audio-control {
     position: absolute;
     bottom: 14px;

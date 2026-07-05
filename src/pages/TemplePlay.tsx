@@ -155,6 +155,100 @@ const MAX_ACTIVE_SPRITE_FRAME_LOADS = 2
 const RIALO_SIGN_INTERACT = { x: 928, y: 860 }
 const RIALO_SIGN_PROFILE_URL = 'https://x.com/nxrskyaa'
 
+// --- Minigames: fishing pond + chest gacha pets (local-only simulation) ---
+const FISHING_SPOT = { x: 448, y: 968 }
+const FISHING_BOBBER = { x: 372, y: 972 }
+
+type MinigameRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'
+
+const RARITY_META: Record<MinigameRarity, { label: string; color: string; stars: number }> = {
+  common: { label: 'Common', color: '#9fb2a4', stars: 1 },
+  uncommon: { label: 'Uncommon', color: '#57e39f', stars: 2 },
+  rare: { label: 'Rare', color: '#78ecff', stars: 3 },
+  epic: { label: 'Epic', color: '#c886ff', stars: 4 },
+  legendary: { label: 'Legendary', color: '#f2c866', stars: 5 },
+}
+
+type FishSpecies = { id: string; name: string; rarity: MinigameRarity; weight: number; pts: number }
+
+const FISH_SPECIES: FishSpecies[] = [
+  { id: 'koi-merah', name: 'Koi Merah', rarity: 'common', weight: 20, pts: 10 },
+  { id: 'mujair-hijau', name: 'Mujair Hijau', rarity: 'common', weight: 20, pts: 10 },
+  { id: 'lele-biru', name: 'Lele Biru', rarity: 'common', weight: 18, pts: 12 },
+  { id: 'nila-emas', name: 'Nila Emas', rarity: 'uncommon', weight: 12, pts: 25 },
+  { id: 'gurame-ungu', name: 'Gurame Ungu', rarity: 'uncommon', weight: 11, pts: 25 },
+  { id: 'cupang-neon', name: 'Cupang Neon', rarity: 'rare', weight: 7, pts: 60 },
+  { id: 'arwana-perak', name: 'Arwana Perak', rarity: 'rare', weight: 6, pts: 70 },
+  { id: 'koi-naga', name: 'Koi Naga', rarity: 'epic', weight: 3.5, pts: 150 },
+  { id: 'ikan-bulan', name: 'Ikan Bulan', rarity: 'epic', weight: 2, pts: 180 },
+  { id: 'rialo-leviathan', name: 'Rialo Leviathan', rarity: 'legendary', weight: 0.5, pts: 500 },
+]
+
+type PetSpecies = { id: string; name: string; rarity: MinigameRarity; weight: number; line: string }
+
+const PET_SPECIES: PetSpecies[] = [
+  { id: 'emberpup', name: 'Emberpup', rarity: 'common', weight: 18, line: 'A warm little pup with a flame-tipped tail.' },
+  { id: 'sproutle', name: 'Sproutle', rarity: 'common', weight: 18, line: 'A mossy turtle sprouting a lucky leaf.' },
+  { id: 'puddlix', name: 'Puddlix', rarity: 'common', weight: 18, line: 'A cheerful axolotl that never dries out.' },
+  { id: 'peebolt', name: 'Peebolt', rarity: 'common', weight: 18, line: 'A zappy mouse that hums when signals arrive.' },
+  { id: 'rockling', name: 'Rockling', rarity: 'rare', weight: 7.5, line: 'A pocket golem grown from temple stone.' },
+  { id: 'wispy', name: 'Wispy', rarity: 'rare', weight: 7.5, line: 'A gentle lantern spirit from the shrine.' },
+  { id: 'frostbun', name: 'Frostbun', rarity: 'rare', weight: 7.5, line: 'A snow bunny with ears of clear ice.' },
+  { id: 'starcub', name: 'Starcub', rarity: 'epic', weight: 4, line: 'A night bear cub blessed by a falling star.' },
+  { id: 'emberdrake', name: 'Emberdrake', rarity: 'legendary', weight: 1.5, line: 'A mini drake said to guard the temple ledger.' },
+]
+
+function weightedPick<T extends { weight: number }>(items: T[]): T {
+  const total = items.reduce((sum, item) => sum + item.weight, 0)
+  let roll = Math.random() * total
+  for (const item of items) {
+    roll -= item.weight
+    if (roll <= 0) return item
+  }
+  return items[items.length - 1]
+}
+
+type FishingPhase = 'idle' | 'waiting' | 'bite' | 'result'
+
+// Module-level runtime (same pattern as npcRuntime below): mutated from the
+// canvas loop, poked by React via the small helper functions.
+const minigame = {
+  fishing: { phase: 'idle' as FishingPhase, timer: 0, splash: 0 },
+  fishingNear: false,
+  chest: null as { x: number; y: number; life: number } | null,
+  chestTimer: 18,
+  chestNear: false,
+  pet: { id: null as string | null, x: FISHING_SPOT.x, y: FISHING_SPOT.y, dir: 'down' as PlayerState['dir'], moving: false },
+}
+
+if (import.meta.env.DEV && typeof window !== 'undefined') {
+  // manual-testing hook: tweak timers/chest from the console in dev builds
+  ;(window as unknown as Record<string, unknown>).__templeMinigame = minigame
+}
+
+function startFishing() {
+  minigame.fishing.phase = 'waiting'
+  minigame.fishing.timer = 1.5 + Math.random() * 3
+  minigame.fishing.splash = 0
+}
+
+function stopFishing() {
+  minigame.fishing.phase = 'idle'
+}
+
+function collectChestDrop() {
+  if (!minigame.chest) return false
+  minigame.chest = null
+  minigame.chestTimer = 120 + Math.random() * 120
+  return true
+}
+
+function setActivePetFollower(id: string | null) {
+  if (minigame.pet.id !== id) {
+    minigame.pet.id = id
+  }
+}
+
 type SpriteSheet = {
   src: string
   frameW: number
@@ -174,6 +268,8 @@ type TemplePlayAssets = {
   spritePromises: Partial<Record<SpriteKey, Promise<void>>>
   spritePreviews: Partial<Record<SpriteKey, HTMLImageElement>>
   props: Record<PropKey, HTMLImageElement>
+  pets: Record<string, HTMLImageElement>
+  chest: HTMLImageElement[]
   loaded: boolean
 }
 
@@ -1312,6 +1408,36 @@ function TemplePlayInner() {
   const [nearNpcId, setNearNpcId] = useState<number | null>(null)
   const [nearAmbientIndex, setNearAmbientIndex] = useState<number | null>(null)
   const [nearSign, setNearSign] = useState(false)
+  const [nearFishing, setNearFishing] = useState(false)
+  const [nearChest, setNearChest] = useState(false)
+  const [fishPts, setFishPts] = useState(() => {
+    if (typeof window === 'undefined') return 0
+    return Number(localStorage.getItem('temple-fish-pts') ?? 0) || 0
+  })
+  const [fishLog, setFishLog] = useState<Record<string, number>>(() => {
+    if (typeof window === 'undefined') return {}
+    try {
+      return JSON.parse(localStorage.getItem('temple-fish-log') ?? '{}') as Record<string, number>
+    } catch {
+      return {}
+    }
+  })
+  const [catchResult, setCatchResult] = useState<FishSpecies | null>(null)
+  const [ownedPets, setOwnedPets] = useState<string[]>(() => {
+    if (typeof window === 'undefined') return []
+    try {
+      const stored = JSON.parse(localStorage.getItem('temple-pets') ?? '[]') as string[]
+      return stored.filter((id) => PET_SPECIES.some((pet) => pet.id === id))
+    } catch {
+      return []
+    }
+  })
+  const [activePet, setActivePetState] = useState<string | null>(() => {
+    if (typeof window === 'undefined') return null
+    return localStorage.getItem('temple-active-pet')
+  })
+  const [gachaResult, setGachaResult] = useState<{ pet: PetSpecies; isNew: boolean } | null>(null)
+  const ownedPetsRef = useRef<string[]>([])
   const [showGuide, setShowGuide] = useState(true)
   const [playerSprite, setPlayerSprite] = useState<SpriteKey>(() => initialPlayerSprite())
   const [toast, setToast] = useState('')
@@ -1478,6 +1604,54 @@ function TemplePlayInner() {
     setToast('')
   }, [])
 
+  useEffect(() => {
+    ownedPetsRef.current = ownedPets
+  }, [ownedPets])
+
+  useEffect(() => {
+    setActivePetFollower(activePet)
+  }, [activePet])
+
+  const addFishPts = useCallback((amount: number) => {
+    setFishPts((current) => {
+      const next = current + amount
+      localStorage.setItem('temple-fish-pts', String(next))
+      return next
+    })
+  }, [])
+
+  const handleFishingCatch = useCallback(() => {
+    const fish = weightedPick(FISH_SPECIES)
+    setCatchResult(fish)
+    addFishPts(fish.pts)
+    setFishLog((current) => {
+      const next = { ...current, [fish.id]: (current[fish.id] ?? 0) + 1 }
+      localStorage.setItem('temple-fish-log', JSON.stringify(next))
+      return next
+    })
+  }, [addFishPts])
+
+  const handleOpenChest = useCallback(() => {
+    const pet = weightedPick(PET_SPECIES)
+    const isNew = !ownedPetsRef.current.includes(pet.id)
+    if (isNew) {
+      const next = [...ownedPetsRef.current, pet.id]
+      ownedPetsRef.current = next
+      setOwnedPets(next)
+      localStorage.setItem('temple-pets', JSON.stringify(next))
+    } else {
+      addFishPts(50)
+    }
+    setGachaResult({ pet, isNew })
+  }, [addFishPts])
+
+  const chooseActivePet = useCallback((id: string | null) => {
+    playTempleSfx('tap')
+    setActivePetState(id)
+    if (id) localStorage.setItem('temple-active-pet', id)
+    else localStorage.removeItem('temple-active-pet')
+  }, [])
+
   function answer(questionIndex: number, optionIndex: number) {
     if (quizDone) return
     const correct = activeQuest?.questions[questionIndex]?.answer === optionIndex
@@ -1524,7 +1698,10 @@ function TemplePlayInner() {
 
   const nearestQuest = nearNpcId ? QUESTS.find((quest) => quest.id === nearNpcId) : null
   const nearestAmbientNpc = nearAmbientIndex !== null ? AMBIENT_NPCS[nearAmbientIndex] : null
-  const nearestSign = nearSign && !nearestQuest && !nearestAmbientNpc
+  // A chest drop is rare and time-limited, so it outranks ambient NPC talk.
+  const nearestChest = nearChest && !nearestQuest
+  const nearestSign = nearSign && !nearestQuest && !nearestAmbientNpc && !nearestChest
+  const nearestFishing = nearFishing && !nearestQuest && !nearestAmbientNpc && !nearestSign && !nearestChest
   const selectedCharacter = CHARACTER_CHOICES.find((choice) => choice.key === playerSprite) ?? CHARACTER_CHOICES[0]
 
   const chooseCharacter = useCallback((sprite: SpriteKey) => {
@@ -1559,9 +1736,13 @@ function TemplePlayInner() {
             onNearQuestChange={setNearNpcId}
             onNearAmbientChange={setNearAmbientIndex}
             onNearSignChange={setNearSign}
+            onNearFishingChange={setNearFishing}
+            onNearChestChange={setNearChest}
             onOpenQuest={(quest) => openQuestRef.current(quest)}
             onOpenAmbientTalk={openAmbientTalk}
             onOpenSignInfo={openSignInfo}
+            onFishingCatch={handleFishingCatch}
+            onOpenChest={handleOpenChest}
           />
 
           <div className="temple-play-audio-control">
@@ -1596,24 +1777,51 @@ function TemplePlayInner() {
           <CharacterPicker selected={playerSprite} selectedLabel={selectedCharacter.label} onSelect={chooseCharacter} />
 
           <div className="temple-play-miniquest">
-            <p>{nearestQuest || nearestAmbientNpc || nearestSign ? 'Interact now' : 'Next destination'}</p>
+            <p>{nearestQuest || nearestAmbientNpc || nearestSign || nearestChest || nearestFishing ? 'Interact now' : 'Next destination'}</p>
             <strong>
               {nearestQuest
                 ? `${nearestQuest.npc} / ${nearestQuest.zone}`
-                : nearestAmbientNpc
-                  ? `${nearestAmbientNpc.name} / ${nearestAmbientNpc.topic}`
-                  : nearestSign
-                    ? 'RialoSign / Temple Info'
+                : nearestChest
+                  ? 'Mystery Chest / Pet Gacha'
+                  : nearestAmbientNpc
+                    ? `${nearestAmbientNpc.name} / ${nearestAmbientNpc.topic}`
+                    : nearestSign
+                      ? 'RialoSign / Temple Info'
+                      : nearestFishing
+                        ? 'Fishing Pond / Cast a line'
                   : `${nextQuest.zone}`}
             </strong>
             <button
               type="button"
-              disabled={!nearestQuest && !nearestAmbientNpc && !nearestSign}
-              onClick={() => nearestQuest ? openQuest(nearestQuest) : nearestAmbientNpc ? openAmbientTalk(nearestAmbientNpc) : nearestSign && openSignInfo()}
+              disabled={!nearestQuest && !nearestAmbientNpc && !nearestSign && !nearestChest && !nearestFishing}
+              onClick={() => {
+                if (nearestQuest) return openQuest(nearestQuest)
+                if (nearestChest) {
+                  if (collectChestDrop()) {
+                    playTempleSfx('claim')
+                    handleOpenChest()
+                  }
+                  return
+                }
+                if (nearestAmbientNpc) return openAmbientTalk(nearestAmbientNpc)
+                if (nearestSign) return openSignInfo()
+                if (nearestFishing && minigame.fishing.phase === 'idle') {
+                  playTempleSfx('tap')
+                  startFishing()
+                }
+              }}
             >
-              {nearestQuest || nearestAmbientNpc ? 'Talk' : nearestSign ? 'Open Info' : 'Find NPC'}
+              {nearestChest ? 'Open Chest' : nearestQuest || nearestAmbientNpc ? 'Talk' : nearestSign ? 'Open Info' : nearestFishing ? 'Fish' : 'Find NPC'}
             </button>
           </div>
+
+          <PetsDock
+            owned={ownedPets}
+            active={activePet}
+            fishPts={fishPts}
+            speciesCount={Object.keys(fishLog).length}
+            onChoose={chooseActivePet}
+          />
 
           <AnimatePresence>
             {showGuide && !activeQuest && !activeTalkNpc && !activeSignInfo ? (
@@ -1654,6 +1862,30 @@ function TemplePlayInner() {
               <RialoSignPanel onClose={() => setActiveSignInfo(false)} />
             ) : null}
           </AnimatePresence>
+
+          <AnimatePresence>
+            {catchResult ? (
+              <FishingResultPanel
+                key={catchResult.id + fishPts}
+                fish={catchResult}
+                onCast={() => {
+                  playTempleSfx('tap')
+                  setCatchResult(null)
+                  startFishing()
+                }}
+                onDone={() => {
+                  setCatchResult(null)
+                  stopFishing()
+                }}
+              />
+            ) : null}
+          </AnimatePresence>
+
+          <AnimatePresence>
+            {gachaResult ? (
+              <ChestGachaOverlay result={gachaResult} onClose={() => setGachaResult(null)} />
+            ) : null}
+          </AnimatePresence>
         </div>
 
       </section>
@@ -1683,9 +1915,13 @@ function TemplePlayCanvas({
   onNearQuestChange,
   onNearAmbientChange,
   onNearSignChange,
+  onNearFishingChange,
+  onNearChestChange,
   onOpenQuest,
   onOpenAmbientTalk,
   onOpenSignInfo,
+  onFishingCatch,
+  onOpenChest,
 }: {
   completedIds: Set<number>
   nextQuest: QuestNpc
@@ -1693,9 +1929,13 @@ function TemplePlayCanvas({
   onNearQuestChange: (id: number | null) => void
   onNearAmbientChange: (index: number | null) => void
   onNearSignChange: (near: boolean) => void
+  onNearFishingChange: (near: boolean) => void
+  onNearChestChange: (near: boolean) => void
   onOpenQuest: (quest: QuestNpc) => void
   onOpenAmbientTalk: (npc: AmbientNpc) => void
   onOpenSignInfo: () => void
+  onFishingCatch: () => void
+  onOpenChest: () => void
 }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const wrapRef = useRef<HTMLDivElement | null>(null)
@@ -1704,9 +1944,11 @@ function TemplePlayCanvas({
   const nearId = useRef<number | null>(null)
   const nearAmbient = useRef<number | null>(null)
   const nearSignRef = useRef(false)
+  const nearFishingRef = useRef(false)
+  const nearChestRef = useRef(false)
   const completedLatest = useRef(completedIds)
   const assetsRef = useRef<TemplePlayAssets | null>(null)
-  const tapTarget = useRef<{ x: number; y: number; questId?: number; ambientIndex?: number; sign?: boolean } | null>(null)
+  const tapTarget = useRef<{ x: number; y: number; questId?: number; ambientIndex?: number; sign?: boolean; fishing?: boolean; chest?: boolean } | null>(null)
   const cameraRef = useRef({ x: 0, y: 0, zoom: DESKTOP_CAMERA_ZOOM })
   const canvasSizeRef = useRef({ width: 1, height: 1 })
 
@@ -1745,11 +1987,34 @@ function TemplePlayCanvas({
     function keyDown(event: KeyboardEvent) {
       const key = event.key.toLowerCase()
       keys.current.add(key)
+      if (key === 'escape' && minigame.fishing.phase !== 'idle' && minigame.fishing.phase !== 'result') {
+        stopFishing()
+        return
+      }
       if (key === 'e') {
+        const fishing = minigame.fishing
+        if (fishing.phase === 'bite') {
+          fishing.phase = 'result'
+          playTempleSfx('success')
+          onFishingCatch()
+          return
+        }
+        if (fishing.phase === 'waiting') {
+          // yanked too early — scare the fish, line settles again
+          fishing.splash = 0.8
+          fishing.timer = 1.6 + Math.random() * 3
+          playTempleSfx('tap')
+          return
+        }
         const quest = QUESTS.find((item) => item.id === nearId.current)
         if (quest) {
           playTempleSfx('talk')
           onOpenQuest(quest)
+          return
+        }
+        if (nearChestRef.current && collectChestDrop()) {
+          playTempleSfx('claim')
+          onOpenChest()
           return
         }
         if (nearAmbient.current !== null) {
@@ -1763,6 +2028,11 @@ function TemplePlayCanvas({
         if (nearSignRef.current) {
           playTempleSfx('talk')
           onOpenSignInfo()
+          return
+        }
+        if (nearFishingRef.current && fishing.phase === 'idle') {
+          playTempleSfx('tap')
+          startFishing()
         }
       }
     }
@@ -1797,12 +2067,14 @@ function TemplePlayCanvas({
       }
 
       updateAmbientNpcs(dt)
+      updateMinigames(dt, player.current)
 
       let input = movementFromInput(keys.current)
       const current = player.current
       const hasManualInput = Math.abs(input.x) > 0.01 || Math.abs(input.y) > 0.01
       if (hasManualInput) {
         tapTarget.current = null
+        if (minigame.fishing.phase === 'waiting' || minigame.fishing.phase === 'bite') stopFishing()
       } else if (tapTarget.current) {
         const dx = tapTarget.current.x - current.x
         const dy = tapTarget.current.y - current.y
@@ -1811,6 +2083,8 @@ function TemplePlayCanvas({
           const arrivedQuest = tapTarget.current.questId
           const arrivedAmbient = tapTarget.current.ambientIndex
           const arrivedSign = tapTarget.current.sign
+          const tapTargetArrivedFishing = tapTarget.current.fishing
+          const tapTargetArrivedChest = tapTarget.current.chest
           tapTarget.current = null
           input = { x: 0, y: 0 }
           if (arrivedQuest) {
@@ -1831,10 +2105,24 @@ function TemplePlayCanvas({
               playTempleSfx('talk')
               onOpenSignInfo()
             }
+          } else if (tapTargetArrivedFishing) {
+            if (Math.hypot(current.x - FISHING_SPOT.x, current.y - FISHING_SPOT.y) < 95 && minigame.fishing.phase === 'idle') {
+              playTempleSfx('tap')
+              startFishing()
+            }
+          } else if (tapTargetArrivedChest) {
+            if (minigame.chest && Math.hypot(current.x - minigame.chest.x, current.y - minigame.chest.y) < 100 && collectChestDrop()) {
+              playTempleSfx('claim')
+              onOpenChest()
+            }
           }
         } else {
           input = { x: dx / distance, y: dy / distance }
         }
+      }
+      if (minigame.fishing.phase === 'waiting' || minigame.fishing.phase === 'bite') {
+        input = { x: 0, y: 0 }
+        current.dir = FISHING_BOBBER.x < current.x ? 'left' : 'right'
       }
       current.moving = Math.abs(input.x) > 0.01 || Math.abs(input.y) > 0.01
       if (current.moving) {
@@ -1873,6 +2161,19 @@ function TemplePlayCanvas({
         nearSignRef.current = signClose
         onNearSignChange(signClose)
       }
+      const fishingDistance = Math.hypot(current.x - FISHING_SPOT.x, current.y - FISHING_SPOT.y)
+      const fishingClose = !nearId.current && (fishingDistance < 70 || (nearAmbient.current === null && fishingDistance < 95))
+      minigame.fishingNear = fishingClose
+      if (fishingClose !== nearFishingRef.current) {
+        nearFishingRef.current = fishingClose
+        onNearFishingChange(fishingClose)
+      }
+      const chestClose = Boolean(minigame.chest && Math.hypot(current.x - minigame.chest.x, current.y - minigame.chest.y) < 96)
+      minigame.chestNear = chestClose
+      if (chestClose !== nearChestRef.current) {
+        nearChestRef.current = chestClose
+        onNearChestChange(chestClose)
+      }
 
       const zoom = cameraZoom(rect.width)
       const viewport = { width: rect.width / zoom, height: rect.height / zoom }
@@ -1899,7 +2200,7 @@ function TemplePlayCanvas({
       window.removeEventListener('keydown', keyDown)
       window.removeEventListener('keyup', keyUp)
     }
-  }, [nextQuest, onNearQuestChange, onNearAmbientChange, onNearSignChange, onOpenQuest, onOpenAmbientTalk, onOpenSignInfo, playerSprite])
+  }, [nextQuest, onNearQuestChange, onNearAmbientChange, onNearSignChange, onNearFishingChange, onNearChestChange, onOpenQuest, onOpenAmbientTalk, onOpenSignInfo, onFishingCatch, onOpenChest, playerSprite])
 
   return (
     <div ref={wrapRef} className="temple-play-canvas-wrap">
@@ -1914,18 +2215,49 @@ function TemplePlayCanvas({
             x: clamp((event.clientX - rect.left) / camera.zoom + camera.x, 90, WORLD.width - 90),
             y: clamp((event.clientY - rect.top) / camera.zoom + camera.y, 90, WORLD.height - 90),
           }
+          // Tapping anywhere while the line is out reels / hooks.
+          if (minigame.fishing.phase === 'bite') {
+            minigame.fishing.phase = 'result'
+            playTempleSfx('success')
+            onFishingCatch()
+            return
+          }
+          if (minigame.fishing.phase === 'waiting') {
+            minigame.fishing.splash = 0.8
+            minigame.fishing.timer = 1.6 + Math.random() * 3
+            playTempleSfx('tap')
+            return
+          }
           const tappedQuest = QUESTS.find((quest) => Math.hypot(target.x - quest.x, target.y - quest.y) < 70)
           // A tap right on the sign beats NPCs loitering on the plaza.
           const signTapDistance = Math.hypot(target.x - RIALO_SIGN_INTERACT.x, target.y - RIALO_SIGN_INTERACT.y)
           const tappedAmbient = tappedQuest || signTapDistance < 70 ? null : tappedAmbientNpc(target)
           const tappedSign = !tappedQuest && !tappedAmbient && signTapDistance < 140
-          const targetActor = tappedQuest ?? tappedAmbient ?? (tappedSign ? RIALO_SIGN_INTERACT : null)
+          const fishingTapDistance = Math.hypot(target.x - FISHING_SPOT.x, target.y - FISHING_SPOT.y)
+          const tappedFishing = !tappedQuest && !tappedAmbient && !tappedSign && fishingTapDistance < 90
+          const chest = minigame.chest
+          const tappedChest = Boolean(
+            chest && !tappedQuest && !tappedAmbient && !tappedSign && !tappedFishing
+            && Math.hypot(target.x - chest.x, target.y - chest.y) < 80,
+          )
+          const targetActor = tappedQuest
+            ?? tappedAmbient
+            ?? (tappedSign ? RIALO_SIGN_INTERACT : null)
+            ?? (tappedFishing ? FISHING_SPOT : null)
+            ?? (tappedChest && chest ? chest : null)
           const walkTarget = targetActor
             ? approachPoint(player.current, targetActor, 76)
             : target
           tapTarget.current = isMovementBlocked(walkTarget.x, walkTarget.y)
             ? null
-            : { ...walkTarget, questId: tappedQuest?.id, ambientIndex: tappedAmbient?.index, sign: tappedSign }
+            : {
+                ...walkTarget,
+                questId: tappedQuest?.id,
+                ambientIndex: tappedAmbient?.index,
+                sign: tappedSign,
+                fishing: tappedFishing,
+                chest: tappedChest,
+              }
           playTempleSfx('tap')
         }}
       />
@@ -2125,6 +2457,155 @@ function RialoSignPanel({ onClose }: { onClose: () => void }) {
   )
 }
 
+function FishingResultPanel({
+  fish,
+  onCast,
+  onDone,
+}: {
+  fish: FishSpecies
+  onCast: () => void
+  onDone: () => void
+}) {
+  const meta = RARITY_META[fish.rarity]
+  return (
+    <motion.section
+      className="temple-play-talk-panel temple-play-fish-panel"
+      style={{ '--npc': meta.color, '--npc-accent': '#78ecff' } as CSSProperties}
+      initial={{ opacity: 0, y: 18, scale: 0.96 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: 12, scale: 0.97 }}
+      transition={{ type: 'spring', stiffness: 260, damping: 24 }}
+    >
+      <div className="temple-play-fish-sprite">
+        <img src={`/temple-play/minigame/fish/${fish.id}.png`} alt={fish.name} />
+      </div>
+      <div className="temple-play-talk-copy">
+        <p>Fishing Pond / {meta.label}</p>
+        <strong>
+          {fish.name} <span className="temple-play-rarity-stars" style={{ color: meta.color }}>{'★'.repeat(meta.stars)}</span>
+        </strong>
+        <small>+{fish.pts} fish pts saved to your local Fish Log.</small>
+      </div>
+      <div className="temple-play-talk-actions">
+        <button type="button" onClick={onDone}>Done</button>
+        <button type="button" onClick={onCast}>Cast Again</button>
+      </div>
+    </motion.section>
+  )
+}
+
+function ChestGachaOverlay({
+  result,
+  onClose,
+}: {
+  result: { pet: PetSpecies; isNew: boolean }
+  onClose: () => void
+}) {
+  const [revealed, setRevealed] = useState(false)
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setRevealed(true)
+      playTempleSfx('success')
+    }, 1350)
+    return () => window.clearTimeout(timer)
+  }, [])
+  const meta = RARITY_META[result.pet.rarity]
+
+  return (
+    <motion.div className="temple-play-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+      {revealed ? (
+        <motion.div
+          className="temple-play-gacha-card"
+          style={{ '--rarity': meta.color } as CSSProperties}
+          initial={{ scale: 0.55, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: 'spring', stiffness: 230, damping: 15 }}
+        >
+          {result.isNew ? <span className="temple-play-gacha-new">NEW!</span> : null}
+          <img src={`/temple-play/minigame/pets/${result.pet.id}.png`} alt={result.pet.name} />
+          <strong>{result.pet.name}</strong>
+          <p className="temple-play-gacha-rarity">{meta.label} {'★'.repeat(meta.stars)}</p>
+          <p className="temple-play-gacha-line">{result.pet.line}</p>
+          <small>
+            {result.isNew
+              ? 'Added to your collection. Set it as your buddy from the Pets panel.'
+              : 'Duplicate! Converted into +50 fish pts.'}
+          </small>
+          <button type="button" onClick={onClose}>Keep</button>
+        </motion.div>
+      ) : (
+        <motion.img
+          className="temple-play-gacha-chest"
+          src="/temple-play/minigame/chest/chest-glow.png"
+          alt="Opening mystery chest"
+          animate={{ rotate: [0, -7, 7, -7, 7, -4, 4, 0], scale: [1, 1.04, 1.1, 1.18] }}
+          transition={{ duration: 1.25 }}
+        />
+      )}
+    </motion.div>
+  )
+}
+
+function PetsDock({
+  owned,
+  active,
+  fishPts,
+  speciesCount,
+  onChoose,
+}: {
+  owned: string[]
+  active: string | null
+  fishPts: number
+  speciesCount: number
+  onChoose: (id: string | null) => void
+}) {
+  const [open, setOpen] = useState(false)
+  return (
+    <details
+      className="temple-play-pets-dock"
+      open={open}
+      onToggle={(event) => setOpen(event.currentTarget.open)}
+    >
+      <summary>
+        <span>Pets & Fish</span>
+        <strong>{owned.length} pets · {fishPts} pts</strong>
+      </summary>
+      {open ? (
+        <div className="temple-play-pets-body">
+          <p className="temple-play-pets-stats">Fish Log: {fishPts} pts · {speciesCount}/{FISH_SPECIES.length} species</p>
+          {owned.length === 0 ? (
+            <p className="temple-play-pets-empty">Open mystery chests around the map to collect pet buddies.</p>
+          ) : (
+            <div className="temple-play-pets-grid">
+              {owned.map((id) => {
+                const pet = PET_SPECIES.find((item) => item.id === id)
+                if (!pet) return null
+                const meta = RARITY_META[pet.rarity]
+                return (
+                  <button
+                    key={id}
+                    type="button"
+                    className={active === id ? 'is-selected' : ''}
+                    style={{ '--rarity': meta.color } as CSSProperties}
+                    onClick={() => onChoose(active === id ? null : id)}
+                  >
+                    <img src={`/temple-play/minigame/pets/${id}.png`} alt={pet.name} />
+                    <span>{pet.name}</span>
+                    <small>{meta.label}</small>
+                  </button>
+                )
+              })}
+            </div>
+          )}
+          {owned.length > 0 ? (
+            <p className="temple-play-pets-hint">{active ? 'Buddy is following you — click it again to unset.' : 'Click a pet to make it follow you.'}</p>
+          ) : null}
+        </div>
+      ) : null}
+    </details>
+  )
+}
+
 function CharacterPicker({
   selected,
   selectedLabel,
@@ -2243,7 +2724,7 @@ function GuideOverlay({
 }
 
 async function loadTemplePlayAssets(initialSprite: SpriteKey): Promise<TemplePlayAssets> {
-  const [propEntries, previewEntries] = await Promise.all([
+  const [propEntries, previewEntries, petEntries, chestFrames] = await Promise.all([
     Promise.all(
       Object.entries(PROPS).map(async ([key, src]) => [key, await loadImage(src)] as const),
     ),
@@ -2253,6 +2734,12 @@ async function loadTemplePlayAssets(initialSprite: SpriteKey): Promise<TemplePla
         return [key, preview] as const
       }),
     ),
+    Promise.all(
+      PET_SPECIES.map(async (pet) => [pet.id, await loadImage(`/temple-play/minigame/pets/${pet.id}.png`)] as const),
+    ),
+    Promise.all(
+      ['chest-closed', 'chest-glow', 'chest-open'].map((name) => loadImage(`/temple-play/minigame/chest/${name}.png`)),
+    ),
   ])
   const assets: TemplePlayAssets = {
     sprites: {},
@@ -2261,6 +2748,8 @@ async function loadTemplePlayAssets(initialSprite: SpriteKey): Promise<TemplePla
       previewEntries.filter((entry): entry is readonly [string, HTMLImageElement] => Boolean(entry[1])),
     ) as Partial<Record<SpriteKey, HTMLImageElement>>,
     props: Object.fromEntries(propEntries) as Record<PropKey, HTMLImageElement>,
+    pets: Object.fromEntries(petEntries),
+    chest: chestFrames,
     loaded: true,
   }
 
@@ -2593,11 +3082,44 @@ function drawWorld(
   drawTapTarget(ctx, time, target)
   drawQuestHint(ctx, time, nextQuest, nearNpcId)
   drawRialoSignHint(ctx, time, nearSign)
+  drawAmbientCritters(ctx, time, lowPower)
   drawActors(ctx, time, completedIds, nearNpcId, nearAmbientIndex, player, assets, playerSprite, camera, viewportWidth, viewportHeight)
   drawWeather(ctx, camera, viewportWidth, viewportHeight, time, lowPower)
   drawShootingStar(ctx, camera, viewportWidth, viewportHeight, time)
   ctx.restore()
   if (!lowPower) drawScanlines(ctx, width, height)
+}
+
+const BUTTERFLY_COLORS = ['#f2c866', '#ff7ad9', '#78ecff', '#b9ff66']
+
+function drawAmbientCritters(ctx: CanvasRenderingContext2D, time: number, lowPower: boolean) {
+  if (lowPower) return
+  // butterflies drifting around the garden plot
+  for (let i = 0; i < 4; i++) {
+    const cx = GARDEN.x + GARDEN.w / 2 + Math.cos(time * 0.35 + i * 1.9) * (90 + i * 26)
+    const cy = GARDEN.y + GARDEN.h / 2 - 30 + Math.sin(time * 0.55 + i * 1.4) * 52
+    const x = Math.round(cx + Math.cos(time * 1.9 + i) * 10)
+    const y = Math.round(cy + Math.sin(time * 2.6 + i * 0.7) * 7)
+    const wing = Math.sin(time * 15 + i * 2) > 0 ? 3 : 1
+    ctx.fillStyle = BUTTERFLY_COLORS[i % BUTTERFLY_COLORS.length]
+    ctx.fillRect(x - wing - 1, y - 2, wing, 4)
+    ctx.fillRect(x + 1, y - 2, wing, 4)
+    ctx.fillStyle = '#2a2118'
+    ctx.fillRect(x - 1, y - 3, 2, 6)
+  }
+  // fireflies hovering over the pond
+  for (let i = 0; i < 7; i++) {
+    const px = POND_RECT.x + POND_RECT.w / 2 + Math.cos(time * 0.4 + i * 2.3) * (POND_RECT.w * 0.42)
+    const py = POND_RECT.y + POND_RECT.h / 2 + Math.sin(time * 0.6 + i * 1.7) * (POND_RECT.h * 0.4) - 14
+    const glow = (Math.sin(time * 2.2 + i * 1.9) + 1) / 2
+    if (glow < 0.25) continue
+    ctx.fillStyle = `rgba(255, 233, 140, ${0.12 + glow * 0.2})`
+    ctx.beginPath()
+    ctx.arc(px, py, 5 + glow * 3, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.fillStyle = `rgba(255, 244, 190, ${0.5 + glow * 0.5})`
+    ctx.fillRect(Math.round(px) - 1, Math.round(py) - 1, 2, 2)
+  }
 }
 
 function drawTapTarget(ctx: CanvasRenderingContext2D, time: number, target: { x: number; y: number } | null) {
@@ -3262,6 +3784,11 @@ function drawActors(
           if (eric && Math.hypot(motion.x - eric.x, motion.y - eric.y) < 112) {
             drawMiniBubble(ctx, motion.x, motion.y - 118, 'Grialo!, Im Spider', npc.color)
           }
+        } else {
+          const runtime = npcRuntime[index]
+          if (runtime && runtime.chatter && runtime.chatterLife > 0) {
+            drawMiniBubble(ctx, motion.x, motion.y - 128, runtime.chatter, npc.color)
+          }
         }
         if (nearAmbientIndex === index) {
           drawPixelNameTag(ctx, motion.x, motion.y - 134, 'Tap / E to chat', '#07100c', true, npc.color, true)
@@ -3314,11 +3841,133 @@ function drawActors(
     }),
   })
 
+  if (minigame.chest) {
+    const chest = minigame.chest
+    actors.push({
+      y: chest.y,
+      bounds: { x: chest.x - 36, y: chest.y - 70, w: 72, h: 86 },
+      draw: () => drawChestActor(ctx, assets, chest.x, chest.y, time),
+    })
+  }
+
+  if (minigame.pet.id && assets.pets[minigame.pet.id]) {
+    const pet = minigame.pet
+    actors.push({
+      y: pet.y,
+      bounds: { x: pet.x - 30, y: pet.y - 50, w: 60, h: 60 },
+      draw: () => drawPetActor(ctx, assets.pets[pet.id as string], pet, time),
+    })
+  }
+
   actors.sort((a, b) => a.y - b.y).forEach((actor) => {
     if (rectsOverlap(actor.bounds, visible)) actor.draw()
   })
   drawCompletedBadges(ctx, time, completedIds)
   drawNpcEventLayer(ctx, time, ambientMotions)
+  drawFishingLayer(ctx, time, player)
+}
+
+function drawChestActor(ctx: CanvasRenderingContext2D, assets: TemplePlayAssets, x: number, y: number, time: number) {
+  const image = assets.chest[minigame.chestNear ? 1 : 0]
+  if (!image) return
+  const scale = 2.4
+  const w = Math.round(image.width * scale)
+  const h = Math.round(image.height * scale)
+  const hover = Math.sin(time * 2.4) * 1.5
+  ctx.fillStyle = 'rgba(0,0,0,.24)'
+  ctx.fillRect(Math.round(x - w * 0.32), Math.round(y - 5), Math.round(w * 0.64), 6)
+  ctx.drawImage(image, Math.round(x - w / 2), Math.round(y - h + hover - 4), w, h)
+  // twinkles so the drop is easy to spot
+  for (let i = 0; i < 3; i++) {
+    const phase = time * 2 + i * 2.1
+    const alpha = (Math.sin(phase) + 1) / 2
+    if (alpha < 0.35) continue
+    const sx = x + Math.cos(phase * 0.8 + i * 2.4) * (26 + i * 7)
+    const sy = y - 30 + Math.sin(phase * 1.1 + i) * 18
+    ctx.fillStyle = `rgba(255, 233, 160, ${0.35 + alpha * 0.5})`
+    ctx.fillRect(Math.round(sx) - 1, Math.round(sy) - 4, 2, 8)
+    ctx.fillRect(Math.round(sx) - 4, Math.round(sy) - 1, 8, 2)
+  }
+  if (minigame.chestNear) {
+    drawPixelNameTag(ctx, x, y - h - 26, 'Open Chest', '#07100c', true, '#f2c866', true)
+  }
+}
+
+function drawPetActor(ctx: CanvasRenderingContext2D, image: HTMLImageElement, pet: typeof minigame.pet, time: number) {
+  const scale = 2.1
+  const w = Math.round(image.width * scale)
+  const h = Math.round(image.height * scale)
+  const bob = pet.moving ? Math.abs(Math.sin(time * 9)) * 3 : Math.sin(time * 2.2) * 1
+  ctx.fillStyle = 'rgba(0,0,0,.22)'
+  ctx.fillRect(Math.round(pet.x - w * 0.28), Math.round(pet.y - 5), Math.round(w * 0.56), 6)
+  ctx.save()
+  ctx.translate(Math.round(pet.x), Math.round(pet.y - bob))
+  if (pet.dir === 'left') ctx.scale(-1, 1)
+  ctx.drawImage(image, Math.round(-w / 2), -h, w, h)
+  ctx.restore()
+}
+
+function drawFishingLayer(ctx: CanvasRenderingContext2D, time: number, player: PlayerState) {
+  const fishing = minigame.fishing
+  if (minigame.fishingNear && fishing.phase === 'idle') {
+    drawPixelInteractCue(ctx, FISHING_SPOT.x, FISHING_SPOT.y, 78, 40, time + 0.6, '#78ecff', true)
+    drawPixelNameTag(ctx, FISHING_SPOT.x, FISHING_SPOT.y - 96, 'Fishing Pond', '#07100c', true, '#78ecff', true)
+  }
+  if (fishing.phase === 'idle' || fishing.phase === 'result') return
+
+  const bobX = FISHING_BOBBER.x
+  const sink = fishing.phase === 'bite' ? 5 : 0
+  const bobY = FISHING_BOBBER.y + Math.sin(time * 3.1) * 1.6 + sink
+
+  // rod line from the player's hand to the bobber
+  ctx.save()
+  ctx.strokeStyle = 'rgba(20, 26, 30, .85)'
+  ctx.lineWidth = 1.6
+  ctx.beginPath()
+  ctx.moveTo(player.x - 12, player.y - 56)
+  ctx.quadraticCurveTo((player.x + bobX) / 2 - 10, Math.min(player.y, bobY) - 44, bobX, bobY - 4)
+  ctx.stroke()
+  ctx.restore()
+
+  // ripples
+  const rippleR = 6 + ((time * 14) % 12)
+  ctx.save()
+  ctx.strokeStyle = `rgba(220, 240, 250, ${Math.max(0, 0.5 - rippleR * 0.035)})`
+  ctx.lineWidth = 1.4
+  ctx.beginPath()
+  ctx.ellipse(bobX, bobY + 3, rippleR, rippleR * 0.45, 0, 0, Math.PI * 2)
+  ctx.stroke()
+  if (fishing.splash > 0) {
+    ctx.strokeStyle = `rgba(255,255,255,${fishing.splash})`
+    ctx.beginPath()
+    ctx.ellipse(bobX, bobY + 3, (0.8 - fishing.splash) * 26 + 6, ((0.8 - fishing.splash) * 26 + 6) * 0.42, 0, 0, Math.PI * 2)
+    ctx.stroke()
+  }
+  ctx.restore()
+
+  // bobber
+  ctx.fillStyle = '#e34f3a'
+  ctx.fillRect(bobX - 4, bobY - 8, 8, 5)
+  ctx.fillStyle = '#f7f1df'
+  ctx.fillRect(bobX - 4, bobY - 3, 8, 4)
+  ctx.fillStyle = '#141a1e'
+  ctx.fillRect(bobX - 1, bobY - 12, 2, 4)
+
+  if (fishing.phase === 'bite') {
+    const pulse = 1 + Math.sin(time * 16) * 0.14
+    ctx.save()
+    ctx.translate(bobX, bobY - 34)
+    ctx.scale(pulse, pulse)
+    ctx.fillStyle = '#07100c'
+    ctx.fillRect(-9, -16, 18, 26)
+    ctx.fillStyle = '#ffe36e'
+    ctx.fillRect(-4, -12, 8, 12)
+    ctx.fillRect(-4, 3, 8, 5)
+    ctx.restore()
+    drawPixelNameTag(ctx, player.x, player.y - 132, 'PRESS E / TAP!', '#07100c', false, '#ffe36e', true)
+  } else {
+    drawPixelNameTag(ctx, player.x, player.y - 126, 'waiting a bite...', '#07100c', true, '#78ecff', true)
+  }
 }
 
 // Stateful ambient NPC controller: roamers walk to a random nearby point, pause,
@@ -3334,6 +3983,10 @@ type NpcRuntime = {
   roams: boolean
   signTrip: 'idle' | 'toSign' | 'atSign' | 'returnHome'
   visitCooldown: number
+  chatter: string | null
+  chatterLife: number
+  chatterDelay: number
+  greetCooldown: number
 }
 
 const ROAM_ACTIVITIES = new Set<AmbientActivity>(['wander', 'stroll'])
@@ -3352,7 +4005,68 @@ const npcRuntime: NpcRuntime[] = AMBIENT_NPCS.map((npc) => ({
   roams: ROAM_ACTIVITIES.has(npc.activity),
   signTrip: 'idle',
   visitCooldown: 2 + Math.random() * 14,
+  chatter: null,
+  chatterLife: 0,
+  chatterDelay: 6 + Math.random() * 16,
+  greetCooldown: 6 + Math.random() * 24,
 }))
+
+const NPC_CHATTER_LINES = [
+  'gm gm~',
+  'nice day today',
+  'signals look clean',
+  'temple vibes...',
+  'badge hunting!',
+  'lofi hits different',
+  'real world > hype',
+  'stay verified',
+  'wen fish rain?',
+  'Rialo~',
+  'zzz... oh, hi!',
+  'plaza is lively',
+]
+
+const NPC_GREET_LINES = ['hey!', 'yo!', 'gm!', 'halo!', 'oy oy~']
+
+function updateNpcChatter(dt: number) {
+  for (const r of npcRuntime) {
+    if (r.chatterLife > 0) {
+      r.chatterLife -= dt
+      if (r.chatterLife <= 0) r.chatter = null
+    }
+    r.greetCooldown -= dt
+    r.chatterDelay -= dt
+    if (r.chatterDelay <= 0) {
+      r.chatter = NPC_CHATTER_LINES[Math.floor(Math.random() * NPC_CHATTER_LINES.length)]
+      r.chatterLife = 2.6
+      r.chatterDelay = 9 + Math.random() * 14
+    }
+  }
+  // Passing NPCs greet each other: face one another, pause, small bubble.
+  for (let i = 0; i < npcRuntime.length; i++) {
+    const a = npcRuntime[i]
+    if (a.greetCooldown > 0) continue
+    for (let j = i + 1; j < npcRuntime.length; j++) {
+      const b = npcRuntime[j]
+      if (b.greetCooldown > 0) continue
+      const dx = b.x - a.x
+      const dy = b.y - a.y
+      if (Math.hypot(dx, dy) > 68) continue
+      a.dir = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : dy > 0 ? 'down' : 'up'
+      b.dir = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'left' : 'right') : dy > 0 ? 'up' : 'down'
+      a.pause = Math.max(a.pause, 1.4)
+      b.pause = Math.max(b.pause, 1.4)
+      const line = NPC_GREET_LINES[Math.floor(Math.random() * NPC_GREET_LINES.length)]
+      a.chatter = line
+      b.chatter = line === 'gm!' ? 'gm gm!' : 'hey hey!'
+      a.chatterLife = 1.7
+      b.chatterLife = 1.7
+      a.greetCooldown = 24 + Math.random() * 22
+      b.greetCooldown = 24 + Math.random() * 22
+      break
+    }
+  }
+}
 
 function pickNpcTarget(r: NpcRuntime, radius = NPC_ROAM_RADIUS) {
   for (let tries = 0; tries < 14; tries++) {
@@ -3398,6 +4112,7 @@ function pickSpiderTarget(r: NpcRuntime, eric: NpcRuntime) {
 }
 
 function updateAmbientNpcs(dt: number) {
+  updateNpcChatter(dt)
   for (let index = 0; index < npcRuntime.length; index++) {
     const r = npcRuntime[index]
     const eric = npcRuntime[ERIC_ARGENT_NPC_INDEX]
@@ -3493,6 +4208,84 @@ function updateAmbientNpcs(dt: number) {
     if (r.moving) {
       if (Math.abs(movedX) > Math.abs(movedY)) r.dir = movedX < 0 ? 'left' : 'right'
       else r.dir = movedY < 0 ? 'up' : 'down'
+    }
+  }
+}
+
+function pickChestSpot() {
+  for (let tries = 0; tries < 24; tries++) {
+    const x = 220 + Math.random() * (WORLD.width - 440)
+    const y = 320 + Math.random() * (WORLD.height - 520)
+    if (!isNpcMovementBlocked(x, y)) return { x, y }
+  }
+  return null
+}
+
+function updateMinigames(dt: number, player: PlayerState) {
+  const fishing = minigame.fishing
+  if (fishing.splash > 0) fishing.splash -= dt
+  if (fishing.phase === 'waiting') {
+    fishing.timer -= dt
+    if (fishing.timer <= 0) {
+      fishing.phase = 'bite'
+      fishing.timer = 0.9
+      playTempleSfx('tap')
+    }
+  } else if (fishing.phase === 'bite') {
+    fishing.timer -= dt
+    if (fishing.timer <= 0) {
+      // fish got away — line settles again
+      fishing.phase = 'waiting'
+      fishing.timer = 1.6 + Math.random() * 3
+      fishing.splash = 0.8
+    }
+  }
+
+  if (minigame.chest) {
+    minigame.chest.life -= dt
+    if (minigame.chest.life <= 0) {
+      minigame.chest = null
+      minigame.chestTimer = 120 + Math.random() * 120
+    }
+  } else {
+    minigame.chestTimer -= dt
+    if (minigame.chestTimer <= 0) {
+      const spot = pickChestSpot()
+      if (spot) {
+        minigame.chest = { ...spot, life: 90 }
+      } else {
+        minigame.chestTimer = 20
+      }
+    }
+  }
+
+  const pet = minigame.pet
+  if (pet.id) {
+    const behind = {
+      down: { x: 0, y: -46 },
+      up: { x: 0, y: 46 },
+      left: { x: 46, y: 0 },
+      right: { x: -46, y: 0 },
+    }[player.dir]
+    const tx = player.x + behind.x
+    const ty = player.y + behind.y
+    const dx = tx - pet.x
+    const dy = ty - pet.y
+    const dist = Math.hypot(dx, dy)
+    if (dist > 320) {
+      pet.x = tx
+      pet.y = ty
+      pet.moving = false
+    } else if (dist > 10) {
+      const speed = Math.min(PLAYER_SPEED * 0.94, 60 + dist * 2.4)
+      const step = Math.min(dist, speed * dt)
+      pet.x += (dx / dist) * step
+      pet.y += (dy / dist) * step
+      pet.moving = true
+      if (Math.abs(dx) > Math.abs(dy)) pet.dir = dx < 0 ? 'left' : 'right'
+      else pet.dir = dy < 0 ? 'up' : 'down'
+    } else {
+      pet.moving = false
     }
   }
 }
