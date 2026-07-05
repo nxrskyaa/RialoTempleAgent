@@ -340,15 +340,29 @@ def build_character(name: str, rgba: np.ndarray, layout: dict, debug_dir: Path |
     if pending:
         raise ValueError(f"{name}: unresolved rows {sorted(pending)}")
 
+    # Some sheets draw their "side" rows facing the opposite direction from
+    # what the art suggests at a glance; a layout-level swap flips the pairs.
+    if layout.get("swap"):
+        for a, b in (("idle_left", "idle_right"), ("walk_left", "walk_right")):
+            gathered[a], gathered[b] = gathered[b], gathered[a]
+            a_bob, b_bob = a in bob_rows, b in bob_rows
+            bob_rows.discard(a)
+            bob_rows.discard(b)
+            if a_bob:
+                bob_rows.add(b)
+            if b_bob:
+                bob_rows.add(a)
+
     # Scale: normalize every row so the character height is uniform across
     # rows (the AI draws some directions/animations at wildly different
     # sizes). Row-max height keeps the intra-row walk bob intact.
+    target_h = layout.get("target_h", TARGET_CHAR_H)
     sheet = Image.new("RGBA", (COLS * CELL, len(ROW_ORDER) * CELL), (0, 0, 0, 0))
     for ri, key in enumerate(ROW_ORDER):
         frames = gathered[key]
         row_h = max(f.height for f in frames)
         row_w = max(f.width for f in frames)
-        scale = min(TARGET_CHAR_H / row_h, (CELL - 4) / row_w)
+        scale = min(target_h / row_h, (CELL - 4) / row_w)
         order = pingpong(list(range(len(frames))), COLS)
         for ci in range(COLS):
             bob = -1 if (key in bob_rows and ci % 2 == 1) else 0

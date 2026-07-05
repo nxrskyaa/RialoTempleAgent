@@ -328,6 +328,7 @@ const RIALO_TEAM_HELPER_KEYS = new Set<SpriteKey>([
   'npcEcelannister',
   'npcCaptain',
   'npcFlippedFace',
+  'npcIshu',
   'npcJeams',
   'npcKGufran',
   'npcKeep',
@@ -421,8 +422,8 @@ const QUESTS: QuestNpc[] = [
     npc: 'NXR',
     role: 'Builder Guide',
     sprite: 'nxr',
-    x: 928,
-    y: 880,
+    x: 745,
+    y: 935,
     color: '#f2c866',
     accent: '#57e39f',
     reward: 50,
@@ -873,8 +874,8 @@ const AMBIENT_NPCS: AmbientNpc[] = [
   {
     name: 'KingJ',
     sprite: 'npcKingJ',
-    x: 420,
-    y: 900,
+    x: 560,
+    y: 1010,
     color: '#f2c866',
     accent: '#57e39f',
     line: 'A good vault turns ownership into something apps can use.',
@@ -884,8 +885,8 @@ const AMBIENT_NPCS: AmbientNpc[] = [
       'Useful real-world assets should update with status, verification, and live conditions.',
       'Then agents can reason about them instead of staring at a static badge.',
     ],
-    activity: 'meditate',
-    persona: 'homebody',
+    activity: 'stroll',
+    persona: 'wanderer',
   },
   {
     name: 'Richard12',
@@ -1858,13 +1859,16 @@ function TemplePlayCanvas({
         nearId.current = nearest?.id ?? null
         onNearQuestChange(nearId.current)
       }
-      const ambient = nearId.current ? null : nearestAmbientNpc(current)
+      // Standing right at the sign always offers the sign, even when ambient
+      // NPCs gather on the plaza around it.
+      const signPriority = Math.hypot(current.x - RIALO_SIGN_INTERACT.x, current.y - RIALO_SIGN_INTERACT.y) < 80
+      const ambient = nearId.current || signPriority ? null : nearestAmbientNpc(current)
       const ambientIndex = ambient?.index ?? null
       if (ambientIndex !== nearAmbient.current) {
         nearAmbient.current = ambientIndex
         onNearAmbientChange(nearAmbient.current)
       }
-      const signClose = !nearId.current && !nearAmbient.current && nearestRialoSign(current)
+      const signClose = !nearId.current && (signPriority || (nearAmbient.current === null && nearestRialoSign(current)))
       if (signClose !== nearSignRef.current) {
         nearSignRef.current = signClose
         onNearSignChange(signClose)
@@ -1911,8 +1915,10 @@ function TemplePlayCanvas({
             y: clamp((event.clientY - rect.top) / camera.zoom + camera.y, 90, WORLD.height - 90),
           }
           const tappedQuest = QUESTS.find((quest) => Math.hypot(target.x - quest.x, target.y - quest.y) < 70)
-          const tappedAmbient = tappedQuest ? null : tappedAmbientNpc(target)
-          const tappedSign = !tappedQuest && !tappedAmbient && Math.hypot(target.x - RIALO_SIGN_INTERACT.x, target.y - RIALO_SIGN_INTERACT.y) < 140
+          // A tap right on the sign beats NPCs loitering on the plaza.
+          const signTapDistance = Math.hypot(target.x - RIALO_SIGN_INTERACT.x, target.y - RIALO_SIGN_INTERACT.y)
+          const tappedAmbient = tappedQuest || signTapDistance < 70 ? null : tappedAmbientNpc(target)
+          const tappedSign = !tappedQuest && !tappedAmbient && signTapDistance < 140
           const targetActor = tappedQuest ?? tappedAmbient ?? (tappedSign ? RIALO_SIGN_INTERACT : null)
           const walkTarget = targetActor
             ? approachPoint(player.current, targetActor, 76)
