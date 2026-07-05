@@ -221,7 +221,7 @@ function spriteAssetUrl(src: string) {
   return `${src}${separator}v=${TEMPLE_PLAY_SPRITE_VERSION}`
 }
 
-const mappedNpc = (src: string, drawW = 58, drawH = 82): SpriteSheet => ({
+const mappedNpc = (src: string, drawW = 84, drawH = 82): SpriteSheet => ({
   src,
   frameW: 96,
   frameH: 96,
@@ -2340,11 +2340,17 @@ async function loadSpriteFrameSet(sheet: SpriteSheet): Promise<SpriteFrameSet> {
     }
   }
 
-  const frameBounds = rawFrames.map((frame) => frame.bounds).filter((bounds): bounds is NonNullable<typeof bounds> => Boolean(bounds))
-  const maxFrameWidth = Math.max(1, ...frameBounds.map((bounds) => bounds.right - bounds.left))
-  const maxFrameHeight = Math.max(1, ...frameBounds.map((bounds) => bounds.bottom - bounds.top))
-  const sharedScale = Math.min(sheet.drawW / maxFrameWidth, sheet.drawH / maxFrameHeight, 1)
-  const frames: HTMLCanvasElement[] = rawFrames.map(({ canvas: rawCanvas, bounds }) => {
+  const rowCount = Math.max(1, Math.ceil(sheet.frames / cols))
+  const rowScales = Array.from({ length: rowCount }, (_, row) => {
+    const rowBounds = rawFrames
+      .slice(row * cols, row * cols + cols)
+      .map((frame) => frame.bounds)
+      .filter((bounds): bounds is NonNullable<typeof bounds> => Boolean(bounds))
+    const maxFrameWidth = Math.max(1, ...rowBounds.map((bounds) => bounds.right - bounds.left))
+    const maxFrameHeight = Math.max(1, ...rowBounds.map((bounds) => bounds.bottom - bounds.top))
+    return Math.min(sheet.drawW / maxFrameWidth, sheet.drawH / maxFrameHeight, 1.35)
+  })
+  const frames: HTMLCanvasElement[] = rawFrames.map(({ canvas: rawCanvas, bounds }, frameIndex) => {
     const canvas = document.createElement('canvas')
     canvas.width = sheet.drawW
     canvas.height = sheet.drawH
@@ -2354,8 +2360,9 @@ async function loadSpriteFrameSet(sheet: SpriteSheet): Promise<SpriteFrameSet> {
       context.clearRect(0, 0, sheet.drawW, sheet.drawH)
       const sourceWidth = bounds.right - bounds.left
       const sourceHeight = bounds.bottom - bounds.top
-      const drawWidth = Math.max(1, Math.round(sourceWidth * sharedScale))
-      const drawHeight = Math.max(1, Math.round(sourceHeight * sharedScale))
+      const rowScale = rowScales[Math.floor(frameIndex / cols)] ?? 1
+      const drawWidth = Math.max(1, Math.round(sourceWidth * rowScale))
+      const drawHeight = Math.max(1, Math.round(sourceHeight * rowScale))
       context.drawImage(
         rawCanvas,
         bounds.left,
