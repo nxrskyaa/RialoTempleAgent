@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+﻿import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Award, CheckCircle2, Loader2, Sparkles, XCircle } from 'lucide-react'
@@ -984,7 +984,7 @@ const AMBIENT_NPCS: AmbientNpc[] = [
     dialogue: [
       'Connectivity is a loop: ask a real system, receive the result, then act with it.',
       'Without the return path, the contract only shouts into the void.',
-      'Rialo’s real-world direction is about closing that loop cleanly.',
+      'Rialoâ€™s real-world direction is about closing that loop cleanly.',
     ],
     activity: 'stroll',
     persona: 'wanderer',
@@ -1153,7 +1153,7 @@ const AMBIENT_NPCS: AmbientNpc[] = [
     topic: 'Nen Matcha',
     dialogue: [
       'Welcome to Nen Matcha, the calmest corner of the temple grounds.',
-      'Builders think better with warm matcha — even agents queue here between quests.',
+      'Builders think better with warm matcha â€” even agents queue here between quests.',
       'Real-world commerce like this little shop is exactly what Rialo wants onchain: simple, verifiable, useful.',
     ],
     activity: 'tend',
@@ -1293,7 +1293,7 @@ const WORLD_BLOCKERS = [
   ...BUILDING_COLLIDERS,
   ...SCENERY.filter((s) => s.solid).map(sceneryCollider),
   { x: POND_RECT.x + 10, y: POND_RECT.y + 8, w: POND_RECT.w - 20, h: POND_RECT.h - 16 },
-  // garden plot collider — prevent walking through crops (values match GARDEN const defined later)
+  // garden plot collider â€” prevent walking through crops (values match GARDEN const defined later)
   { x: 478, y: 1128, w: 208, h: 144 },
 ]
 
@@ -2306,18 +2306,20 @@ function ensureSpriteFrames(assets: TemplePlayAssets, sprite: SpriteKey) {
 }
 
 async function loadSpriteFrameSet(sheet: SpriteSheet): Promise<SpriteFrameSet> {
+  // Sheets are pre-processed by scripts/repack_characters.py: transparent
+  // background, uniform character scale, feet anchored near the cell bottom.
+  // Slicing the fixed grid is all that's needed here.
   const image = await loadImage(spriteAssetUrl(sheet.src))
   const cols = sheet.cols ?? Math.max(1, Math.floor(image.width / sheet.frameW))
-  const rawFrames: Array<{ canvas: HTMLCanvasElement; bounds: ReturnType<typeof spriteCanvasBounds> }> = []
+  const frames: HTMLCanvasElement[] = []
 
   for (let frame = 0; frame < sheet.frames; frame++) {
-    const rawCanvas = document.createElement('canvas')
-    rawCanvas.width = sheet.frameW
-    rawCanvas.height = sheet.frameH
-    const context = rawCanvas.getContext('2d', { willReadFrequently: true })
+    const canvas = document.createElement('canvas')
+    canvas.width = sheet.frameW
+    canvas.height = sheet.frameH
+    const context = canvas.getContext('2d')
     if (context) {
       context.imageSmoothingEnabled = false
-      context.clearRect(0, 0, sheet.frameW, sheet.frameH)
       context.drawImage(
         image,
         (frame % cols) * sheet.frameW,
@@ -2329,200 +2331,12 @@ async function loadSpriteFrameSet(sheet: SpriteSheet): Promise<SpriteFrameSet> {
         sheet.frameW,
         sheet.frameH,
       )
-      clearSpriteBackgroundPixels(context, sheet.frameW, sheet.frameH)
-      removeSpriteArtifactPixels(context, sheet.frameW, sheet.frameH)
-      rawFrames.push({
-        canvas: rawCanvas,
-        bounds: spriteCanvasBounds(context.getImageData(0, 0, sheet.frameW, sheet.frameH), sheet.frameW, sheet.frameH),
-      })
-    } else {
-      rawFrames.push({ canvas: rawCanvas, bounds: null })
     }
+    frames.push(canvas)
   }
-
-  const rowCount = Math.max(1, Math.ceil(sheet.frames / cols))
-  const rowScales = Array.from({ length: rowCount }, (_, row) => {
-    const rowBounds = rawFrames
-      .slice(row * cols, row * cols + cols)
-      .map((frame) => frame.bounds)
-      .filter((bounds): bounds is NonNullable<typeof bounds> => Boolean(bounds))
-    const maxFrameWidth = Math.max(1, ...rowBounds.map((bounds) => bounds.right - bounds.left))
-    const maxFrameHeight = Math.max(1, ...rowBounds.map((bounds) => bounds.bottom - bounds.top))
-    return Math.min(sheet.drawW / maxFrameWidth, sheet.drawH / maxFrameHeight, 1.35)
-  })
-  const frames: HTMLCanvasElement[] = rawFrames.map(({ canvas: rawCanvas, bounds }, frameIndex) => {
-    const canvas = document.createElement('canvas')
-    canvas.width = sheet.drawW
-    canvas.height = sheet.drawH
-    const context = canvas.getContext('2d', { willReadFrequently: true })
-    if (context && bounds) {
-      context.imageSmoothingEnabled = false
-      context.clearRect(0, 0, sheet.drawW, sheet.drawH)
-      const sourceWidth = bounds.right - bounds.left
-      const sourceHeight = bounds.bottom - bounds.top
-      const rowScale = rowScales[Math.floor(frameIndex / cols)] ?? 1
-      const drawWidth = Math.max(1, Math.round(sourceWidth * rowScale))
-      const drawHeight = Math.max(1, Math.round(sourceHeight * rowScale))
-      context.drawImage(
-        rawCanvas,
-        bounds.left,
-        bounds.top,
-        sourceWidth,
-        sourceHeight,
-        Math.round((sheet.drawW - drawWidth) / 2),
-        Math.round(sheet.drawH - drawHeight),
-        drawWidth,
-        drawHeight,
-      )
-    }
-    return canvas
-  })
 
   image.src = ''
   return { frames }
-}
-
-function clearSpriteBackgroundPixels(context: CanvasRenderingContext2D, width: number, height: number) {
-  const imageData = context.getImageData(0, 0, width, height)
-  const data = imageData.data
-  const visited = new Uint8Array(width * height)
-  const stack: number[] = []
-
-  for (let x = 0; x < width; x++) {
-    stack.push(x, (height - 1) * width + x)
-  }
-  for (let y = 0; y < height; y++) {
-    stack.push(y * width, y * width + width - 1)
-  }
-
-  while (stack.length > 0) {
-    const point = stack.pop()
-    if (point === undefined || visited[point]) continue
-    visited[point] = 1
-    const index = point * 4
-    if (!isSpriteBackgroundPixel(data[index], data[index + 1], data[index + 2], data[index + 3])) continue
-
-    data[index + 3] = 0
-    const x = point % width
-    const y = Math.floor(point / width)
-    if (x > 0) stack.push(point - 1)
-    if (x < width - 1) stack.push(point + 1)
-    if (y > 0) stack.push(point - width)
-    if (y < height - 1) stack.push(point + width)
-  }
-
-  context.putImageData(imageData, 0, 0)
-}
-
-function isSpriteBackgroundPixel(red: number, green: number, blue: number, alpha: number) {
-  if (alpha < 8) return true
-  const hotPinkMatte = red > 175 && blue > 160 && green < 120
-  const brightChecker = red > 218 && green > 218 && blue > 218 && Math.max(red, green, blue) - Math.min(red, green, blue) < 38
-  const grayChecker = red > 198 && green > 198 && blue > 198 && Math.max(red, green, blue) - Math.min(red, green, blue) < 18
-  return hotPinkMatte || brightChecker || grayChecker
-}
-
-function removeSpriteArtifactPixels(context: CanvasRenderingContext2D, width: number, height: number) {
-  const imageData = context.getImageData(0, 0, width, height)
-  const data = imageData.data
-  const visited = new Uint8Array(width * height)
-  type Component = {
-    points: number[]
-    left: number
-    right: number
-    top: number
-    bottom: number
-  }
-  const components: Component[] = []
-
-  for (let start = 0; start < width * height; start++) {
-    if (visited[start] || data[start * 4 + 3] <= 12) continue
-    const stack = [start]
-    const points: number[] = []
-    visited[start] = 1
-    let left = width
-    let right = -1
-    let top = height
-    let bottom = -1
-
-    while (stack.length > 0) {
-      const point = stack.pop()
-      if (point === undefined) continue
-      points.push(point)
-      const x = point % width
-      const y = Math.floor(point / width)
-      if (x < left) left = x
-      if (x > right) right = x
-      if (y < top) top = y
-      if (y > bottom) bottom = y
-
-      const neighbors = [point - 1, point + 1, point - width, point + width]
-      for (const next of neighbors) {
-        if (next < 0 || next >= width * height || visited[next]) continue
-        const nx = next % width
-        if ((next === point - 1 && nx === width - 1) || (next === point + 1 && nx === 0)) continue
-        if (data[next * 4 + 3] <= 12) continue
-        visited[next] = 1
-        stack.push(next)
-      }
-    }
-
-    components.push({ points, left, right, top, bottom })
-  }
-
-  if (components.length === 0) {
-    context.putImageData(imageData, 0, 0)
-    return
-  }
-
-  const main = components.reduce((largest, component) => (component.points.length > largest.points.length ? component : largest), components[0])
-  const mainHeight = Math.max(1, main.bottom - main.top + 1)
-  const mainWidth = Math.max(1, main.right - main.left + 1)
-
-  for (const component of components) {
-    if (component === main) continue
-    const componentWidth = component.right - component.left + 1
-    const componentHeight = component.bottom - component.top + 1
-    const touchesEdge = component.left <= 1 || component.top <= 1 || component.right >= width - 2 || component.bottom >= height - 2
-    const tinySpeck = component.points.length <= 14
-    const edgeScratch = touchesEdge && component.points.length <= 160 && (componentWidth <= 4 || componentHeight <= 4)
-    const separatedAbove = component.bottom < main.top - 4 && component.points.length < main.points.length * 0.55
-    const topRowBleed =
-      component.top <= 2 &&
-      component.bottom < main.top + mainHeight * 0.35 &&
-      component.points.length < main.points.length * 0.7
-    const sideBleed =
-      touchesEdge &&
-      component.points.length < main.points.length * 0.25 &&
-      (componentWidth > mainWidth * 0.65 || componentHeight > mainHeight * 0.55)
-
-    if (tinySpeck || edgeScratch || separatedAbove || topRowBleed || sideBleed) {
-      for (const point of component.points) data[point * 4 + 3] = 0
-    }
-  }
-
-  context.putImageData(imageData, 0, 0)
-}
-
-function spriteCanvasBounds(imageData: ImageData, width: number, height: number) {
-  let left = width
-  let top = height
-  let right = -1
-  let bottom = -1
-
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      const alpha = imageData.data[(y * width + x) * 4 + 3]
-      if (alpha <= 12) continue
-      if (x < left) left = x
-      if (x > right) right = x
-      if (y < top) top = y
-      if (y > bottom) bottom = y
-    }
-  }
-
-  if (right < left || bottom < top) return null
-  return { left, top, right: right + 1, bottom: bottom + 1 }
 }
 
 
@@ -3112,15 +2926,15 @@ function drawEnvironmentProps(ctx: CanvasRenderingContext2D, time: number, asset
     drawProp(ctx, assets, FLOWERS[i % FLOWERS.length], x, y + bob, 34, 33)
   }
 
-  // garden crop rows — canvas-drawn pixel art with VFX (sway, sparkle, growth shimmer)
+  // garden crop rows â€” canvas-drawn pixel art with VFX (sway, sparkle, growth shimmer)
   if (rectsOverlap(GARDEN, drawView)) drawGardenCrops(ctx, time)
 
   drawFloatingLeaves(ctx, time, view, lowPower)
 }
 
-// ═══════════════════════════════════════════════════════════
-// Canvas-drawn pixel art crops with VFX — replaces image-based crops
-// ═══════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// Canvas-drawn pixel art crops with VFX â€” replaces image-based crops
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 function drawGardenCrops(ctx: CanvasRenderingContext2D, time: number) {
   ctx.save()
@@ -3133,7 +2947,7 @@ function drawGardenCrops(ctx: CanvasRenderingContext2D, time: number) {
       const isLeafy = row % 2 === 0
       const stage = (col + row) % 4  // 0=sprout, 1=small, 2=medium, 3=mature
 
-      // gentle sway — each crop has a phase offset for organic feel
+      // gentle sway â€” each crop has a phase offset for organic feel
       const sway = Math.sin(time * 1.4 + col * 0.7 + row * 1.3) * 2.2
 
       if (isLeafy) {
@@ -3159,7 +2973,7 @@ function drawGardenCrops(ctx: CanvasRenderingContext2D, time: number) {
         }
       }
 
-      // growth shimmer — subtle green glow on stages 1-2
+      // growth shimmer â€” subtle green glow on stages 1-2
       if (stage === 1 || stage === 2) {
         const shimmerAlpha = 0.08 + Math.sin(time * 3 + col * 2 + row) * 0.06
         ctx.globalAlpha = Math.max(0, shimmerAlpha)
@@ -3170,7 +2984,7 @@ function drawGardenCrops(ctx: CanvasRenderingContext2D, time: number) {
     }
   }
 
-  // soil moisture shimmer — subtle blue tint that sweeps across the plot
+  // soil moisture shimmer â€” subtle blue tint that sweeps across the plot
   const moisturePhase = (time * 0.3) % 1
   const moistureX = GARDEN.x + moisturePhase * GARDEN.w
   ctx.globalAlpha = 0.06
@@ -3181,7 +2995,7 @@ function drawGardenCrops(ctx: CanvasRenderingContext2D, time: number) {
   ctx.restore()
 }
 
-// ── Leafy crop (lettuce/cabbage style) — 4 growth stages ──
+// â”€â”€ Leafy crop (lettuce/cabbage style) â€” 4 growth stages â”€â”€
 function drawPixelCropLeafy(ctx: CanvasRenderingContext2D, cx: number, cy: number, stage: number, _time: number, _seed: number) {
   const p = (x: number, y: number, w: number, h: number, color: string) => {
     ctx.fillStyle = color
@@ -3193,20 +3007,20 @@ function drawPixelCropLeafy(ctx: CanvasRenderingContext2D, cx: number, cy: numbe
   p(-12, -3, 24, 3, '#7a5030')
 
   if (stage === 0) {
-    // sprout — 2 tiny leaves poking out
+    // sprout â€” 2 tiny leaves poking out
     p(-3, -8, 6, 5, '#5fb84e')
     p(-5, -6, 4, 3, '#7fd45f')
     p(1, -6, 4, 3, '#7fd45f')
     p(-1, -10, 2, 3, '#b9ff66')
   } else if (stage === 1) {
-    // small — cluster of leaves
+    // small â€” cluster of leaves
     p(-7, -12, 14, 9, '#5fb84e')
     p(-5, -14, 10, 6, '#7fd45f')
     p(-3, -15, 6, 4, '#b9ff66')
     p(-8, -8, 4, 4, '#4a9e3e')
     p(4, -8, 4, 4, '#4a9e3e')
   } else if (stage === 2) {
-    // medium — fuller bush with detail
+    // medium â€” fuller bush with detail
     p(-10, -18, 20, 14, '#5fb84e')
     p(-8, -22, 16, 8, '#7fd45f')
     p(-6, -24, 12, 5, '#b9ff66')
@@ -3216,7 +3030,7 @@ function drawPixelCropLeafy(ctx: CanvasRenderingContext2D, cx: number, cy: numbe
     p(-2, -20, 1, 8, '#3d8a32')
     p(2, -18, 1, 6, '#3d8a32')
   } else {
-    // mature — full canopy with fruit/flower
+    // mature â€” full canopy with fruit/flower
     p(-14, -26, 28, 22, '#5fb84e')
     p(-12, -30, 24, 10, '#7fd45f')
     p(-8, -32, 16, 6, '#b9ff66')
@@ -3235,7 +3049,7 @@ function drawPixelCropLeafy(ctx: CanvasRenderingContext2D, cx: number, cy: numbe
   }
 }
 
-// ── Root crop (carrot/turnip style) — 4 growth stages ──
+// â”€â”€ Root crop (carrot/turnip style) â€” 4 growth stages â”€â”€
 function drawPixelCropRoot(ctx: CanvasRenderingContext2D, cx: number, cy: number, stage: number, _time: number, _seed: number) {
   const p = (x: number, y: number, w: number, h: number, color: string) => {
     ctx.fillStyle = color
@@ -3247,19 +3061,19 @@ function drawPixelCropRoot(ctx: CanvasRenderingContext2D, cx: number, cy: number
   p(-12, -3, 24, 3, '#7a5030')
 
   if (stage === 0) {
-    // sprout — single stem with 2 tiny leaves
+    // sprout â€” single stem with 2 tiny leaves
     p(-1, -10, 2, 6, '#5fb84e')
     p(-4, -8, 3, 3, '#7fd45f')
     p(1, -8, 3, 3, '#7fd45f')
   } else if (stage === 1) {
-    // small — taller stem with leaf clusters
+    // small â€” taller stem with leaf clusters
     p(-1, -14, 2, 10, '#5fb84e')
     p(-5, -12, 4, 4, '#7fd45f')
     p(1, -12, 4, 4, '#7fd45f')
     p(-3, -14, 3, 3, '#b9ff66')
     p(0, -15, 3, 3, '#b9ff66')
   } else if (stage === 2) {
-    // medium — bushy top, slight root visible
+    // medium â€” bushy top, slight root visible
     p(-1, -18, 2, 14, '#5fb84e')
     p(-7, -16, 6, 5, '#7fd45f')
     p(1, -16, 6, 5, '#7fd45f')
@@ -3269,7 +3083,7 @@ function drawPixelCropRoot(ctx: CanvasRenderingContext2D, cx: number, cy: number
     p(-3, -2, 6, 3, '#e8821e')
     p(-2, 0, 4, 2, '#d4740e')
   } else {
-    // mature — full leafy top + exposed carrot
+    // mature â€” full leafy top + exposed carrot
     p(-1, -24, 2, 20, '#5fb84e')
     p(-9, -22, 8, 7, '#7fd45f')
     p(1, -22, 8, 7, '#7fd45f')
@@ -4000,7 +3814,7 @@ function drawWeather(ctx: CanvasRenderingContext2D, camera: { x: number; y: numb
     ctx.fillRect(x + 52, y + 11, 46, 12)
   }
   const wind = Math.sin(time * 0.36) * 14
-  // rain — two layers with sub-pixel positioning for buttery motion
+  // rain â€” two layers with sub-pixel positioning for buttery motion
   for (let layer = 0; layer < 2; layer++) {
     ctx.strokeStyle = layer === 0 ? 'rgba(210,232,255,.19)' : 'rgba(247,241,223,.14)'
     ctx.lineWidth = layer === 0 ? 2 : 1
@@ -4027,7 +3841,7 @@ function drawWeather(ctx: CanvasRenderingContext2D, camera: { x: number; y: numb
     ctx.fillRect(x + Math.sin(time + i) * 7, y, 9, 5)
   }
 
-  // pond ripples — smooth float ellipses
+  // pond ripples â€” smooth float ellipses
   ctx.strokeStyle = 'rgba(210, 251, 255, .3)'
   ctx.lineWidth = 2
   const rippleCount = lowPower ? 4 : 10

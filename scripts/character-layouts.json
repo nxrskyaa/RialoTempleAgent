@@ -1,0 +1,227 @@
+{
+  "_doc": "Per-character semantic row mapping for repack_characters.py. Values: {row, cols?} pick detected cells; 'mirror:<key>' flips the referenced row; 'bob:<key>' reuses idle frames with a 1px bob; omitted walk_* rows fall back to mirror of the opposite side or an idle bob.",
+  "families": {
+    "std8": {
+      "idle_down": { "row": 0 },
+      "idle_up": { "row": 1 },
+      "idle_left": { "row": 2 },
+      "idle_right": { "row": 3 },
+      "walk_down": { "row": 4 },
+      "walk_up": { "row": 5 },
+      "walk_left": { "row": 6 },
+      "walk_right": { "row": 7 }
+    },
+    "f1122": {
+      "idle_down": { "row": 0 },
+      "idle_up": { "row": 1 },
+      "idle_left": { "row": 2 },
+      "idle_right": { "row": 3 },
+      "walk_down": { "row": 4 },
+      "walk_up": { "row": 5 },
+      "walk_left": { "row": 6 },
+      "walk_right": "mirror:walk_left"
+    },
+    "f1254-right": {
+      "idle_down": { "row": 0, "cols": [0] },
+      "idle_right": { "row": 0, "cols": [1] },
+      "idle_up": { "row": 0, "cols": [2] },
+      "idle_left": { "row": 0, "cols": [3] },
+      "walk_right": { "row": 2 },
+      "walk_left": "mirror:walk_right",
+      "walk_down": "bob:idle_down",
+      "walk_up": "bob:idle_up"
+    },
+    "f1254-left": {
+      "idle_down": { "row": 0, "cols": [0] },
+      "idle_left": { "row": 0, "cols": [1] },
+      "idle_up": { "row": 0, "cols": [2] },
+      "idle_right": { "row": 0, "cols": [3] },
+      "walk_left": { "row": 2 },
+      "walk_right": "mirror:walk_left",
+      "walk_down": "bob:idle_down",
+      "walk_up": "bob:idle_up"
+    }
+  },
+  "characters": {
+    "Ade": { "family": "f1254-right" },
+    "Barong": { "family": "f1254-right" },
+    "Darma": { "family": "f1254-right" },
+    "dikzzy": { "family": "f1254-right" },
+    "Garuda": { "family": "f1254-right" },
+    "Blond": {
+      "family": "f1254-right",
+      "rows": {
+        "idle_left": { "row": 0, "cols": [1] },
+        "idle_right": { "row": 0, "cols": [3] }
+      }
+    },
+    "Pinkeu": {
+      "family": "f1254-right",
+      "rows": {
+        "idle_left": { "row": 0, "cols": [1] },
+        "idle_right": { "row": 0, "cols": [3] }
+      }
+    },
+    "Vika Joestar": {
+      "family": "f1254-right",
+      "rows": {
+        "idle_left": { "row": 0, "cols": [1] },
+        "idle_right": { "row": 0, "cols": [3] }
+      }
+    },
+    "Eric Argent": { "family": "f1254-left" },
+    "Rollins": {
+      "family": "f1254-left",
+      "rows": {
+        "idle_left": { "row": 0, "cols": [1] },
+        "idle_right": { "row": 0, "cols": [3] }
+      }
+    },
+    "Vibevortex": {
+      "family": "f1254-left",
+      "rows": {
+        "idle_left": { "row": 0, "cols": [1] },
+        "idle_right": { "row": 0, "cols": [3] }
+      }
+    },
+
+    "Ali": { "family": "f1122" },
+    "Ecelannister": { "family": "f1122" },
+    "Keep": { "family": "f1122" },
+    "Luka": { "family": "f1122" },
+    "BJoestar": { "family": "f1122", "rows": { "idle_right": "mirror:idle_left" } },
+    "Silverwave": { "family": "f1122", "rows": { "idle_right": "mirror:idle_left" } },
+    "Richard12": {
+      "family": "f1122",
+      "rows": {
+        "walk_down": { "row": 7 },
+        "walk_up": { "row": 5 },
+        "walk_left": { "row": 6 }
+      }
+    },
+
+    "Cryptondo": { "family": "std8" },
+    "Dora": { "family": "std8" },
+    "Elias": { "family": "std8" },
+    "Flippedface": { "family": "std8" },
+    "Jeams": { "family": "std8" },
+    "KingJ": { "family": "std8" },
+    "Koushik": { "family": "std8" },
+    "LongLife": { "family": "std8" },
+    "Luzzy": { "family": "std8" },
+    "rikky": { "family": "std8" },
+    "Sukanto": { "family": "std8" },
+    "Yozi": { "family": "std8" },
+    "Suleyman": { "family": "std8", "rows": { "idle_right": "mirror:idle_left" } },
+    "Goat": {
+      "family": "std8",
+      "rows": {
+        "idle_right": "mirror:idle_left",
+        "walk_right": "mirror:walk_left"
+      }
+    },
+    "K.Gufran": {
+      "family": "std8",
+      "rows": {
+        "walk_left": { "row": 7 },
+        "walk_right": "mirror:walk_left"
+      }
+    },
+    "Sza": {
+      "family": "std8",
+      "rows": {
+        "walk_left": { "row": 7 },
+        "walk_right": "mirror:walk_left"
+      }
+    },
+    "AQC": {
+      "family": "std8",
+      "rows": {
+        "walk_up": "bob:idle_up",
+        "walk_left": { "row": 5 },
+        "walk_right": { "row": 6 }
+      }
+    },
+    "Spider": {
+      "family": "std8",
+      "rows": {
+        "walk_up": { "row": 5 },
+        "walk_right": { "row": 6 },
+        "walk_left": "mirror:walk_right"
+      }
+    },
+
+    "Nxr": {
+      "rows": {
+        "idle_down": { "row": 0, "cols": [0, 1] },
+        "walk_down": { "row": 0, "cols": [2, 3, 4, 5] },
+        "idle_right": { "row": 1, "cols": [0, 1] },
+        "walk_right": { "row": 1, "cols": [2, 3, 4, 5] },
+        "idle_up": { "row": 2, "cols": [0, 1] },
+        "walk_up": { "row": 2, "cols": [2, 3, 4, 5] },
+        "idle_left": { "row": 3, "cols": [0, 1] },
+        "walk_left": { "row": 3, "cols": [2, 3, 4, 5] }
+      }
+    },
+    "Ishu": {
+      "rows": {
+        "idle_down": { "row": 0, "cols": [0] },
+        "idle_left": { "row": 0, "cols": [1] },
+        "idle_up": { "row": 0, "cols": [2] },
+        "idle_right": "mirror:idle_left",
+        "walk_left": { "row": 1 },
+        "walk_right": "mirror:walk_left",
+        "walk_down": "bob:idle_down",
+        "walk_up": "bob:idle_up"
+      }
+    },
+    "Raka": {
+      "rows": {
+        "idle_down": { "row": 0, "cols": [0] },
+        "idle_up": { "row": 2, "cols": [1] },
+        "idle_left": { "row": 2, "cols": [2] },
+        "idle_right": "mirror:idle_left",
+        "walk_left": { "row": 0, "cols": [1, 2, 3, 4] },
+        "walk_right": "mirror:walk_left",
+        "walk_down": "bob:idle_down",
+        "walk_up": "bob:idle_up"
+      }
+    },
+    "DP": {
+      "rows": {
+        "idle_down": { "row": 0, "cols": [4] },
+        "idle_left": { "row": 0, "cols": [1] },
+        "idle_up": { "row": 0, "cols": [2] },
+        "idle_right": "mirror:idle_left",
+        "walk_left": { "row": 1, "cols": [0, 1, 2, 3] },
+        "walk_right": "mirror:walk_left",
+        "walk_down": "bob:idle_down",
+        "walk_up": "bob:idle_up"
+      }
+    },
+    "Jepanya": {
+      "rows": {
+        "idle_down": { "row": 0, "cols": [0] },
+        "idle_up": { "row": 0, "cols": [1] },
+        "idle_left": { "row": 0, "cols": [2] },
+        "idle_right": "mirror:idle_left",
+        "walk_left": { "row": 1 },
+        "walk_right": "mirror:walk_left",
+        "walk_down": "bob:idle_down",
+        "walk_up": "bob:idle_up"
+      }
+    },
+    "Wisnu": {
+      "rows": {
+        "idle_down": { "row": 0, "cols": [0] },
+        "idle_up": { "row": 0, "cols": [3] },
+        "idle_left": { "row": 0, "cols": [5] },
+        "idle_right": "mirror:idle_left",
+        "walk_left": { "row": 1 },
+        "walk_right": "mirror:walk_left",
+        "walk_down": "bob:idle_down",
+        "walk_up": "bob:idle_up"
+      }
+    }
+  }
+}
