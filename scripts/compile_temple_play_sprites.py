@@ -236,6 +236,216 @@ def grid6x8_rows(source: Image.Image) -> list[list[Image.Image]]:
     return rows
 
 
+def band_component_rows(source: Image.Image) -> list[list[Image.Image]]:
+    clean = flood_clear_background(source)
+    rows: list[list[Image.Image]] = []
+
+    for row in range(ROWS):
+        top = round(clean.height * row / ROWS)
+        bottom = round(clean.height * (row + 1) / ROWS)
+        band = clean.crop((0, top, clean.width, bottom))
+        alpha = band.getchannel("A")
+        mask = alpha.point(lambda value: 255 if value > 12 else 0).filter(ImageFilter.MaxFilter(5))
+        components = connected_components(mask)
+        min_area = max(220, int(band.width * band.height * 0.00035))
+        frames: list[tuple[float, Image.Image]] = []
+
+        for left, component_top, right, component_bottom, area in components:
+            if area < min_area:
+                continue
+            pad = 6
+            left = max(0, left - pad)
+            component_top = max(0, component_top - pad)
+            right = min(band.width, right + pad)
+            component_bottom = min(band.height, component_bottom + pad)
+            crop = crop_content(band.crop((left, component_top, right, component_bottom)))
+            if crop:
+                frames.append(((left + right) / 2, crop))
+
+        frames.sort(key=lambda item: item[0])
+        row_frames = pick_six([frame for _, frame in frames])
+        rows.append(row_frames)
+
+    for row, frames in enumerate(rows):
+        if frames:
+            continue
+        if row == 3 and rows[2]:
+            rows[row] = mirror(rows[2])
+        elif row == 7 and rows[6]:
+            rows[row] = mirror(rows[6])
+        elif row > 0 and rows[row - 1]:
+            rows[row] = [frame.copy() for frame in rows[row - 1]]
+        elif rows[0]:
+            rows[row] = [frame.copy() for frame in rows[0]]
+        else:
+            raise ValueError(f"empty row {row}")
+
+    return rows
+
+
+def content_row_runs(clean: Image.Image) -> list[tuple[int, int]]:
+    pixels = clean.load()
+    row_counts: list[int] = []
+    for y in range(clean.height):
+        count = 0
+        for x in range(clean.width):
+            if pixels[x, y][3] > 12:
+                count += 1
+        row_counts.append(count)
+
+    threshold = max(10, clean.width // 160)
+    runs: list[tuple[int, int]] = []
+    start: int | None = None
+    for index, count in enumerate(row_counts):
+        if count > threshold and start is None:
+            start = index
+        is_end = count <= threshold or index == len(row_counts) - 1
+        if is_end and start is not None:
+            end = index if count <= threshold else index + 1
+            if end - start > 18:
+                runs.append((start, end))
+            start = None
+    return runs
+
+
+def row_component_frames(clean: Image.Image, top: int, bottom: int, dilation: int = 9) -> list[Image.Image]:
+    pad_y = 5
+    top = max(0, top - pad_y)
+    bottom = min(clean.height, bottom + pad_y)
+    band = clean.crop((0, top, clean.width, bottom))
+    alpha = band.getchannel("A")
+    mask = alpha.point(lambda value: 255 if value > 12 else 0).filter(ImageFilter.MaxFilter(dilation))
+    min_area = max(180, int(band.width * band.height * 0.00045))
+    frames: list[tuple[float, Image.Image]] = []
+
+    for left, component_top, right, component_bottom, area in connected_components(mask):
+        if area < min_area:
+            continue
+        pad = 8
+        crop = crop_content(
+            band.crop(
+                (
+                    max(0, left - pad),
+                    max(0, component_top - pad),
+                    min(band.width, right + pad),
+                    min(band.height, component_bottom + pad),
+                )
+            )
+        )
+        if crop:
+            frames.append(((left + right) / 2, crop))
+
+    frames.sort(key=lambda item: item[0])
+    return [frame for _, frame in frames]
+
+
+def projection_rows(source: Image.Image) -> list[list[Image.Image]]:
+    clean = flood_clear_background(source)
+    return [row_component_frames(clean, top, bottom) for top, bottom in content_row_runs(clean)]
+
+
+def first_frame(frames: list[Image.Image]) -> Image.Image:
+    if not frames:
+        raise ValueError("empty direction row")
+    return frames[0]
+
+
+def layout_1254_rows(source: Image.Image) -> list[list[Image.Image]]:
+    rows = projection_rows(source)
+    if not rows or len(rows[0]) < 4:
+        return component_layout_rows(source)
+
+    directions = rows[0]
+    down = first_frame(directions)
+    right = directions[1]
+    up = directions[2]
+    left = directions[3]
+    side_walk = pick_six(rows[2] if len(rows) > 2 and len(rows[2]) >= 3 else rows[-1])
+
+    return [
+        repeat(down),
+        repeat(up),
+        repeat(left),
+        repeat(right),
+        repeat(down),
+        repeat(up),
+        mirror(side_walk),
+        side_walk,
+    ]
+
+
+def layout_1122_rows(source: Image.Image) -> list[list[Image.Image]]:
+    rows = projection_rows(source)
+    if len(rows) < 7:
+        return component_layout_rows(source)
+
+    down = first_frame(rows[0])
+    up = first_frame(rows[1])
+    left = first_frame(rows[2])
+    right = first_frame(rows[3]) if len(rows) > 3 else mirror([left])[0]
+    walk_down = pick_six(rows[4])
+    walk_up = pick_six(rows[5]) if len(rows) > 5 else repeat(up)
+    walk_left = pick_six(rows[6]) if len(rows) > 6 else repeat(left)
+    walk_right = mirror(walk_left)
+
+    return [
+        repeat(down),
+        repeat(up),
+        repeat(left),
+        repeat(right),
+        walk_down,
+        walk_up,
+        walk_left,
+        walk_right,
+    ]
+
+
+def layout_1536_rows(source: Image.Image) -> list[list[Image.Image]]:
+    rows = projection_rows(source)
+    if not rows:
+        return component_layout_rows(source)
+
+    main = rows[0]
+    down = main[0]
+    up = main[3] if len(main) > 3 else main[0]
+    side_walk = pick_six(rows[1] if len(rows) > 1 and len(rows[1]) >= 3 else main)
+    right = first_frame(side_walk)
+    left = mirror([right])[0]
+
+    return [
+        repeat(down),
+        repeat(up),
+        repeat(left),
+        repeat(right),
+        repeat(down),
+        repeat(up),
+        mirror(side_walk),
+        side_walk,
+    ]
+
+
+def layout_nxr_rows(source: Image.Image) -> list[list[Image.Image]]:
+    rows = projection_rows(source)
+    if len(rows) < 4:
+        return component_layout_rows(source)
+
+    down = pick_six(rows[0])
+    right = pick_six(rows[1])
+    up = pick_six(rows[2])
+    left = pick_six(rows[3])
+
+    return [
+        repeat(first_frame(down)),
+        repeat(first_frame(up)),
+        repeat(first_frame(left)),
+        repeat(first_frame(right)),
+        down,
+        up,
+        left,
+        right,
+    ]
+
+
 def connected_components(mask: Image.Image) -> list[tuple[int, int, int, int, int]]:
     width, height = mask.size
     data = mask.load()
@@ -365,9 +575,17 @@ def component_layout_rows(source: Image.Image) -> list[list[Image.Image]]:
     ]
 
 
-def source_rows(source: Image.Image) -> list[list[Image.Image]]:
-    if source.size in {(1086, 1448), (1122, 1402)}:
+def source_rows(source: Image.Image, source_name: str = "") -> list[list[Image.Image]]:
+    if source_name == "Nxr.png":
+        return layout_nxr_rows(source)
+    if source.size == (1122, 1402):
+        return layout_1122_rows(source)
+    if source.size == (1086, 1448):
         return grid6x8_rows(source)
+    if source.size == (1254, 1254):
+        return layout_1254_rows(source)
+    if source.size == (1536, 1024):
+        return layout_1536_rows(source)
     return component_layout_rows(source)
 
 
@@ -399,7 +617,7 @@ def normalize_rows(rows: list[list[Image.Image]]) -> list[Image.Image]:
 
 def build_sheet(source_path: Path) -> Image.Image:
     source = Image.open(source_path).convert("RGBA")
-    frames = normalize_rows(source_rows(source))
+    frames = normalize_rows(source_rows(source, source_path.name))
     sheet = Image.new("RGBA", OUT_SIZE, (0, 0, 0, 0))
     for index, frame in enumerate(frames):
         sheet.alpha_composite(frame, ((index % COLS) * CELL, (index // COLS) * CELL))
