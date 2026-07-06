@@ -6,8 +6,10 @@ import { useAccount, useReadContract, useReadContracts, useWaitForTransactionRec
 import { ARC_CHAIN, RIALO_TEMPLE_ABI, RIALO_TEMPLE_ADDRESS } from '@/config/contracts'
 import { parseUnifiedUser } from '@/lib/rialo'
 import {
+  AGENT_GENDERS,
   AGENT_HAIR_COLORS,
   AGENT_HAIR_STYLES,
+  AGENT_OUTFITS,
   AGENT_PANTS_COLORS,
   AGENT_SHIRT_COLORS,
   AGENT_SHOE_COLORS,
@@ -195,30 +197,42 @@ type FishSpecies = { id: string; name: string; rarity: MinigameRarity; weight: n
 
 // ids stay unchanged — they key the sprite files and the localStorage fish log
 const FISH_SPECIES: FishSpecies[] = [
-  { id: 'koi-merah', name: 'Crimson Koi', rarity: 'common', weight: 20, pts: 10 },
-  { id: 'mujair-hijau', name: 'Jade Tilapia', rarity: 'common', weight: 20, pts: 10 },
-  { id: 'lele-biru', name: 'Azure Catfish', rarity: 'common', weight: 18, pts: 12 },
-  { id: 'nila-emas', name: 'Golden Perch', rarity: 'uncommon', weight: 12, pts: 25 },
-  { id: 'gurame-ungu', name: 'Violet Gourami', rarity: 'uncommon', weight: 11, pts: 25 },
-  { id: 'cupang-neon', name: 'Neon Betta', rarity: 'rare', weight: 7, pts: 60 },
-  { id: 'arwana-perak', name: 'Silver Arowana', rarity: 'rare', weight: 6, pts: 70 },
-  { id: 'koi-naga', name: 'Dragon Koi', rarity: 'epic', weight: 3.5, pts: 150 },
-  { id: 'ikan-bulan', name: 'Moonfish', rarity: 'epic', weight: 2, pts: 180 },
-  { id: 'rialo-leviathan', name: 'Rialo Leviathan', rarity: 'legendary', weight: 0.5, pts: 500 },
+  { id: 'koi-merah', name: 'Crimson Koi', rarity: 'common', weight: 14, pts: 10 },
+  { id: 'mujair-hijau', name: 'Jade Tilapia', rarity: 'common', weight: 14, pts: 10 },
+  { id: 'lele-biru', name: 'Azure Catfish', rarity: 'common', weight: 13, pts: 12 },
+  { id: 'zebra-danio', name: 'Zebra Danio', rarity: 'common', weight: 13, pts: 12 },
+  { id: 'sunny-guppy', name: 'Sunny Guppy', rarity: 'common', weight: 13, pts: 14 },
+  { id: 'nila-emas', name: 'Golden Perch', rarity: 'uncommon', weight: 8, pts: 25 },
+  { id: 'gurame-ungu', name: 'Violet Gourami', rarity: 'uncommon', weight: 8, pts: 25 },
+  { id: 'glass-eel', name: 'Glass Eel', rarity: 'uncommon', weight: 7, pts: 30 },
+  { id: 'royal-gar', name: 'Royal Gar', rarity: 'uncommon', weight: 7, pts: 32 },
+  { id: 'cupang-neon', name: 'Neon Betta', rarity: 'rare', weight: 5, pts: 60 },
+  { id: 'arwana-perak', name: 'Silver Arowana', rarity: 'rare', weight: 4.5, pts: 70 },
+  { id: 'thunder-ray', name: 'Thunder Ray', rarity: 'rare', weight: 4, pts: 80 },
+  { id: 'koi-naga', name: 'Dragon Koi', rarity: 'epic', weight: 2.6, pts: 150 },
+  { id: 'ikan-bulan', name: 'Moonfish', rarity: 'epic', weight: 1.8, pts: 180 },
+  { id: 'aurora-salmon', name: 'Aurora Salmon', rarity: 'epic', weight: 1.4, pts: 220 },
+  { id: 'rialo-leviathan', name: 'Rialo Leviathan', rarity: 'legendary', weight: 0.45, pts: 500 },
+  { id: 'celestial-koi', name: 'Celestial Koi', rarity: 'legendary', weight: 0.25, pts: 650 },
 ]
 
 type PetSpecies = { id: string; name: string; rarity: MinigameRarity; weight: number; line: string }
 
 const PET_SPECIES: PetSpecies[] = [
-  { id: 'emberpup', name: 'Emberpup', rarity: 'common', weight: 18, line: 'A warm little pup with a flame-tipped tail.' },
-  { id: 'sproutle', name: 'Sproutle', rarity: 'common', weight: 18, line: 'A mossy turtle sprouting a lucky leaf.' },
-  { id: 'puddlix', name: 'Puddlix', rarity: 'common', weight: 18, line: 'A cheerful axolotl that never dries out.' },
-  { id: 'peebolt', name: 'Peebolt', rarity: 'common', weight: 18, line: 'A zappy mouse that hums when signals arrive.' },
-  { id: 'rockling', name: 'Rockling', rarity: 'rare', weight: 7.5, line: 'A pocket golem grown from temple stone.' },
-  { id: 'wispy', name: 'Wispy', rarity: 'rare', weight: 7.5, line: 'A gentle lantern spirit from the shrine.' },
-  { id: 'frostbun', name: 'Frostbun', rarity: 'rare', weight: 7.5, line: 'A snow bunny with ears of clear ice.' },
-  { id: 'starcub', name: 'Starcub', rarity: 'epic', weight: 4, line: 'A night bear cub blessed by a falling star.' },
-  { id: 'emberdrake', name: 'Emberdrake', rarity: 'legendary', weight: 1.5, line: 'A mini drake said to guard the temple ledger.' },
+  { id: 'emberpup', name: 'Emberpup', rarity: 'common', weight: 12, line: 'A warm little pup with a flame-tipped tail.' },
+  { id: 'sproutle', name: 'Sproutle', rarity: 'common', weight: 12, line: 'A mossy turtle sprouting a lucky leaf.' },
+  { id: 'puddlix', name: 'Puddlix', rarity: 'common', weight: 12, line: 'A cheerful axolotl that never dries out.' },
+  { id: 'peebolt', name: 'Peebolt', rarity: 'common', weight: 12, line: 'A zappy mouse that hums when signals arrive.' },
+  { id: 'bubbly', name: 'Bubbly', rarity: 'common', weight: 12, line: 'A drifting pond jelly that giggles in ripples.' },
+  { id: 'mothie', name: 'Mothie', rarity: 'common', weight: 12, line: 'A dusty moth that naps on warm lanterns.' },
+  { id: 'rockling', name: 'Rockling', rarity: 'rare', weight: 6, line: 'A pocket golem grown from temple stone.' },
+  { id: 'wispy', name: 'Wispy', rarity: 'rare', weight: 6, line: 'A gentle lantern spirit from the shrine.' },
+  { id: 'frostbun', name: 'Frostbun', rarity: 'rare', weight: 6, line: 'A snow bunny with ears of clear ice.' },
+  { id: 'shockfin', name: 'Shockfin', rarity: 'rare', weight: 5, line: 'A flying fish that swims through static.' },
+  { id: 'starcub', name: 'Starcub', rarity: 'epic', weight: 3, line: 'A night bear cub blessed by a falling star.' },
+  { id: 'lunarowl', name: 'Lunarowl', rarity: 'epic', weight: 2.5, line: 'A quiet owl that hoots at the moonrise.' },
+  { id: 'emberdrake', name: 'Emberdrake', rarity: 'legendary', weight: 1, line: 'A mini drake said to guard the temple ledger.' },
+  { id: 'aurorix', name: 'Aurorix', rarity: 'legendary', weight: 0.7, line: 'A crystal fawn woven from aurora light.' },
 ]
 
 function weightedPick<T extends { weight: number }>(items: T[]): T {
@@ -244,15 +258,32 @@ const minigame = {
   playerX: 928,
   playerY: 940,
   pet: { id: null as string | null, x: FISHING_SPOT.x, y: FISHING_SPOT.y, dir: 'down' as PlayerState['dir'], moving: false },
+  // a wild pixel dragon occasionally sweeps across the sky above the map
+  dragon: { active: false, timer: 26 + Math.random() * 40, x: 0, y: 0, dir: 1 as 1 | -1 },
 }
 
 if (import.meta.env.DEV && typeof window !== 'undefined') {
   // manual-testing hooks for dev builds
   ;(window as unknown as Record<string, unknown>).__templeMinigame = minigame
-  ;(window as unknown as Record<string, unknown>).__templeBuildCard = (stats: { badges: number; fishPts: number; pets: number }) =>
-    buildAgentCardCanvas(loadAgentConfig(), stats).then((canvas) => canvas.toDataURL())
+  ;(window as unknown as Record<string, unknown>).__templeBuildCard = (overrides?: Partial<AgentConfig>) =>
+    buildAgentCardCanvas({ ...loadAgentConfig(), ...overrides }).then((canvas) => canvas.toDataURL())
   ;(window as unknown as Record<string, unknown>).__templeAgentSheet = () =>
     buildAgentSheetCanvas(loadAgentConfig()).toDataURL()
+  ;(window as unknown as Record<string, unknown>).__templeAgentPreview = (overrides: Partial<AgentConfig>) =>
+    buildAgentPortraitCanvas({ ...loadAgentConfig(), ...overrides }, 4).toDataURL()
+  ;(window as unknown as Record<string, unknown>).__templeDragonSnap = (time = 1.2) => {
+    const canvas = document.createElement('canvas')
+    canvas.width = 260
+    canvas.height = 220
+    const context = canvas.getContext('2d')
+    if (!context) return ''
+    const dragon = minigame.dragon
+    const previous = { ...dragon }
+    Object.assign(dragon, { active: true, x: 130, y: 80, dir: 1 })
+    drawSkyDragon(context, time)
+    Object.assign(dragon, previous)
+    return canvas.toDataURL()
+  }
 }
 
 function startFishing() {
@@ -1483,6 +1514,7 @@ function TemplePlayInner() {
   const [nearSign, setNearSign] = useState(false)
   const [nearFishing, setNearFishing] = useState(false)
   const [nearChest, setNearChest] = useState(false)
+  const [fishingActive, setFishingActive] = useState(false)
   const [fishPts, setFishPts] = useState(() => {
     if (typeof window === 'undefined') return 0
     return Number(localStorage.getItem('temple-fish-pts') ?? 0) || 0
@@ -1822,6 +1854,7 @@ function TemplePlayInner() {
             onNearSignChange={setNearSign}
             onNearFishingChange={setNearFishing}
             onNearChestChange={setNearChest}
+            onFishingActiveChange={setFishingActive}
             onOpenQuest={(quest) => openQuestRef.current(quest)}
             onOpenAmbientTalk={openAmbientTalk}
             onOpenSignInfo={openSignInfo}
@@ -1866,24 +1899,31 @@ function TemplePlayInner() {
           />
 
           <div className="temple-play-miniquest">
-            <p>{nearestQuest || nearestAmbientNpc || nearestSign || nearestChest || nearestFishing ? 'Interact now' : 'Next destination'}</p>
+            <p>{fishingActive ? 'Fishing' : nearestQuest || nearestAmbientNpc || nearestSign || nearestChest || nearestFishing ? 'Interact now' : 'Next destination'}</p>
             <strong>
-              {nearestQuest
-                ? `${nearestQuest.npc} / ${nearestQuest.zone}`
-                : nearestChest
-                  ? 'Mystery Chest / Pet Gacha'
-                  : nearestAmbientNpc
-                    ? `${nearestAmbientNpc.name} / ${nearestAmbientNpc.topic}`
-                    : nearestSign
-                      ? 'RialoSign / Temple Info'
-                      : nearestFishing
-                        ? 'Fishing Pond / Cast a line'
+              {fishingActive
+                ? 'Waiting for a bite…'
+                : nearestQuest
+                  ? `${nearestQuest.npc} / ${nearestQuest.zone}`
+                  : nearestChest
+                    ? 'Mystery Chest / Pet Gacha'
+                    : nearestAmbientNpc
+                      ? `${nearestAmbientNpc.name} / ${nearestAmbientNpc.topic}`
+                      : nearestSign
+                        ? 'RialoSign / Temple Info'
+                        : nearestFishing
+                          ? 'Fishing Pond / Cast a line'
                   : `${nextQuest.zone}`}
             </strong>
             <button
               type="button"
-              disabled={!nearestQuest && !nearestAmbientNpc && !nearestSign && !nearestChest && !nearestFishing}
+              disabled={!fishingActive && !nearestQuest && !nearestAmbientNpc && !nearestSign && !nearestChest && !nearestFishing}
               onClick={() => {
+                if (fishingActive) {
+                  playTempleSfx('tap')
+                  stopFishing()
+                  return
+                }
                 if (nearestQuest) return openQuest(nearestQuest)
                 if (nearestChest) {
                   if (collectChestDrop()) {
@@ -1900,7 +1940,7 @@ function TemplePlayInner() {
                 }
               }}
             >
-              {nearestChest ? 'Open Chest' : nearestQuest || nearestAmbientNpc ? 'Talk' : nearestSign ? 'Open Info' : nearestFishing ? 'Fish' : 'Find NPC'}
+              {fishingActive ? 'Cancel' : nearestChest ? 'Open Chest' : nearestQuest || nearestAmbientNpc ? 'Talk' : nearestSign ? 'Open Info' : nearestFishing ? 'Fish' : 'Find NPC'}
             </button>
           </div>
 
@@ -1980,7 +2020,6 @@ function TemplePlayInner() {
             {creatorOpen ? (
               <AgentCreatorOverlay
                 initial={loadAgentConfig()}
-                stats={{ badges: completedIds.size, fishPts, pets: ownedPets.length }}
                 onSave={handleSaveAgent}
                 onClose={() => setCreatorOpen(false)}
               />
@@ -2017,6 +2056,7 @@ function TemplePlayCanvas({
   onNearSignChange,
   onNearFishingChange,
   onNearChestChange,
+  onFishingActiveChange,
   onOpenQuest,
   onOpenAmbientTalk,
   onOpenSignInfo,
@@ -2031,6 +2071,7 @@ function TemplePlayCanvas({
   onNearSignChange: (near: boolean) => void
   onNearFishingChange: (near: boolean) => void
   onNearChestChange: (near: boolean) => void
+  onFishingActiveChange: (active: boolean) => void
   onOpenQuest: (quest: QuestNpc) => void
   onOpenAmbientTalk: (npc: AmbientNpc) => void
   onOpenSignInfo: () => void
@@ -2046,6 +2087,7 @@ function TemplePlayCanvas({
   const nearSignRef = useRef(false)
   const nearFishingRef = useRef(false)
   const nearChestRef = useRef(false)
+  const fishingActiveRef = useRef(false)
   const completedLatest = useRef(completedIds)
   const assetsRef = useRef<TemplePlayAssets | null>(null)
   const tapTarget = useRef<{ x: number; y: number; questId?: number; ambientIndex?: number; sign?: boolean; fishing?: boolean; chest?: boolean } | null>(null)
@@ -2288,6 +2330,11 @@ function TemplePlayCanvas({
         nearChestRef.current = chestClose
         onNearChestChange(chestClose)
       }
+      const fishingBusy = minigame.fishing.phase === 'waiting' || minigame.fishing.phase === 'bite'
+      if (fishingBusy !== fishingActiveRef.current) {
+        fishingActiveRef.current = fishingBusy
+        onFishingActiveChange(fishingBusy)
+      }
 
       const zoom = cameraZoom(rect.width)
       const viewport = { width: rect.width / zoom, height: rect.height / zoom }
@@ -2314,7 +2361,7 @@ function TemplePlayCanvas({
       window.removeEventListener('keydown', keyDown)
       window.removeEventListener('keyup', keyUp)
     }
-  }, [nextQuest, onNearQuestChange, onNearAmbientChange, onNearSignChange, onNearFishingChange, onNearChestChange, onOpenQuest, onOpenAmbientTalk, onOpenSignInfo, onFishingCatch, onOpenChest, playerSprite])
+  }, [nextQuest, onNearQuestChange, onNearAmbientChange, onNearSignChange, onNearFishingChange, onNearChestChange, onFishingActiveChange, onOpenQuest, onOpenAmbientTalk, onOpenSignInfo, onFishingCatch, onOpenChest, playerSprite])
 
   return (
     <div ref={wrapRef} className="temple-play-canvas-wrap">
@@ -2329,7 +2376,8 @@ function TemplePlayCanvas({
             x: clamp((event.clientX - rect.left) / camera.zoom + camera.x, 90, WORLD.width - 90),
             y: clamp((event.clientY - rect.top) / camera.zoom + camera.y, 90, WORLD.height - 90),
           }
-          // Tapping anywhere while the line is out reels / hooks.
+          // Tapping while the line is out: hook on a bite; near the bobber it
+          // is an early yank; anywhere else reels in and walks away instead.
           if (minigame.fishing.phase === 'bite') {
             minigame.fishing.phase = 'result'
             playTempleSfx('success')
@@ -2337,10 +2385,14 @@ function TemplePlayCanvas({
             return
           }
           if (minigame.fishing.phase === 'waiting') {
-            minigame.fishing.splash = 0.8
-            minigame.fishing.timer = 1.6 + Math.random() * 3
-            playTempleSfx('tap')
-            return
+            if (Math.hypot(target.x - FISHING_BOBBER.x, target.y - FISHING_BOBBER.y) < 150) {
+              minigame.fishing.splash = 0.8
+              minigame.fishing.timer = 1.6 + Math.random() * 3
+              playTempleSfx('tap')
+              return
+            }
+            stopFishing()
+            // fall through: the tap becomes a normal walk target
           }
           const tappedQuest = QUESTS.find((quest) => Math.hypot(target.x - quest.x, target.y - quest.y) < 70)
           // A tap right on the sign beats NPCs loitering on the plaza.
@@ -2859,12 +2911,10 @@ const AGENT_VIEW_ORDER: AgentView[] = ['front', 'side', 'back']
 
 function AgentCreatorOverlay({
   initial,
-  stats,
   onSave,
   onClose,
 }: {
   initial: AgentConfig
-  stats: { badges: number; fishPts: number; pets: number }
   onSave: (config: AgentConfig) => void
   onClose: () => void
 }) {
@@ -2887,7 +2937,7 @@ function AgentCreatorOverlay({
   const downloadCard = async () => {
     setDownloading(true)
     try {
-      const card = await buildAgentCardCanvas(config, stats)
+      const card = await buildAgentCardCanvas(config)
       await new Promise<void>((resolve) => {
         card.toBlob((blob) => {
           if (blob) {
@@ -2940,8 +2990,46 @@ function AgentCreatorOverlay({
               aria-label="Agent name"
               onChange={(event) => update({ name: event.target.value })}
             />
+            <textarea
+              maxLength={120}
+              rows={3}
+              value={config.cardText}
+              placeholder="Card text (shown on your agent card)"
+              aria-label="Card text"
+              onChange={(event) => update({ cardText: event.target.value })}
+            />
           </div>
           <div className="temple-play-creator-options">
+            <div className="temple-play-creator-row">
+              <p>Gender</p>
+              <div className="temple-play-creator-chips">
+                {AGENT_GENDERS.map((gender) => (
+                  <button
+                    key={gender}
+                    type="button"
+                    className={config.gender === gender ? 'is-selected' : ''}
+                    onClick={() => update({ gender })}
+                  >
+                    {gender}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="temple-play-creator-row">
+              <p>Outfit Style</p>
+              <div className="temple-play-creator-chips">
+                {AGENT_OUTFITS.map((outfit) => (
+                  <button
+                    key={outfit.id}
+                    type="button"
+                    className={config.outfit === outfit.id ? 'is-selected' : ''}
+                    onClick={() => update({ outfit: outfit.id })}
+                  >
+                    {outfit.label}
+                  </button>
+                ))}
+              </div>
+            </div>
             <div className="temple-play-creator-row">
               <p>Hair Style</p>
               <div className="temple-play-creator-chips">
@@ -3442,10 +3530,92 @@ function drawWorld(
   drawRialoSignHint(ctx, time, nearSign)
   drawAmbientCritters(ctx, time, lowPower)
   drawActors(ctx, time, completedIds, nearNpcId, nearAmbientIndex, player, assets, playerSprite, camera, viewportWidth, viewportHeight)
+  drawSkyDragon(ctx, time)
   drawWeather(ctx, camera, viewportWidth, viewportHeight, time, lowPower)
   drawShootingStar(ctx, camera, viewportWidth, viewportHeight, time)
   ctx.restore()
   if (!lowPower) drawScanlines(ctx, width, height)
+}
+
+// The sky dragon is rendered onto a tiny offscreen canvas and scaled up with
+// smoothing disabled, so it stays pixel art while the wings animate smoothly.
+let dragonScratch: HTMLCanvasElement | null = null
+
+function drawSkyDragon(ctx: CanvasRenderingContext2D, time: number) {
+  const dragon = minigame.dragon
+  if (!dragon.active) return
+  if (!dragonScratch) {
+    dragonScratch = document.createElement('canvas')
+    dragonScratch.width = 64
+    dragonScratch.height = 44
+  }
+  const scratch = dragonScratch.getContext('2d')
+  if (!scratch) return
+  scratch.clearRect(0, 0, 64, 44)
+
+  const flap = Math.sin(time * 7)
+  const cy = 22
+  const px = (x: number, y: number, w: number, h: number, color: string) => {
+    scratch.fillStyle = color
+    scratch.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h))
+  }
+
+  // tail (left) with flickering flame tip
+  for (let i = 0; i < 6; i++) {
+    const size = 2 + i
+    px(6 + i * 4, cy - size / 2, 4, size, i % 2 ? '#d1642a' : '#c2571f')
+  }
+  const flameFlip = Math.sin(time * 16) > 0
+  px(1, cy - 3, 5, 6, flameFlip ? '#f6d33c' : '#ff7a2a')
+  px(2, cy - 1, 3, 3, flameFlip ? '#ff7a2a' : '#f6d33c')
+
+  // wings: symmetric span, animated by the flap phase
+  const span = 12 + Math.abs(flap) * 8
+  const sweep = flap * 4
+  scratch.fillStyle = '#3ea8a0'
+  scratch.beginPath()
+  scratch.moveTo(30, cy - 3)
+  scratch.lineTo(24 + sweep, cy - span - 4)
+  scratch.lineTo(44 + sweep, cy - span)
+  scratch.lineTo(42, cy - 3)
+  scratch.closePath()
+  scratch.fill()
+  scratch.beginPath()
+  scratch.moveTo(30, cy + 3)
+  scratch.lineTo(24 + sweep, cy + span + 4)
+  scratch.lineTo(44 + sweep, cy + span)
+  scratch.lineTo(42, cy + 3)
+  scratch.closePath()
+  scratch.fill()
+  scratch.fillStyle = '#2c7a74'
+  scratch.fillRect(28, Math.round(cy - span - 2), 3, Math.round(span))
+  scratch.fillRect(28, cy + 2, 3, Math.round(span))
+
+  // body + belly + neck + head (facing right)
+  px(26, cy - 4, 18, 8, '#e07030')
+  px(28, cy - 1, 15, 3, '#f6d3a0')
+  px(43, cy - 4, 6, 6, '#e07030')
+  px(48, cy - 5, 7, 6, '#e07030')
+  px(54, cy - 3, 4, 3, '#f6d3a0')
+  // horns + eye + nostril
+  px(49, cy - 8, 2, 4, '#f2e2c2')
+  px(52, cy - 8, 2, 4, '#f2e2c2')
+  px(52, cy - 4, 2, 2, '#141018')
+  px(57, cy - 2, 1, 1, '#141018')
+
+  // ground shadow, then the dragon itself
+  const bob = Math.sin(time * 2.2) * 6
+  const scale = 3.4
+  ctx.save()
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.18)'
+  ctx.beginPath()
+  ctx.ellipse(dragon.x, dragon.y + 170, 70 - Math.abs(flap) * 14, 20, 0, 0, Math.PI * 2)
+  ctx.fill()
+  ctx.imageSmoothingEnabled = false
+  ctx.translate(dragon.x, dragon.y + bob)
+  if (dragon.dir < 0) ctx.scale(-1, 1)
+  ctx.drawImage(dragonScratch, Math.round(-32 * scale), Math.round(-22 * scale), Math.round(64 * scale), Math.round(44 * scale))
+  ctx.restore()
 }
 
 const BUTTERFLY_COLORS = ['#f2c866', '#ff7ad9', '#78ecff', '#b9ff66']
@@ -4744,6 +4914,23 @@ function updateMinigames(dt: number, player: PlayerState) {
       } else {
         minigame.chestTimer = 4
       }
+    }
+  }
+
+  const dragon = minigame.dragon
+  if (!dragon.active) {
+    dragon.timer -= dt
+    if (dragon.timer <= 0) {
+      dragon.active = true
+      dragon.dir = Math.random() < 0.5 ? 1 : -1
+      dragon.x = dragon.dir > 0 ? -280 : WORLD.width + 280
+      dragon.y = 300 + Math.random() * (WORLD.height - 800)
+    }
+  } else {
+    dragon.x += dragon.dir * 185 * dt
+    if (dragon.x < -320 || dragon.x > WORLD.width + 320) {
+      dragon.active = false
+      dragon.timer = 90 + Math.random() * 150
     }
   }
 

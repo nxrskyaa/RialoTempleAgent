@@ -146,7 +146,47 @@ LEVIATHAN = [
     "................ooo.....",
 ]
 
+RAY = [
+    "........oooooo..........",
+    "......ooBBBBBBoo........",
+    "....ooBBBBBBBBBBoo......",
+    "..ooBBWKBBBBBBPBBBoooo..",
+    ".oBBBBBBBBBPBBBBABTTTTo.",
+    "..ooBBBBBBBBBBPBBBoooo..",
+    "....ooSSSSSSSSSSoo......",
+    "......ooSSSSSSoo........",
+    "........oooooo..........",
+]
+
 FISH = {
+    "zebra-danio": (CARP, {
+        "o": "#3a4048", "B": "#d8dde2", "S": "#eef1f4", "T": "#8a94a0",
+        "W": "#ffffff", "K": "#14181c", "P": "#3a4048", "A": "#3a4048",
+    }),
+    "sunny-guppy": (BETTA, {
+        "o": "#7a4a10", "B": "#f6c33c", "S": "#fadf90", "T": "#ff8a3c",
+        "W": "#ffffff", "K": "#241a06", "P": "#ff8a3c", "A": "#ffd977",
+    }),
+    "glass-eel": (AROWANA, {
+        "o": "#5a7a8a", "B": "#cfe8f2", "S": "#eff8fc", "T": "#a5cbdd",
+        "W": "#ffffff", "K": "#1c2c34", "P": "#a5cbdd", "A": "#a5cbdd",
+    }),
+    "royal-gar": (AROWANA, {
+        "o": "#1f4d2e", "B": "#4f9e5c", "S": "#a9dcae", "T": "#f2c24e",
+        "W": "#ffffff", "K": "#0f2415", "P": "#2f7a45", "A": "#f2c24e",
+    }),
+    "thunder-ray": (RAY, {
+        "o": "#2c3a6e", "B": "#4f63b8", "S": "#93a3e0", "T": "#3a4a8a",
+        "W": "#ffffff", "K": "#10142a", "P": "#f6d33c", "A": "#f6d33c",
+    }),
+    "aurora-salmon": (CARP, {
+        "o": "#7a3a52", "B": "#f090ac", "S": "#f8cede", "T": "#4de3d2",
+        "W": "#ffffff", "K": "#2a0f18", "P": "#4de3d2", "A": "#4de3d2",
+    }),
+    "celestial-koi": (DRAGON_KOI, {
+        "o": "#7a6a2a", "B": "#f4f0e2", "S": "#ffffff", "T": "#f2c24e",
+        "W": "#ffffff", "K": "#241a08", "P": "#f2c24e", "A": "#ffe9a0",
+    }),
     "koi-merah": (CARP, {
         "o": "#7a2f24", "B": "#f5efe0", "S": "#f0dfc2", "T": "#ff8f6b",
         "W": "#ffffff", "K": "#1c1310", "P": "#e34f3a", "A": "#e34f3a",
@@ -372,7 +412,99 @@ EMBERDRAKE = ([
 ], {"o": "#5c1414", "B": "#d13a2a", "S": "#f2a03c", "A": "#ff7a2a",
     "K": "#200606", "W": "#ffe9c9"})
 
+BUBBLY = ([
+    "......oooooo......",
+    "....ooBBBBBBoo....",
+    "...oBBBBBBBBBBo...",
+    "..oBBABBBBBBABBo..",
+    "..oBWKBBBBBBWKBo..",
+    "..oBWKBBBBBBWKBo..",
+    "..oBBBBSKKSBBBBo..",
+    "...oBBBBBBBBBBo...",
+    "....ooBBBBBBoo....",
+    "....oBoBBoBBoo....",
+    "...oB.oBBo.oBo....",
+    "...o..oB.o..o.....",
+    "......o..o........",
+], {"o": "#2a5c6e", "B": "#7ad4e8", "A": "#c4eef6", "S": "#a8e2f0",
+    "K": "#0f2a32", "W": "#ffffff"})
+
+MOTHIE = ([
+    "..oooo......oooo..",
+    ".oWWWWo....oWWWWo.",
+    "oWWAAWWo..oWWAAWWo",
+    "oWAAAAWWooWWAAAAWo",
+    "oWWAAWWBBBBWWAAWWo",
+    ".oWWWoBKBBKBoWWWo.",
+    "..ooooBBBBBBoooo..",
+    "....oBBSKKSBBo....",
+    "...oWWBBBBBBWWo...",
+    "..oWWWWBBBBWWWWo..",
+    "..oWWWWoBBoWWWWo..",
+    "...oooo.oo.oooo...",
+    "....A........A....",
+], {"o": "#4a3a1e", "W": "#e8d8a8", "A": "#c9973f", "B": "#8a6a3a",
+    "K": "#1c1408", "S": "#f2e2b8"})
+
+SHOCKFIN = ([
+    "........AA........",
+    ".......AAA........",
+    "......oooooo......",
+    "....ooBBBBBBoo....",
+    "...oBWKBBBBBBBo...",
+    "..oBBWKBBBBBBSBo..",
+    "..oBBBBBBBBBSSBo..",
+    "...oBBSKKSBBSBo...",
+    "....ooBBBBBBoo....",
+    "......oooooo......",
+    "....A...AA........",
+    "...AA....AAA......",
+    "...A.......A......",
+], {"o": "#6e5312", "B": "#f6d33c", "S": "#ffefb0", "A": "#78ecff",
+    "K": "#241c06", "W": "#ffffff"})
+
+LUNAROWL = ([
+    ".oo............oo.",
+    ".oBo..........oBo.",
+    "..oBoooooooooooBo.",
+    "..oBBBBBBBBBBBBo..",
+    "..oBWWKBBBBWWKBo..",
+    "..oBWWKBBBBWWKBo..",
+    "..oBBBBAAABBBBBo..",
+    "...oBSSBABBSSBo...",
+    "...oBSSBBBBSSBo...",
+    "...oBSSSSSSSSBo...",
+    "....oBSSSSSSBo....",
+    "....oBBBBBBBBo....",
+    ".....oAo..oAo.....",
+    "......o....o......",
+], {"o": "#241c30", "B": "#4a3c64", "S": "#8a7ab0", "A": "#f2c24e",
+    "K": "#100c18", "W": "#f6f0ff"})
+
+AURORIX = ([
+    "..A..A......A..A..",
+    "..oAoA......AoAo..",
+    "...oo..oooo..oo...",
+    "....ooBBBBBBoo....",
+    "....oBWKBBWKBo....",
+    "....oBWKBBWKBo....",
+    "....oBBBKKBBBo....",
+    ".....oBBBBBBo.....",
+    "....oBBAABBBBo....",
+    "...oBBBAABBBBBo...",
+    "...oBBBBBBBBBBo...",
+    "...oBBoBBBBoBBo...",
+    "....oo.oBBo.oo....",
+    "........oo........",
+], {"o": "#3a2a5c", "B": "#cfd8f4", "A": "#8ff2e8", "K": "#141024",
+    "W": "#ffffff"})
+
 PETS = {
+    "bubbly": BUBBLY,
+    "mothie": MOTHIE,
+    "shockfin": SHOCKFIN,
+    "lunarowl": LUNAROWL,
+    "aurorix": AURORIX,
     "emberpup": EMBERPUP,
     "sproutle": SPROUTLE,
     "puddlix": PUDDLIX,

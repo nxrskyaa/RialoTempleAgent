@@ -5,8 +5,13 @@
 export type AgentView = 'front' | 'back' | 'side'
 export type AgentPose = 'idle' | 'walkA' | 'walkB'
 
+export type AgentGender = 'male' | 'female'
+
 export type AgentConfig = {
   name: string
+  cardText: string
+  gender: AgentGender
+  outfit: string
   hair: string
   hairColor: string
   skin: string
@@ -21,9 +26,21 @@ export const AGENT_SHIRT_COLORS = ['#e34f3a', '#f2c24e', '#57b36b', '#3f6f9e', '
 export const AGENT_PANTS_COLORS = ['#2c3a44', '#4a2f18', '#3f6f9e', '#6e6a5e', '#41245c', '#7a2f24']
 export const AGENT_SHOE_COLORS = ['#4a2f18', '#2c3a44', '#e34f3a', '#e8e4da', '#f2c24e', '#41245c']
 export const AGENT_HAIR_STYLES = ['spiky', 'bob', 'long', 'bun', 'buzz', 'none'] as const
+export const AGENT_GENDERS: AgentGender[] = ['male', 'female']
+export const AGENT_OUTFITS = [
+  { id: 'tee', label: 'Tee' },
+  { id: 'warrior', label: 'Warrior' },
+  { id: 'ninja', label: 'Ninja' },
+  { id: 'mage', label: 'Mage' },
+  { id: 'hoodie', label: 'Hoodie' },
+  { id: 'sailor', label: 'Sailor' },
+] as const
 
 export const DEFAULT_AGENT_CONFIG: AgentConfig = {
   name: 'Agent',
+  cardText: 'Exploring the Rialo Temple, one quest at a time.',
+  gender: 'male',
+  outfit: 'tee',
   hair: 'spiky',
   hairColor: '#2a2118',
   skin: '#f2c69a',
@@ -272,10 +289,198 @@ const BODY_SIDE_WALK_B = [
   '.....oooooo.....',
 ]
 
-const BODIES: Record<AgentView, Record<AgentPose, string[]>> = {
+const MALE_BODIES: Record<AgentView, Record<AgentPose, string[]>> = {
   front: { idle: BODY_FRONT_IDLE, walkA: BODY_FRONT_WALK_A, walkB: BODY_FRONT_WALK_B },
   back: { idle: BODY_BACK_IDLE, walkA: BODY_BACK_WALK_A, walkB: BODY_BACK_WALK_B },
   side: { idle: BODY_SIDE_IDLE, walkA: BODY_SIDE_WALK_A, walkB: BODY_SIDE_WALK_B },
+}
+
+// The female body reuses the male maps with a fitted waist, a hip flare and
+// soft lashes; rows are overridden by index so every pose stays in sync.
+const FEMALE_ROWS: Record<AgentView, Record<number, string>> = {
+  front: {
+    5: '...oSKsSSsKSo...',
+    12: '..oTtTTTTTTtTo..',
+    13: '...oTTTTTTTTo...',
+    14: '...oSTTTTTTSo...',
+    15: '..oTTTTTTTTTTo..',
+  },
+  back: {
+    12: '..oTtTTTTTTtTo..',
+    13: '...oTTTTTTTTo...',
+    14: '...oSTTTTTTSo...',
+    15: '..oTTTTTTTTTTo..',
+  },
+  side: {
+    13: '....oTtTTTo.....',
+    15: '...oTTTTTTTTo...',
+  },
+}
+
+function toFemale(view: AgentView, rows: string[]): string[] {
+  return rows.map((row, index) => FEMALE_ROWS[view][index] ?? row)
+}
+
+const FEMALE_BODIES: Record<AgentView, Record<AgentPose, string[]>> = {
+  front: {
+    idle: toFemale('front', BODY_FRONT_IDLE),
+    walkA: toFemale('front', BODY_FRONT_WALK_A),
+    walkB: toFemale('front', BODY_FRONT_WALK_B),
+  },
+  back: {
+    idle: toFemale('back', BODY_BACK_IDLE),
+    walkA: toFemale('back', BODY_BACK_WALK_A),
+    walkB: toFemale('back', BODY_BACK_WALK_B),
+  },
+  side: {
+    idle: toFemale('side', BODY_SIDE_IDLE),
+    walkA: toFemale('side', BODY_SIDE_WALK_A),
+    walkB: toFemale('side', BODY_SIDE_WALK_B),
+  },
+}
+
+const BODIES_BY_GENDER: Record<AgentGender, Record<AgentView, Record<AgentPose, string[]>>> = {
+  male: MALE_BODIES,
+  female: FEMALE_BODIES,
+}
+
+// Outfit overlays are anchored at body row 10 (the shoulders) and stay inside
+// rows 10-16, which are identical across idle/walk poses in every view.
+// Extra keys: M/m armor plate, G gold trim, R accent red, W white, N/n dark suit.
+const OUTFIT_OVERLAYS: Record<string, Record<AgentView, string[]>> = {
+  warrior: {
+    front: [
+      '..MMo......oMM..',
+      '..MMM......MMM..',
+      '....MMMMMMMM....',
+      '....MmMMMMmM....',
+      '....MMMmmMMM....',
+      '....GGGGGGGG....',
+    ],
+    back: [
+      '..MMo......oMM..',
+      '..MMM......MMM..',
+      '....MMMMMMMM....',
+      '....MMMMMMMM....',
+      '....MmMMMMmM....',
+      '....GGGGGGGG....',
+    ],
+    side: [
+      '....MMMo........',
+      '....MMM.........',
+      '.....MMMMMM.....',
+      '.....MmMMMM.....',
+      '.....MMMMmM.....',
+      '.....GGGGGG.....',
+    ],
+  },
+  ninja: {
+    front: [
+      '...NNNNNNNNNN...',
+      '..NNNNNNNNNNNN..',
+      '..NnNNNNNNNNnN..',
+      '..NnNNNNNNNNnN..',
+      '..NNNNNNNNNNNN..',
+      '....TTTTTTTT....',
+    ],
+    back: [
+      '...NNNNNNNNNN...',
+      '..NNNNNNNNNNNN..',
+      '..NnNNNNNNNNnN..',
+      '..NnNNNNNNNNnN..',
+      '..NNNNNNNNNNNN..',
+      '....TTTTTTTT....',
+    ],
+    side: [
+      '....NNNNNN......',
+      '...NNNNNNNN.....',
+      '...NNnNNNNN.....',
+      '...NNnNNNNN.....',
+      '...NNNNNNNN.....',
+      '....TTTTTT......',
+    ],
+  },
+  mage: {
+    front: [
+      '................',
+      '......G.........',
+      '................',
+      '...G.......G....',
+      '................',
+      '........G.......',
+      '...GGGGGGGGGG...',
+    ],
+    back: [
+      '................',
+      '.........G......',
+      '................',
+      '....G.......G...',
+      '................',
+      '......G.........',
+      '...GGGGGGGGGG...',
+    ],
+    side: [
+      '................',
+      '.......G........',
+      '................',
+      '.....G..........',
+      '.........G......',
+      '................',
+      '....GGGGGGGG....',
+    ],
+  },
+  hoodie: {
+    front: [
+      '......W..W......',
+      '......W..W......',
+      '................',
+      '....tttttttt....',
+      '....t......t....',
+      '................',
+    ],
+    back: [
+      '...tttttttttt...',
+      '..tttttttttttt..',
+      '..tttttttttttt..',
+      '...tttttttttt...',
+      '................',
+      '................',
+    ],
+    side: [
+      '.....tttttt.....',
+      '....tttttttt....',
+      '......W.........',
+      '................',
+      '................',
+      '................',
+    ],
+  },
+  sailor: {
+    front: [
+      '...WW......WW...',
+      '..WWWWWWWWWWWW..',
+      '................',
+      '..WWWWWWWWWWWW..',
+      '................',
+      '..WWWWWWWWWWWW..',
+    ],
+    back: [
+      '...WWWWWWWWWW...',
+      '..WWWWWWWWWWWW..',
+      '................',
+      '..WWWWWWWWWWWW..',
+      '................',
+      '..WWWWWWWWWWWW..',
+    ],
+    side: [
+      '....WWWWWW......',
+      '...WWWWWWWW.....',
+      '................',
+      '...WWWWWWWW.....',
+      '................',
+      '...WWWWWWWW.....',
+    ],
+  },
 }
 
 // Hair overlays share the same 16-wide grid, anchored at the top of the head.
@@ -447,6 +652,14 @@ function paletteFor(config: AgentConfig): Record<string, string> {
     f: shade(config.shoes, 0.74),
     H: config.hairColor,
     h: shade(config.hairColor, 0.74),
+    // outfit accents
+    M: '#9aa3ae',
+    m: '#5f6771',
+    G: '#f2c24e',
+    R: '#d13a2a',
+    W: '#e8e4da',
+    N: '#23262e',
+    n: '#15181e',
   }
 }
 
@@ -483,7 +696,12 @@ export function drawAgentFrame(
   scale: number,
 ) {
   const palette = paletteFor(config)
-  drawMap(ctx, BODIES[view][pose], palette, x, y, scale)
+  const bodies = BODIES_BY_GENDER[config.gender] ?? BODIES_BY_GENDER.male
+  drawMap(ctx, bodies[view][pose], palette, x, y, scale)
+  const overlay = OUTFIT_OVERLAYS[config.outfit]
+  if (overlay) {
+    drawMap(ctx, overlay[view], palette, x, y + 10 * scale, scale)
+  }
   const hair = HAIR[config.hair] ?? HAIR.none
   drawMap(ctx, hair[view], palette, x, y, scale)
 }
@@ -555,11 +773,41 @@ export function buildAgentPortraitCanvas(config: AgentConfig, scale = 4): HTMLCa
   return canvas
 }
 
+function wrapCanvasText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
+  const words = text.split(/\s+/).filter(Boolean)
+  const lines: string[] = []
+  let line = ''
+  for (const word of words) {
+    const candidate = line ? `${line} ${word}` : word
+    if (ctx.measureText(candidate).width > maxWidth && line) {
+      lines.push(line)
+      line = word
+    } else {
+      line = candidate
+    }
+  }
+  if (line) lines.push(line)
+  return lines.slice(0, 3)
+}
+
+function drawPixelCorner(ctx: CanvasRenderingContext2D, x: number, y: number, sx: number, sy: number) {
+  // small stepped ornament, mirrored by sx/sy
+  ctx.save()
+  ctx.translate(x, y)
+  ctx.scale(sx, sy)
+  ctx.fillStyle = '#ffe9a0'
+  ctx.fillRect(0, 0, 26, 6)
+  ctx.fillRect(0, 0, 6, 26)
+  ctx.fillStyle = '#c9973f'
+  ctx.fillRect(6, 6, 12, 4)
+  ctx.fillRect(6, 6, 4, 12)
+  ctx.fillStyle = '#f2c866'
+  ctx.fillRect(12, 12, 6, 6)
+  ctx.restore()
+}
+
 /** Pokemon-style share card. Returns a canvas ready for toBlob/download. */
-export async function buildAgentCardCanvas(
-  config: AgentConfig,
-  stats: { badges: number; fishPts: number; pets: number },
-): Promise<HTMLCanvasElement> {
+export async function buildAgentCardCanvas(config: AgentConfig): Promise<HTMLCanvasElement> {
   const width = 640
   const height = 900
   const canvas = document.createElement('canvas')
@@ -569,99 +817,185 @@ export async function buildAgentCardCanvas(
   if (!ctx) return canvas
   ctx.imageSmoothingEnabled = false
 
-  // outer holo frame
+  // --- outer holo frame with pinstripes and corner ornaments ---
   const frame = ctx.createLinearGradient(0, 0, width, height)
-  frame.addColorStop(0, '#f2c866')
-  frame.addColorStop(0.35, '#ffe9a0')
+  frame.addColorStop(0, '#8a5a1e')
+  frame.addColorStop(0.2, '#f2c866')
+  frame.addColorStop(0.42, '#fff3c4')
   frame.addColorStop(0.6, '#c9973f')
-  frame.addColorStop(1, '#f2c866')
+  frame.addColorStop(0.82, '#f2c866')
+  frame.addColorStop(1, '#8a5a1e')
   ctx.fillStyle = frame
   ctx.fillRect(0, 0, width, height)
+  // beveled edge
+  ctx.fillStyle = 'rgba(255, 250, 225, 0.5)'
+  ctx.fillRect(0, 0, width, 4)
+  ctx.fillRect(0, 0, 4, height)
+  ctx.fillStyle = 'rgba(70, 42, 8, 0.45)'
+  ctx.fillRect(0, height - 4, width, 4)
+  ctx.fillRect(width - 4, 0, 4, height)
   ctx.fillStyle = '#0a120d'
-  ctx.fillRect(18, 18, width - 36, height - 36)
-  ctx.strokeStyle = 'rgba(242, 200, 102, 0.5)'
+  ctx.fillRect(20, 20, width - 40, height - 40)
+  ctx.strokeStyle = 'rgba(242, 200, 102, 0.6)'
   ctx.lineWidth = 2
-  ctx.strokeRect(26, 26, width - 52, height - 52)
+  ctx.strokeRect(27, 27, width - 54, height - 54)
+  ctx.strokeStyle = 'rgba(242, 200, 102, 0.22)'
+  ctx.strokeRect(33, 33, width - 66, height - 66)
+  drawPixelCorner(ctx, 30, 30, 1, 1)
+  drawPixelCorner(ctx, width - 30, 30, -1, 1)
+  drawPixelCorner(ctx, 30, height - 30, 1, -1)
+  drawPixelCorner(ctx, width - 30, height - 30, -1, -1)
 
-  // header
+  // --- header plate ---
+  ctx.fillStyle = '#10231a'
+  ctx.fillRect(46, 48, width - 92, 52)
+  ctx.strokeStyle = 'rgba(242, 200, 102, 0.7)'
+  ctx.lineWidth = 2
+  ctx.strokeRect(46, 48, width - 92, 52)
   ctx.fillStyle = '#f2c866'
-  ctx.font = '900 34px monospace'
+  ctx.fillRect(46, 48, 6, 52)
+  ctx.fillRect(width - 52, 48, 6, 52)
+  ctx.font = '900 30px monospace'
   ctx.textAlign = 'left'
-  ctx.fillText('RIALO TEMPLE AGENT', 44, 78)
-  ctx.font = '900 16px monospace'
-  ctx.fillStyle = '#78ecff'
+  ctx.fillStyle = '#f2c866'
+  ctx.fillText('RIALO TEMPLE AGENT', 66, 84)
   ctx.textAlign = 'right'
-  ctx.fillText('AGENT CARD', width - 44, 76)
+  ctx.font = '900 13px monospace'
+  ctx.fillStyle = '#78ecff'
+  ctx.fillText('★ AGENT CARD', width - 66, 82)
 
-  // art window
-  const artX = 44
-  const artY = 100
-  const artW = width - 88
-  const artH = 430
+  // --- art window: holo bands, scenery, character ---
+  const artX = 46
+  const artY = 116
+  const artW = width - 92
+  const artH = 420
   const sky = ctx.createLinearGradient(0, artY, 0, artY + artH)
-  sky.addColorStop(0, '#14351f')
-  sky.addColorStop(0.62, '#1d4d2c')
-  sky.addColorStop(0.63, '#2a6a3c')
+  sky.addColorStop(0, '#0f2c3a')
+  sky.addColorStop(0.45, '#14351f')
+  sky.addColorStop(0.66, '#1d4d2c')
+  sky.addColorStop(0.67, '#2a6a3c')
   sky.addColorStop(1, '#1f5730')
   ctx.fillStyle = sky
   ctx.fillRect(artX, artY, artW, artH)
+
+  // iridescent holo bands
+  ctx.save()
+  ctx.beginPath()
+  ctx.rect(artX, artY, artW, artH)
+  ctx.clip()
+  const bandColors = ['rgba(120,236,255,0.10)', 'rgba(200,134,255,0.10)', 'rgba(242,200,102,0.10)', 'rgba(87,227,159,0.08)']
+  for (let i = 0; i < 9; i++) {
+    ctx.fillStyle = bandColors[i % bandColors.length]
+    ctx.beginPath()
+    ctx.moveTo(artX - 220 + i * 92, artY)
+    ctx.lineTo(artX - 150 + i * 92, artY)
+    ctx.lineTo(artX + 50 + i * 92, artY + artH)
+    ctx.lineTo(artX - 20 + i * 92, artY + artH)
+    ctx.closePath()
+    ctx.fill()
+  }
+  // moon + stars
+  ctx.fillStyle = 'rgba(255, 244, 200, 0.9)'
+  ctx.beginPath()
+  ctx.arc(artX + artW - 74, artY + 62, 26, 0, Math.PI * 2)
+  ctx.fill()
+  ctx.fillStyle = '#0f2c3a'
+  ctx.beginPath()
+  ctx.arc(artX + artW - 62, artY + 54, 22, 0, Math.PI * 2)
+  ctx.fill()
+  ctx.fillStyle = 'rgba(242, 200, 102, 0.7)'
+  const sparkles = [[90, 60], [170, 120], [420, 70], [330, 150], [500, 190], [110, 200], [260, 55], [460, 260]]
+  sparkles.forEach(([sx, sy]) => {
+    ctx.fillRect(artX + sx, artY + sy - 5, 3, 13)
+    ctx.fillRect(artX + sx - 5, artY + sy, 13, 3)
+  })
+  // layered pagoda silhouette
+  ctx.fillStyle = 'rgba(8, 15, 11, 0.7)'
+  const px = artX + 56
+  const py = artY + 282
+  ctx.fillRect(px + 22, py - 118, 44, 16)
+  ctx.fillRect(px + 10, py - 102, 68, 10)
+  ctx.fillRect(px + 26, py - 92, 36, 22)
+  ctx.fillRect(px + 2, py - 70, 84, 10)
+  ctx.fillRect(px + 16, py - 60, 56, 28)
+  ctx.fillRect(px - 8, py - 32, 104, 10)
+  ctx.fillRect(px + 8, py - 22, 72, 22)
+  // grass tufts
+  ctx.fillStyle = 'rgba(12, 28, 16, 0.8)'
+  for (let i = 0; i < 12; i++) {
+    ctx.fillRect(artX + 20 + i * 46, artY + artH - 18 - (i % 3) * 6, 6, 12)
+  }
+  ctx.restore()
+
+  // character + soft shadow
+  const portrait = buildAgentPortraitCanvas(config, 16)
+  ctx.fillStyle = 'rgba(0,0,0,0.35)'
+  ctx.beginPath()
+  ctx.ellipse(artX + artW / 2, artY + artH - 26, 104, 16, 0, 0, Math.PI * 2)
+  ctx.fill()
+  ctx.drawImage(portrait, artX + Math.round((artW - portrait.width) / 2), artY + artH - portrait.height - 30)
+
+  // art window double frame
   ctx.strokeStyle = '#f2c866'
   ctx.lineWidth = 3
   ctx.strokeRect(artX, artY, artW, artH)
+  ctx.strokeStyle = 'rgba(255, 243, 196, 0.35)'
+  ctx.lineWidth = 1
+  ctx.strokeRect(artX + 4, artY + 4, artW - 8, artH - 8)
 
-  // sparkles + temple silhouette
-  ctx.fillStyle = 'rgba(242, 200, 102, 0.55)'
-  const sparkles = [[90, 150], [180, 210], [500, 140], [430, 250], [540, 320], [120, 330], [300, 130]]
-  sparkles.forEach(([sx, sy]) => {
-    ctx.fillRect(sx, sy, 4, 12)
-    ctx.fillRect(sx - 4, sy + 4, 12, 4)
-  })
-  ctx.fillStyle = 'rgba(10, 18, 13, 0.55)'
-  ctx.fillRect(artX + 30, artY + 168, 120, 100)
-  ctx.fillRect(artX + 50, artY + 138, 80, 34)
-  ctx.fillRect(artX + 70, artY + 116, 40, 26)
-
-  // character (front idle, big)
-  const portrait = buildAgentPortraitCanvas(config, 16)
-  ctx.drawImage(portrait, artX + Math.round((artW - portrait.width) / 2), artY + artH - portrait.height - 26)
-  // ground shadow
-  ctx.fillStyle = 'rgba(0,0,0,0.3)'
-  ctx.fillRect(artX + Math.round(artW / 2) - 90, artY + artH - 24, 180, 10)
-
-  // name plate
-  ctx.fillStyle = '#10231a'
-  ctx.fillRect(44, 556, width - 88, 74)
-  ctx.strokeStyle = 'rgba(242, 200, 102, 0.6)'
-  ctx.lineWidth = 2
-  ctx.strokeRect(44, 556, width - 88, 74)
-  ctx.fillStyle = '#f7f1df'
-  ctx.font = '900 40px monospace'
+  // --- name ribbon ---
+  const ribbonY = 556
+  const ribbon = ctx.createLinearGradient(0, ribbonY, 0, ribbonY + 64)
+  ribbon.addColorStop(0, '#ffe9a0')
+  ribbon.addColorStop(0.5, '#f2c866')
+  ribbon.addColorStop(1, '#c9973f')
+  ctx.fillStyle = ribbon
+  ctx.beginPath()
+  ctx.moveTo(70, ribbonY)
+  ctx.lineTo(width - 70, ribbonY)
+  ctx.lineTo(width - 46, ribbonY + 32)
+  ctx.lineTo(width - 70, ribbonY + 64)
+  ctx.lineTo(70, ribbonY + 64)
+  ctx.lineTo(46, ribbonY + 32)
+  ctx.closePath()
+  ctx.fill()
+  ctx.strokeStyle = '#171009'
+  ctx.lineWidth = 3
+  ctx.stroke()
+  ctx.fillStyle = '#171009'
+  ctx.font = '900 34px monospace'
   ctx.textAlign = 'center'
   const displayName = (config.name || 'Agent').slice(0, 14).toUpperCase()
-  ctx.fillText(displayName, width / 2, 606)
+  ctx.fillText(displayName, width / 2, ribbonY + 44)
 
-  // stats row
-  const statBoxes = [
-    { label: 'BADGES', value: String(stats.badges) },
-    { label: 'FISH PTS', value: String(stats.fishPts) },
-    { label: 'PETS', value: String(stats.pets) },
-  ]
-  const boxW = (width - 88 - 24) / 3
-  statBoxes.forEach((stat, index) => {
-    const bx = 44 + index * (boxW + 12)
-    ctx.fillStyle = '#10231a'
-    ctx.fillRect(bx, 652, boxW, 92)
-    ctx.strokeStyle = 'rgba(120, 236, 255, 0.4)'
-    ctx.strokeRect(bx, 652, boxW, 92)
-    ctx.fillStyle = '#78ecff'
-    ctx.font = '900 15px monospace'
-    ctx.fillText(stat.label, bx + boxW / 2, 682)
-    ctx.fillStyle = '#f7f1df'
-    ctx.font = '900 32px monospace'
-    ctx.fillText(stat.value, bx + boxW / 2, 726)
+  // --- flavor text box ---
+  const flavorY = 648
+  const flavorH = 118
+  ctx.fillStyle = '#10231a'
+  ctx.fillRect(46, flavorY, width - 92, flavorH)
+  ctx.strokeStyle = 'rgba(120, 236, 255, 0.45)'
+  ctx.lineWidth = 2
+  ctx.strokeRect(46, flavorY, width - 92, flavorH)
+  ctx.fillStyle = 'rgba(120, 236, 255, 0.8)'
+  ;[[46, flavorY], [width - 54, flavorY], [46, flavorY + flavorH - 8], [width - 54, flavorY + flavorH - 8]]
+    .forEach(([cx, cy]) => ctx.fillRect(cx, cy, 8, 8))
+  ctx.font = 'italic 700 19px monospace'
+  ctx.fillStyle = '#e9f4ee'
+  const flavor = (config.cardText || DEFAULT_AGENT_CONFIG.cardText).slice(0, 120)
+  const lines = wrapCanvasText(ctx, `“${flavor}”`, width - 150)
+  lines.forEach((line, index) => {
+    ctx.fillText(line, width / 2, flavorY + 40 + index * 28)
   })
 
-  // footer: rialo logo + credit
+  // --- footer: divider, logo, credit ---
+  ctx.strokeStyle = 'rgba(242, 200, 102, 0.4)'
+  ctx.lineWidth = 1
+  ctx.beginPath()
+  ctx.moveTo(90, 796)
+  ctx.lineTo(width - 90, 796)
+  ctx.stroke()
+  ctx.fillStyle = '#f2c866'
+  ctx.fillRect(width / 2 - 4, 792, 8, 8)
   try {
     const logo = await new Promise<HTMLImageElement>((resolve, reject) => {
       const image = new Image()
@@ -669,17 +1003,17 @@ export async function buildAgentCardCanvas(
       image.onerror = reject
       image.src = '/rialo_logo.png'
     })
-    const logoH = 54
+    const logoH = 44
     const logoW = Math.round((logo.width / logo.height) * logoH)
-    ctx.drawImage(logo, Math.round(width / 2 - logoW / 2), 772, logoW, logoH)
+    ctx.drawImage(logo, Math.round(width / 2 - logoW / 2), 806, logoW, logoH)
   } catch {
     ctx.fillStyle = '#f2c866'
-    ctx.font = '900 30px monospace'
-    ctx.fillText('RIALO', width / 2, 806)
+    ctx.font = '900 26px monospace'
+    ctx.fillText('RIALO', width / 2, 836)
   }
-  ctx.fillStyle = 'rgba(247, 241, 223, 0.85)'
-  ctx.font = '800 18px monospace'
-  ctx.fillText('Build by NXR for Rialo', width / 2, 862)
+  ctx.fillStyle = 'rgba(247, 241, 223, 0.9)'
+  ctx.font = '800 17px monospace'
+  ctx.fillText('Build by NXR for Rialo', width / 2, 872)
 
   return canvas
 }

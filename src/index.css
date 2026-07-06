@@ -3264,6 +3264,19 @@
     text-align: center;
   }
 
+  .temple-play-creator-preview textarea {
+    width: 100%;
+    resize: none;
+    border: 2px solid rgba(120, 236, 255, 0.35);
+    border-radius: 8px;
+    background: rgba(245, 239, 218, 0.07);
+    color: var(--temple-text);
+    padding: 7px 9px;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.45;
+  }
+
   .temple-play-creator-options {
     display: flex;
     flex: 1;
