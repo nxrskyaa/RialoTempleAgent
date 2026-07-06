@@ -2967,10 +2967,48 @@
     letter-spacing: 0.12em;
   }
 
+  .temple-play-overlay.is-center {
+    align-items: center;
+    pointer-events: auto;
+    background:
+      radial-gradient(circle at 50% 45%, rgba(7, 16, 12, 0.5), rgba(1, 4, 3, 0.78)),
+      linear-gradient(180deg, rgba(1, 4, 3, 0.2), rgba(1, 4, 3, 0.4));
+  }
+
+  .temple-play-gacha-stage {
+    position: relative;
+    display: grid;
+    place-items: center;
+  }
+
+  .temple-play-gacha-rays {
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background:
+      repeating-conic-gradient(rgba(255, 233, 160, 0.16) 0deg 9deg, transparent 9deg 24deg);
+    animation: temple-gacha-spin 3.4s linear infinite;
+    mask-image: radial-gradient(circle, black 18%, transparent 68%);
+  }
+
+  @keyframes temple-gacha-spin {
+    to { transform: rotate(360deg); }
+  }
+
   .temple-play-gacha-chest {
+    position: relative;
     width: 132px;
     image-rendering: pixelated;
     filter: drop-shadow(0 0 26px rgba(255, 233, 160, 0.55));
+  }
+
+  .temple-play-gacha-flash {
+    display: block;
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #fff7d6 12%, rgba(255, 247, 214, 0.75) 42%, transparent 70%);
   }
 
   .temple-play-gacha-card {
@@ -2980,12 +3018,145 @@
     align-items: center;
     gap: 8px;
     width: min(320px, calc(100% - 40px));
+    pointer-events: auto;
     border: 3px solid var(--rarity, #f2c866);
     border-radius: 16px;
-    background: rgba(5, 8, 7, 0.94);
+    background: rgba(5, 8, 7, 0.96);
     box-shadow: 0 0 44px color-mix(in srgb, var(--rarity, #f2c866) 45%, transparent), 0 18px 36px rgba(0, 0, 0, 0.5);
     padding: 22px 18px 18px;
     text-align: center;
+  }
+
+  .temple-play-gacha-confetti {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    border-radius: 13px;
+    pointer-events: none;
+  }
+
+  .temple-play-gacha-confetti i {
+    position: absolute;
+    top: -8px;
+    width: 6px;
+    height: 10px;
+    background: var(--rarity, #f2c866);
+    animation: temple-confetti-fall 1.5s ease-in forwards;
+  }
+
+  .temple-play-gacha-confetti i:nth-child(3n) { background: #ff7ad9; }
+  .temple-play-gacha-confetti i:nth-child(3n + 1) { background: #78ecff; }
+  .temple-play-gacha-confetti i:nth-child(1) { left: 6%; animation-delay: 0.15s; }
+  .temple-play-gacha-confetti i:nth-child(2) { left: 14%; animation-delay: 0.42s; }
+  .temple-play-gacha-confetti i:nth-child(3) { left: 24%; animation-delay: 0.05s; }
+  .temple-play-gacha-confetti i:nth-child(4) { left: 33%; animation-delay: 0.55s; }
+  .temple-play-gacha-confetti i:nth-child(5) { left: 42%; animation-delay: 0.28s; }
+  .temple-play-gacha-confetti i:nth-child(6) { left: 51%; animation-delay: 0.68s; }
+  .temple-play-gacha-confetti i:nth-child(7) { left: 60%; animation-delay: 0.12s; }
+  .temple-play-gacha-confetti i:nth-child(8) { left: 68%; animation-delay: 0.48s; }
+  .temple-play-gacha-confetti i:nth-child(9) { left: 77%; animation-delay: 0.22s; }
+  .temple-play-gacha-confetti i:nth-child(10) { left: 85%; animation-delay: 0.6s; }
+  .temple-play-gacha-confetti i:nth-child(11) { left: 92%; animation-delay: 0.35s; }
+  .temple-play-gacha-confetti i:nth-child(12) { left: 48%; animation-delay: 0.82s; }
+
+  @keyframes temple-confetti-fall {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(340px) rotate(320deg); opacity: 0; }
+  }
+
+  .temple-play-rarity-row {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+    color: var(--rarity, #f2c866);
+    font-size: 17px;
+    text-shadow: 0 0 10px color-mix(in srgb, var(--rarity, #f2c866) 65%, transparent);
+  }
+
+  .temple-play-catch-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 7px;
+    width: min(300px, calc(100% - 40px));
+    pointer-events: auto;
+    border: 3px solid var(--rarity, #78ecff);
+    border-radius: 16px;
+    background: rgba(5, 8, 7, 0.96);
+    box-shadow: 0 0 40px color-mix(in srgb, var(--rarity, #78ecff) 40%, transparent), 0 18px 36px rgba(0, 0, 0, 0.5);
+    padding: 18px 18px 16px;
+    text-align: center;
+  }
+
+  .temple-play-catch-title {
+    color: var(--temple-gold);
+    font-size: 12px;
+    font-weight: 950;
+    letter-spacing: 0.22em;
+  }
+
+  .temple-play-catch-splash {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 132px;
+    height: 96px;
+  }
+
+  .temple-play-catch-splash img {
+    width: 104px;
+    image-rendering: pixelated;
+    filter: drop-shadow(0 6px 0 rgba(0, 0, 0, 0.3));
+  }
+
+  .temple-play-catch-ring {
+    position: absolute;
+    bottom: 6px;
+    width: 96px;
+    height: 30px;
+    border: 2px solid rgba(120, 236, 255, 0.55);
+    border-radius: 50%;
+    animation: temple-catch-ring 1.1s ease-out infinite;
+  }
+
+  @keyframes temple-catch-ring {
+    0% { transform: scale(0.45); opacity: 0.9; }
+    100% { transform: scale(1.25); opacity: 0; }
+  }
+
+  .temple-play-catch-card strong {
+    color: var(--temple-text);
+    font-size: 18px;
+    font-weight: 950;
+  }
+
+  .temple-play-catch-card small {
+    color: var(--temple-gold);
+    font-size: 10px;
+    font-weight: 800;
+  }
+
+  .temple-play-catch-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+  }
+
+  .temple-play-catch-actions button {
+    border: 2px solid rgba(245, 239, 218, 0.28);
+    border-radius: 10px;
+    background: rgba(245, 239, 218, 0.08);
+    color: var(--temple-text);
+    padding: 7px 16px;
+    font-size: 11px;
+    font-weight: 950;
+    text-transform: uppercase;
+  }
+
+  .temple-play-catch-actions button.is-primary {
+    border-color: var(--rarity, #78ecff);
+    background: color-mix(in srgb, var(--rarity, #78ecff) 22%, transparent);
   }
 
   .temple-play-gacha-card img {
