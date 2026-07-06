@@ -5,6 +5,21 @@ import { Award, CheckCircle2, Loader2, Sparkles, XCircle } from 'lucide-react'
 import { useAccount, useReadContract, useReadContracts, useWaitForTransactionReceipt, useWriteContract } from 'wagmi'
 import { ARC_CHAIN, RIALO_TEMPLE_ABI, RIALO_TEMPLE_ADDRESS } from '@/config/contracts'
 import { parseUnifiedUser } from '@/lib/rialo'
+import {
+  AGENT_HAIR_COLORS,
+  AGENT_HAIR_STYLES,
+  AGENT_PANTS_COLORS,
+  AGENT_SHIRT_COLORS,
+  AGENT_SHOE_COLORS,
+  AGENT_SKIN_TONES,
+  buildAgentCardCanvas,
+  buildAgentPortraitCanvas,
+  buildAgentSheetCanvas,
+  drawAgentFrame,
+  loadAgentConfig,
+  saveAgentConfig,
+} from '@/lib/pixelCharacter'
+import type { AgentConfig, AgentView } from '@/lib/pixelCharacter'
 
 type Question = {
   prompt: string
@@ -73,6 +88,7 @@ type PlayerState = {
 
 type SpriteKey =
   | 'nxr'
+  | 'custom'
   | 'npcOracle'
   | 'npcForestGuide'
   | 'npcBuilder'
@@ -177,16 +193,17 @@ const RARITY_META: Record<MinigameRarity, { label: string; color: string; stars:
 
 type FishSpecies = { id: string; name: string; rarity: MinigameRarity; weight: number; pts: number }
 
+// ids stay unchanged — they key the sprite files and the localStorage fish log
 const FISH_SPECIES: FishSpecies[] = [
-  { id: 'koi-merah', name: 'Koi Merah', rarity: 'common', weight: 20, pts: 10 },
-  { id: 'mujair-hijau', name: 'Mujair Hijau', rarity: 'common', weight: 20, pts: 10 },
-  { id: 'lele-biru', name: 'Lele Biru', rarity: 'common', weight: 18, pts: 12 },
-  { id: 'nila-emas', name: 'Nila Emas', rarity: 'uncommon', weight: 12, pts: 25 },
-  { id: 'gurame-ungu', name: 'Gurame Ungu', rarity: 'uncommon', weight: 11, pts: 25 },
-  { id: 'cupang-neon', name: 'Cupang Neon', rarity: 'rare', weight: 7, pts: 60 },
-  { id: 'arwana-perak', name: 'Arwana Perak', rarity: 'rare', weight: 6, pts: 70 },
-  { id: 'koi-naga', name: 'Koi Naga', rarity: 'epic', weight: 3.5, pts: 150 },
-  { id: 'ikan-bulan', name: 'Ikan Bulan', rarity: 'epic', weight: 2, pts: 180 },
+  { id: 'koi-merah', name: 'Crimson Koi', rarity: 'common', weight: 20, pts: 10 },
+  { id: 'mujair-hijau', name: 'Jade Tilapia', rarity: 'common', weight: 20, pts: 10 },
+  { id: 'lele-biru', name: 'Azure Catfish', rarity: 'common', weight: 18, pts: 12 },
+  { id: 'nila-emas', name: 'Golden Perch', rarity: 'uncommon', weight: 12, pts: 25 },
+  { id: 'gurame-ungu', name: 'Violet Gourami', rarity: 'uncommon', weight: 11, pts: 25 },
+  { id: 'cupang-neon', name: 'Neon Betta', rarity: 'rare', weight: 7, pts: 60 },
+  { id: 'arwana-perak', name: 'Silver Arowana', rarity: 'rare', weight: 6, pts: 70 },
+  { id: 'koi-naga', name: 'Dragon Koi', rarity: 'epic', weight: 3.5, pts: 150 },
+  { id: 'ikan-bulan', name: 'Moonfish', rarity: 'epic', weight: 2, pts: 180 },
   { id: 'rialo-leviathan', name: 'Rialo Leviathan', rarity: 'legendary', weight: 0.5, pts: 500 },
 ]
 
@@ -230,8 +247,12 @@ const minigame = {
 }
 
 if (import.meta.env.DEV && typeof window !== 'undefined') {
-  // manual-testing hook: tweak timers/chest from the console in dev builds
+  // manual-testing hooks for dev builds
   ;(window as unknown as Record<string, unknown>).__templeMinigame = minigame
+  ;(window as unknown as Record<string, unknown>).__templeBuildCard = (stats: { badges: number; fishPts: number; pets: number }) =>
+    buildAgentCardCanvas(loadAgentConfig(), stats).then((canvas) => canvas.toDataURL())
+  ;(window as unknown as Record<string, unknown>).__templeAgentSheet = () =>
+    buildAgentSheetCanvas(loadAgentConfig()).toDataURL()
 }
 
 function startFishing() {
@@ -292,6 +313,7 @@ type TemplePlayAssets = {
   props: Record<PropKey, HTMLImageElement>
   pets: Record<string, HTMLImageElement>
   chest: HTMLImageElement[]
+  customToken?: number
   loaded: boolean
 }
 
@@ -351,6 +373,8 @@ const mappedNpc = (src: string, drawW = 84, drawH = 82): SpriteSheet => ({
 
 const SPRITES: Record<SpriteKey, SpriteSheet> = {
   nxr: mappedNpc('/temple-play/characters/walk/nxr.png'),
+  // built at runtime from the player's saved creator config
+  custom: { src: 'custom', frameW: 96, frameH: 96, frames: 48, drawW: 84, drawH: 82, cols: 6 },
   npcOracle: mappedNpc('/temple-play/characters/walk/vika-joestar.png'),
   npcForestGuide: mappedNpc('/temple-play/characters/walk/ade.png'),
   npcBuilder: mappedNpc('/temple-play/characters/walk/barong.png'),
@@ -395,6 +419,7 @@ const SPRITES: Record<SpriteKey, SpriteSheet> = {
 
 const CHARACTER_CHOICES: Array<{ key: SpriteKey; label: string }> = [
   { key: 'nxr', label: 'NXR' },
+  { key: 'custom', label: 'Custom Agent' },
   { key: 'npcOracle', label: 'Vika' },
   { key: 'npcForestGuide', label: 'Ade' },
   { key: 'npcBuilder', label: 'Barong' },
@@ -479,7 +504,25 @@ function initialPlayerSprite(): SpriteKey {
   return stored && CHARACTER_CHOICES.some((choice) => choice.key === stored) ? stored : 'nxr'
 }
 
+// The custom agent's art is generated locally; bumping the token invalidates
+// every cached preview/frame set after the player edits their design.
+let customSpriteToken = 0
+let customPreviewCache: { token: number; url: string } | null = null
+
+function invalidateCustomAgentSprite() {
+  customSpriteToken += 1
+  customPreviewCache = null
+}
+
+function customAgentPreviewUrl() {
+  if (!customPreviewCache || customPreviewCache.token !== customSpriteToken) {
+    customPreviewCache = { token: customSpriteToken, url: buildAgentPortraitCanvas(loadAgentConfig(), 3).toDataURL() }
+  }
+  return customPreviewCache.url
+}
+
 function spritePreviewUrl(sheet: SpriteSheet) {
+  if (sheet.src === 'custom') return customAgentPreviewUrl()
   const filename = sheet.src.split('/').pop() ?? 'nxr.png'
   return spriteAssetUrl(`/temple-play/characters/preview/${filename}`)
 }
@@ -1467,6 +1510,7 @@ function TemplePlayInner() {
     return localStorage.getItem('temple-active-pet')
   })
   const [gachaResult, setGachaResult] = useState<{ pet: PetSpecies; isNew: boolean } | null>(null)
+  const [creatorOpen, setCreatorOpen] = useState(false)
   const ownedPetsRef = useRef<string[]>([])
   const [showGuide, setShowGuide] = useState(true)
   const [playerSprite, setPlayerSprite] = useState<SpriteKey>(() => initialPlayerSprite())
@@ -1740,6 +1784,16 @@ function TemplePlayInner() {
     playTempleSfx('tap')
   }, [])
 
+  const handleSaveAgent = useCallback((config: AgentConfig) => {
+    saveAgentConfig(config)
+    invalidateCustomAgentSprite()
+    setPlayerSprite('custom')
+    localStorage.setItem('temple-player-sprite', 'custom')
+    setCreatorOpen(false)
+    playTempleSfx('claim')
+    setToast(`${config.name || 'Agent'} saved. Your custom agent is now in play!`)
+  }, [])
+
   return (
     <main className="temple-play-page">
       <section className={`temple-play-shell ${activeQuest || activeTalkNpc || activeSignInfo ? 'is-dialog-open' : ''}`}>
@@ -1804,7 +1858,12 @@ function TemplePlayInner() {
             />
           </div>
 
-          <CharacterPicker selected={playerSprite} selectedLabel={selectedCharacter.label} onSelect={chooseCharacter} />
+          <CharacterPicker
+            selected={playerSprite}
+            selectedLabel={selectedCharacter.label}
+            onSelect={chooseCharacter}
+            onOpenCreator={() => setCreatorOpen(true)}
+          />
 
           <div className="temple-play-miniquest">
             <p>{nearestQuest || nearestAmbientNpc || nearestSign || nearestChest || nearestFishing ? 'Interact now' : 'Next destination'}</p>
@@ -1914,6 +1973,17 @@ function TemplePlayInner() {
           <AnimatePresence>
             {gachaResult ? (
               <ChestGachaOverlay result={gachaResult} onClose={() => setGachaResult(null)} />
+            ) : null}
+          </AnimatePresence>
+
+          <AnimatePresence>
+            {creatorOpen ? (
+              <AgentCreatorOverlay
+                initial={loadAgentConfig()}
+                stats={{ badges: completedIds.size, fishPts, pets: ownedPets.length }}
+                onSave={handleSaveAgent}
+                onClose={() => setCreatorOpen(false)}
+              />
             ) : null}
           </AnimatePresence>
         </div>
@@ -2724,10 +2794,12 @@ function CharacterPicker({
   selected,
   selectedLabel,
   onSelect,
+  onOpenCreator,
 }: {
   selected: SpriteKey
   selectedLabel: string
   onSelect: (sprite: SpriteKey) => void
+  onOpenCreator: () => void
 }) {
   const [open, setOpen] = useState(false)
 
@@ -2743,10 +2815,164 @@ function CharacterPicker({
       </summary>
       {open ? (
         <div className="temple-play-character-sections">
+          <button type="button" className="temple-play-creator-launch" onClick={onOpenCreator}>
+            ✦ Create Custom Agent
+          </button>
           <CharacterChoiceSections selected={selected} onSelect={onSelect} />
         </div>
       ) : null}
     </details>
+  )
+}
+
+function ColorSwatchRow({
+  label,
+  colors,
+  value,
+  onChange,
+}: {
+  label: string
+  colors: string[]
+  value: string
+  onChange: (color: string) => void
+}) {
+  return (
+    <div className="temple-play-creator-row">
+      <p>{label}</p>
+      <div className="temple-play-creator-swatches">
+        {colors.map((color) => (
+          <button
+            key={color}
+            type="button"
+            aria-label={`${label} ${color}`}
+            className={color === value ? 'is-selected' : ''}
+            style={{ background: color }}
+            onClick={() => onChange(color)}
+          />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+const AGENT_VIEW_ORDER: AgentView[] = ['front', 'side', 'back']
+
+function AgentCreatorOverlay({
+  initial,
+  stats,
+  onSave,
+  onClose,
+}: {
+  initial: AgentConfig
+  stats: { badges: number; fishPts: number; pets: number }
+  onSave: (config: AgentConfig) => void
+  onClose: () => void
+}) {
+  const [config, setConfig] = useState<AgentConfig>(initial)
+  const [view, setView] = useState<AgentView>('front')
+  const [downloading, setDownloading] = useState(false)
+  const previewRef = useRef<HTMLCanvasElement | null>(null)
+
+  useEffect(() => {
+    const canvas = previewRef.current
+    const ctx = canvas?.getContext('2d')
+    if (!canvas || !ctx) return
+    ctx.imageSmoothingEnabled = false
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    drawAgentFrame(ctx, config, view, 'idle', 8, 6, 8)
+  }, [config, view])
+
+  const update = (patch: Partial<AgentConfig>) => setConfig((current) => ({ ...current, ...patch }))
+
+  const downloadCard = async () => {
+    setDownloading(true)
+    try {
+      const card = await buildAgentCardCanvas(config, stats)
+      await new Promise<void>((resolve) => {
+        card.toBlob((blob) => {
+          if (blob) {
+            const link = document.createElement('a')
+            link.href = URL.createObjectURL(blob)
+            link.download = `${(config.name || 'agent').trim().toLowerCase().replace(/\s+/g, '-')}-rialo-agent-card.png`
+            link.click()
+            window.setTimeout(() => URL.revokeObjectURL(link.href), 5000)
+          }
+          resolve()
+        }, 'image/png')
+      })
+    } finally {
+      setDownloading(false)
+    }
+  }
+
+  return (
+    <motion.div className="temple-play-overlay is-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+      <motion.div
+        className="temple-play-creator-card"
+        initial={{ scale: 0.9, y: 24, opacity: 0 }}
+        animate={{ scale: 1, y: 0, opacity: 1 }}
+        transition={{ type: 'spring', stiffness: 240, damping: 20 }}
+      >
+        <div className="temple-play-creator-head">
+          <p>Agent Studio</p>
+          <h3>Create Custom Agent</h3>
+        </div>
+        <div className="temple-play-creator-body">
+          <div className="temple-play-creator-preview">
+            <canvas ref={previewRef} width={144} height={200} />
+            <div className="temple-play-creator-views">
+              {AGENT_VIEW_ORDER.map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  className={view === option ? 'is-selected' : ''}
+                  onClick={() => setView(option)}
+                >
+                  {option}
+                </button>
+              ))}
+            </div>
+            <input
+              type="text"
+              maxLength={14}
+              value={config.name}
+              placeholder="Agent name"
+              aria-label="Agent name"
+              onChange={(event) => update({ name: event.target.value })}
+            />
+          </div>
+          <div className="temple-play-creator-options">
+            <div className="temple-play-creator-row">
+              <p>Hair Style</p>
+              <div className="temple-play-creator-chips">
+                {AGENT_HAIR_STYLES.map((style) => (
+                  <button
+                    key={style}
+                    type="button"
+                    className={config.hair === style ? 'is-selected' : ''}
+                    onClick={() => update({ hair: style })}
+                  >
+                    {style}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <ColorSwatchRow label="Hair Color" colors={AGENT_HAIR_COLORS} value={config.hairColor} onChange={(hairColor) => update({ hairColor })} />
+            <ColorSwatchRow label="Skin Tone" colors={AGENT_SKIN_TONES} value={config.skin} onChange={(skin) => update({ skin })} />
+            <ColorSwatchRow label="Shirt" colors={AGENT_SHIRT_COLORS} value={config.shirt} onChange={(shirt) => update({ shirt })} />
+            <ColorSwatchRow label="Pants" colors={AGENT_PANTS_COLORS} value={config.pants} onChange={(pants) => update({ pants })} />
+            <ColorSwatchRow label="Shoes" colors={AGENT_SHOE_COLORS} value={config.shoes} onChange={(shoes) => update({ shoes })} />
+          </div>
+        </div>
+        <div className="temple-play-creator-actions">
+          <button type="button" onClick={onClose}>Close</button>
+          <button type="button" onClick={downloadCard} disabled={downloading}>
+            {downloading ? 'Rendering…' : 'Download Card'}
+          </button>
+          <button type="button" className="is-primary" onClick={() => onSave(config)}>Save & Play</button>
+        </div>
+      </motion.div>
+    </motion.div>
   )
 }
 
@@ -2867,8 +3093,13 @@ async function loadTemplePlayAssets(initialSprite: SpriteKey): Promise<TemplePla
     props: Object.fromEntries(propEntries) as Record<PropKey, HTMLImageElement>,
     pets: Object.fromEntries(petEntries),
     chest: chestFrames,
+    customToken: customSpriteToken,
     loaded: true,
   }
+
+  const customPreview = new Image()
+  customPreview.src = customAgentPreviewUrl()
+  assets.spritePreviews.custom = customPreview
 
   await Promise.all([
     ensureSpriteFrames(assets, 'nxr'),
@@ -2917,14 +3148,8 @@ function ensureSpriteFrames(assets: TemplePlayAssets, sprite: SpriteKey) {
   return promise
 }
 
-async function loadSpriteFrameSet(sheet: SpriteSheet): Promise<SpriteFrameSet> {
-  // Sheets are pre-processed by scripts/repack_characters.py: transparent
-  // background, uniform character scale, feet anchored near the cell bottom.
-  // Slicing the fixed grid is all that's needed here.
-  const image = await loadImage(spriteAssetUrl(sheet.src))
-  const cols = sheet.cols ?? Math.max(1, Math.floor(image.width / sheet.frameW))
+function sliceSheetFrames(source: CanvasImageSource, sheet: SpriteSheet, cols: number): HTMLCanvasElement[] {
   const frames: HTMLCanvasElement[] = []
-
   for (let frame = 0; frame < sheet.frames; frame++) {
     const canvas = document.createElement('canvas')
     canvas.width = sheet.frameW
@@ -2933,7 +3158,7 @@ async function loadSpriteFrameSet(sheet: SpriteSheet): Promise<SpriteFrameSet> {
     if (context) {
       context.imageSmoothingEnabled = false
       context.drawImage(
-        image,
+        source,
         (frame % cols) * sheet.frameW,
         Math.floor(frame / cols) * sheet.frameH,
         sheet.frameW,
@@ -2946,7 +3171,21 @@ async function loadSpriteFrameSet(sheet: SpriteSheet): Promise<SpriteFrameSet> {
     }
     frames.push(canvas)
   }
+  return frames
+}
 
+async function loadSpriteFrameSet(sheet: SpriteSheet): Promise<SpriteFrameSet> {
+  // The custom agent sheet is composed locally from the creator config.
+  if (sheet.src === 'custom') {
+    const sheetCanvas = buildAgentSheetCanvas(loadAgentConfig())
+    return { frames: sliceSheetFrames(sheetCanvas, sheet, sheet.cols ?? 6) }
+  }
+  // Other sheets are pre-processed by scripts/repack_characters.py:
+  // transparent background, uniform character scale, feet anchored near the
+  // cell bottom. Slicing the fixed grid is all that's needed here.
+  const image = await loadImage(spriteAssetUrl(sheet.src))
+  const cols = sheet.cols ?? Math.max(1, Math.floor(image.width / sheet.frameW))
+  const frames = sliceSheetFrames(image, sheet, cols)
   image.src = ''
   return { frames }
 }
@@ -3909,7 +4148,7 @@ function drawActors(
             drawMiniBubble(ctx, motion.x, motion.y - 128, runtime.chatter, npc.color)
           }
           if (index === FISHER_NPC_INDEX && runtime?.fisherState === 'fishing') {
-            drawFishingTackle(ctx, motion.x + 10, motion.y - 46, FISHER_BOBBER.x, FISHER_BOBBER.y, time + 1.7, false)
+            drawFishingTackle(ctx, motion.x + 8, motion.y - 30, FISHER_BOBBER.x, FISHER_BOBBER.y, time + 1.7, false)
           }
         }
         if (nearAmbientIndex === index) {
@@ -3963,6 +4202,12 @@ function drawActors(
     }),
   })
 
+  actors.push({
+    y: FISHING_SPOT.y - 6,
+    bounds: { x: FISHING_SPOT.x + 8, y: FISHING_SPOT.y - 86, w: 76, h: 96 },
+    draw: () => drawFishingSign(ctx, FISHING_SPOT.x + 44, FISHING_SPOT.y - 6, time),
+  })
+
   minigame.chests.forEach((chest) => {
     actors.push({
       y: chest.y,
@@ -3986,6 +4231,58 @@ function drawActors(
   drawCompletedBadges(ctx, time, completedIds)
   drawNpcEventLayer(ctx, time, ambientMotions)
   drawFishingLayer(ctx, time, player)
+}
+
+function drawFishingSign(ctx: CanvasRenderingContext2D, x: number, y: number, time: number) {
+  ctx.save()
+  ctx.translate(Math.round(x), Math.round(y))
+  // shadow
+  ctx.fillStyle = 'rgba(0,0,0,.22)'
+  ctx.fillRect(-16, -3, 32, 5)
+  // post
+  ctx.fillStyle = '#4a2f18'
+  ctx.fillRect(-3, -46, 6, 46)
+  ctx.fillStyle = '#5c3a1e'
+  ctx.fillRect(-1, -46, 2, 46)
+  // board
+  ctx.fillStyle = '#2c1c0e'
+  ctx.fillRect(-26, -78, 52, 34)
+  ctx.fillStyle = '#8a5a2e'
+  ctx.fillRect(-23, -75, 46, 28)
+  ctx.fillStyle = '#a8743e'
+  ctx.fillRect(-23, -75, 46, 4)
+  // painted fish icon (body, tail, eye)
+  ctx.fillStyle = '#78ecff'
+  ctx.fillRect(-13, -64, 16, 8)
+  ctx.fillRect(-15, -62, 2, 4)
+  ctx.beginPath()
+  ctx.moveTo(3, -60)
+  ctx.lineTo(11, -66)
+  ctx.lineTo(11, -54)
+  ctx.closePath()
+  ctx.fill()
+  ctx.fillStyle = '#07100c'
+  ctx.fillRect(-11, -62, 2, 2)
+  // dangling hook under the board, swaying gently
+  const sway = Math.sin(time * 1.8) * 2
+  ctx.strokeStyle = 'rgba(20,26,30,.8)'
+  ctx.lineWidth = 1.2
+  ctx.beginPath()
+  ctx.moveTo(14, -44)
+  ctx.quadraticCurveTo(14 + sway * 0.5, -36, 14 + sway, -28)
+  ctx.stroke()
+  ctx.fillStyle = '#e34f3a'
+  ctx.fillRect(Math.round(12 + sway), -28, 5, 4)
+  ctx.fillStyle = '#f7f1df'
+  ctx.fillRect(Math.round(12 + sway), -24, 5, 3)
+  // bucket beside the post
+  ctx.fillStyle = '#2c3a44'
+  ctx.fillRect(-22, -14, 14, 14)
+  ctx.fillStyle = '#435662'
+  ctx.fillRect(-21, -13, 12, 4)
+  ctx.fillStyle = '#78ecff'
+  ctx.fillRect(-19, -12, 8, 2)
+  ctx.restore()
 }
 
 function drawChestActor(ctx: CanvasRenderingContext2D, assets: TemplePlayAssets, x: number, y: number, time: number) {
@@ -4037,7 +4334,7 @@ function drawFishingLayer(ctx: CanvasRenderingContext2D, time: number, player: P
   }
   if (fishing.phase === 'idle' || fishing.phase === 'result') return
 
-  drawFishingTackle(ctx, player.x - 12, player.y - 56, FISHING_BOBBER.x, FISHING_BOBBER.y, time, fishing.phase === 'bite', fishing.splash)
+  drawFishingTackle(ctx, player.x - 10, player.y - 34, FISHING_BOBBER.x, FISHING_BOBBER.y, time, fishing.phase === 'bite', fishing.splash)
 
   if (fishing.phase === 'bite') {
     const bobX = FISHING_BOBBER.x
@@ -4071,12 +4368,26 @@ function drawFishingTackle(
   const bobX = bobberX
   const bobY = bobberY + Math.sin(time * 3.1) * 1.6 + (biting ? 5 : 0)
 
+  // a short rod from the hand, angled up toward the water, then the line
+  const reach = Math.hypot(bobX - fromX, bobY - fromY) || 1
+  const tipX = fromX + ((bobX - fromX) / reach) * 24
+  const tipY = fromY + ((bobY - fromY) / reach) * 10 - 16
+
   ctx.save()
-  ctx.strokeStyle = 'rgba(20, 26, 30, .85)'
-  ctx.lineWidth = 1.6
+  ctx.strokeStyle = '#5c3a1e'
+  ctx.lineWidth = 3
+  ctx.lineCap = 'round'
   ctx.beginPath()
   ctx.moveTo(fromX, fromY)
-  ctx.quadraticCurveTo((fromX + bobX) / 2 - 10, Math.min(fromY + 56, bobY) - 44, bobX, bobY - 4)
+  ctx.lineTo(tipX, tipY)
+  ctx.stroke()
+
+  ctx.strokeStyle = 'rgba(20, 26, 30, .85)'
+  ctx.lineWidth = 1.4
+  ctx.lineCap = 'butt'
+  ctx.beginPath()
+  ctx.moveTo(tipX, tipY)
+  ctx.quadraticCurveTo((tipX + bobX) / 2, Math.max(tipY, bobY - 26), bobX, bobY - 4)
   ctx.stroke()
 
   const rippleR = 6 + ((time * 14) % 12)
@@ -4621,6 +4932,12 @@ function drawSpriteActor(
   },
 ) {
   const sheet = SPRITES[sprite]
+  if (sprite === 'custom' && assets.customToken !== customSpriteToken) {
+    // the player edited their agent — rebuild the generated frames
+    assets.customToken = customSpriteToken
+    delete assets.sprites.custom
+    delete assets.spritePromises.custom
+  }
   const spriteFrames = assets.sprites[sprite]
   if (!spriteFrames) {
     void ensureSpriteFrames(assets, sprite)
