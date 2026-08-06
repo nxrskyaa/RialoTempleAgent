@@ -22,6 +22,8 @@ import {
   saveAgentConfig,
 } from '@/lib/pixelCharacter'
 import type { AgentConfig, AgentView } from '@/lib/pixelCharacter'
+import { net } from '@/lib/net'
+import type { RemotePlayer } from '@/lib/net'
 
 type Question = {
   prompt: string
@@ -1546,6 +1548,8 @@ function TemplePlayInner() {
   const ownedPetsRef = useRef<string[]>([])
   const [showGuide, setShowGuide] = useState(true)
   const [playerSprite, setPlayerSprite] = useState<SpriteKey>(() => initialPlayerSprite())
+  // Multiplayer identity: short wallet address when connected, character name otherwise.
+  const playerName = isConnected && address ? `${address.slice(0, 6)}…${address.slice(-4)}` : characterName(playerSprite)
   const [toast, setToast] = useState('')
   const [claimingQuest, setClaimingQuest] = useState<QuestNpc | null>(null)
   const completedRef = useRef<Set<number>>(new Set())
@@ -1849,6 +1853,7 @@ function TemplePlayInner() {
             completedIds={completedIds}
             nextQuest={nextQuest}
             playerSprite={playerSprite}
+            playerName={playerName}
             onNearQuestChange={setNearNpcId}
             onNearAmbientChange={setNearAmbientIndex}
             onNearSignChange={setNearSign}
@@ -2051,6 +2056,7 @@ function TemplePlayCanvas({
   completedIds,
   nextQuest,
   playerSprite,
+  playerName,
   onNearQuestChange,
   onNearAmbientChange,
   onNearSignChange,
@@ -2066,6 +2072,7 @@ function TemplePlayCanvas({
   completedIds: Set<number>
   nextQuest: QuestNpc
   playerSprite: SpriteKey
+  playerName: string
   onNearQuestChange: (id: number | null) => void
   onNearAmbientChange: (index: number | null) => void
   onNearSignChange: (near: boolean) => void
@@ -2297,6 +2304,8 @@ function TemplePlayCanvas({
         if (Math.abs(input.x) > Math.abs(input.y)) current.dir = input.x < 0 ? 'left' : 'right'
         else current.dir = input.y < 0 ? 'up' : 'down'
       }
+      net.sendMove(current.x, current.y, current.dir, current.moving)
+      net.update(dt)
 
       const nearest = nearestQuest(current)
       if (nearest?.id !== nearId.current) {
@@ -2350,6 +2359,7 @@ function TemplePlayCanvas({
       cameraRef.current = { ...camera, zoom }
 
       drawWorld(context, rect.width, rect.height, viewport.width, viewport.height, camera, zoom, frame, current, completedLatest.current, nearId.current, nearAmbient.current, nearSignRef.current, assets, tapTarget.current, nextQuest, playerSprite, lowPower)
+      drawNetStatus(context, rect.width)
       schedule(tick)
     }
 
@@ -2362,6 +2372,16 @@ function TemplePlayCanvas({
       window.removeEventListener('keyup', keyUp)
     }
   }, [nextQuest, onNearQuestChange, onNearAmbientChange, onNearSignChange, onNearFishingChange, onNearChestChange, onFishingActiveChange, onOpenQuest, onOpenAmbientTalk, onOpenSignInfo, onFishingCatch, onOpenChest, playerSprite])
+
+  // Multiplayer: join the shared temple world while this canvas is mounted.
+  useEffect(() => {
+    net.connect({
+      name: playerName,
+      sprite: playerSprite,
+      config: playerSprite === 'custom' ? loadAgentConfig() : undefined,
+    })
+    return () => net.disconnect()
+  }, [playerName, playerSprite])
 
   return (
     <div ref={wrapRef} className="temple-play-canvas-wrap">
@@ -4354,6 +4374,18 @@ function drawActors(
     })
   })
 
+  // Remote multiplayer players (same world, synced positions only).
+  for (const remote of Object.values(net.remote)) {
+    const sprite = remote.sprite as SpriteKey
+    const sheet = SPRITES[sprite]
+    if (!sheet) continue
+    actors.push({
+      y: remote.sy,
+      bounds: { x: remote.sx - sheet.drawW / 2, y: remote.sy - sheet.drawH - 170, w: sheet.drawW, h: sheet.drawH + 190 },
+      draw: () => drawRemoteActor(ctx, assets, remote, time),
+    })
+  }
+
   actors.push({
     y: player.y,
     bounds: { x: player.x - 60, y: player.y - 160, w: 120, h: 190 },
@@ -4401,6 +4433,98 @@ function drawActors(
   drawCompletedBadges(ctx, time, completedIds)
   drawNpcEventLayer(ctx, time, ambientMotions)
   drawFishingLayer(ctx, time, player)
+}
+
+// --- Multiplayer: remote player rendering ---
+
+// Remote players with the 'custom' sprite need their frame sheet built from
+// the AgentConfig JSON they sent on join (their config, not the local one).
+const remoteCustomFrames = new Map<string, { frames: HTMLCanvasElement[]; token: string }>()
+
+function remoteCustomFrameSet(playerId: string, config: AgentConfig | undefined): HTMLCanvasElement[] | undefined {
+  if (!config) return undefined
+  const token = JSON.stringify(config)
+  const cached = remoteCustomFrames.get(playerId)
+  if (cached && cached.token === token) return cached.frames
+  try {
+    const sheetCanvas = buildAgentSheetCanvas(config)
+    const frames = sliceSheetFrames(sheetCanvas, SPRITES.custom, SPRITES.custom.cols ?? 6)
+    remoteCustomFrames.set(playerId, { frames, token })
+    return frames
+  } catch {
+    return undefined
+  }
+}
+
+function hashId(id: string) {
+  let hash = 0
+  for (let index = 0; index < id.length; index++) {
+    hash = (hash * 31 + id.charCodeAt(index)) % 997
+  }
+  return hash / 997
+}
+
+function drawRemoteActor(ctx: CanvasRenderingContext2D, assets: TemplePlayAssets, remote: RemotePlayer, time: number) {
+  const sprite = remote.sprite as SpriteKey
+  const sheet = SPRITES[sprite]
+  if (!sheet) return
+  const x = remote.sx
+  const y = remote.sy
+  if (sprite === 'custom') {
+    const frames = remoteCustomFrameSet(remote.id, remote.config)
+    if (!frames) {
+      // config not here yet — name tag only until the sprite resolves
+      drawPixelNameTag(ctx, Math.round(x), Math.round(y) - sheet.drawH - 20, remote.name, '#f7f1df', true, '#9fb2a4')
+      return
+    }
+    drawSpriteActor(ctx, assets, {
+      sprite,
+      x,
+      y,
+      name: remote.name,
+      tone: '#9fb2a4',
+      accent: '#57e39f',
+      time,
+      seed: hashId(remote.id),
+      compact: true,
+      moving: remote.moving,
+      direction: remote.dir,
+      customFrames: frames,
+    })
+    return
+  }
+  drawSpriteActor(ctx, assets, {
+    sprite,
+    x,
+    y,
+    name: remote.name,
+    tone: '#9fb2a4',
+    accent: '#57e39f',
+    time,
+    seed: hashId(remote.id),
+    compact: true,
+    moving: remote.moving,
+    direction: remote.dir,
+  })
+}
+
+function drawNetStatus(ctx: CanvasRenderingContext2D, viewportWidth: number) {
+  const x = viewportWidth - 14
+  const y = 14
+  const online = net.connected
+  ctx.fillStyle = online ? 'rgba(87,227,159,.16)' : 'rgba(159,178,164,.12)'
+  ctx.beginPath()
+  ctx.arc(x, y, 7, 0, Math.PI * 2)
+  ctx.fill()
+  ctx.fillStyle = online ? '#57e39f' : '#9fb2a4'
+  ctx.beginPath()
+  ctx.arc(x, y, 3.5, 0, Math.PI * 2)
+  ctx.fill()
+  ctx.font = '700 10px monospace'
+  ctx.textAlign = 'right'
+  ctx.fillStyle = online ? 'rgba(87,227,159,.9)' : 'rgba(159,178,164,.75)'
+  ctx.fillText(online ? 'ONLINE' : 'OFFLINE', x - 12, y + 3.5)
+  ctx.textAlign = 'left'
 }
 
 function drawFishingSign(ctx: CanvasRenderingContext2D, x: number, y: number, time: number) {
@@ -5100,6 +5224,7 @@ function drawSpriteActor(
     moving = false,
     direction = 'down',
     activity,
+    customFrames,
   }: {
     sprite: SpriteKey
     x: number
@@ -5116,16 +5241,17 @@ function drawSpriteActor(
     moving?: boolean
     direction?: PlayerState['dir']
     activity?: AmbientActivity
+    customFrames?: HTMLCanvasElement[]
   },
 ) {
   const sheet = SPRITES[sprite]
-  if (sprite === 'custom' && assets.customToken !== customSpriteToken) {
+  if (sprite === 'custom' && !customFrames && assets.customToken !== customSpriteToken) {
     // the player edited their agent — rebuild the generated frames
     assets.customToken = customSpriteToken
     delete assets.sprites.custom
     delete assets.spritePromises.custom
   }
-  const spriteFrames = assets.sprites[sprite]
+  const spriteFrames = customFrames ?? assets.sprites[sprite]
   if (!spriteFrames) {
     void ensureSpriteFrames(assets, sprite)
     const baseDrawW = sprite === 'nxr' && !player ? 58 : sheet.drawW
@@ -5134,8 +5260,9 @@ function drawSpriteActor(
     drawPixelNameTag(ctx, x, y - baseDrawH - (compact ? 18 : 24), name, completed ? '#57e39f' : '#f7f1df', compact, tone)
     return
   }
+  const frameImages = Array.isArray(spriteFrames) ? spriteFrames : spriteFrames.frames
   const frame = chooseSpriteFrame(sheet, time, seed, moving, direction)
-  const frameImage = spriteFrames.frames[frame] ?? spriteFrames.frames[0]
+  const frameImage = frameImages[frame] ?? frameImages[0]
   if (!frameImage) return
   const flipX = shouldFlipSprite(sprite, sheet, direction)
   const baseDrawW = sprite === 'nxr' && !player ? 58 : sheet.drawW
