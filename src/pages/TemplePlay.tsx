@@ -1548,8 +1548,12 @@ function TemplePlayInner() {
   const ownedPetsRef = useRef<string[]>([])
   const [showGuide, setShowGuide] = useState(true)
   const [playerSprite, setPlayerSprite] = useState<SpriteKey>(() => initialPlayerSprite())
-  // Multiplayer identity: short wallet address when connected, character name otherwise.
-  const playerName = isConnected && address ? `${address.slice(0, 6)}…${address.slice(-4)}` : characterName(playerSprite)
+  // Multiplayer identity: short wallet address when connected, otherwise the
+  // character name — custom agents get their creator-configured name.
+  const agentName = playerSprite === 'custom' ? loadAgentConfig().name : ''
+  const playerName = isConnected && address
+    ? `${address.slice(0, 6)}…${address.slice(-4)}`
+    : agentName || characterName(playerSprite)
   const [toast, setToast] = useState('')
   const [claimingQuest, setClaimingQuest] = useState<QuestNpc | null>(null)
   const completedRef = useRef<Set<number>>(new Set())
@@ -4393,7 +4397,7 @@ function drawActors(
       sprite: playerSprite,
       x: player.x,
       y: player.y,
-      name: `${characterName(playerSprite)} (you)`,
+      name: `${playerSprite === 'custom' ? loadAgentConfig().name || characterName(playerSprite) : characterName(playerSprite)} (you)`,
       tone: '#f2c866',
       accent: '#57e39f',
       time,
@@ -4487,6 +4491,7 @@ function drawRemoteActor(ctx: CanvasRenderingContext2D, assets: TemplePlayAssets
       time,
       seed: hashId(remote.id),
       compact: true,
+      player: true,
       moving: remote.moving,
       direction: remote.dir,
       customFrames: frames,
@@ -4503,6 +4508,7 @@ function drawRemoteActor(ctx: CanvasRenderingContext2D, assets: TemplePlayAssets
     time,
     seed: hashId(remote.id),
     compact: true,
+    player: true,
     moving: remote.moving,
     direction: remote.dir,
   })
