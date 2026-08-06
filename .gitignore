@@ -32,3 +32,4 @@ broadcast
 
 # Local sibling project accidentally copied into this workspace.
 nxrskyaa-portfolio-site/
+.env*
